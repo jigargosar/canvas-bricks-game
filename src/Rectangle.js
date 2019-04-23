@@ -64,12 +64,16 @@ function alignCenterX(refRect: TRectangle, rect: TRectangle): void {
   setX((getWidth(refRect) - getWidth(rect)) / 2, rect)
 }
 
+function setY(y, rect) {
+  rect.y = y
+}
+
 function alignBottomWithOffset(
   offset: number,
   refRect: TRectangle,
   rect: TRectangle,
 ) {
-  rect.y = getHeight(refRect) - getHeight(refRect) - offset
+  setY(getHeight(refRect) - getHeight(rect) - offset, rect)
 }
 
 export {

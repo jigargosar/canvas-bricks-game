@@ -78,6 +78,8 @@ const ctx = Game.initScreen(screenRect)
 
 Game.start(gameStep, ctx)
 
+const keyDowns = {}
+
 function update(ds) {
   Rect.setX_(x => x + paddle.dx * ds, paddle.rect)
 }
@@ -104,3 +106,17 @@ function setCanvasSize(w: number, h: number, canvas: HTMLCanvasElement) {
   canvas.width = w
   canvas.height = h
 }
+
+window.addEventListener('keydown', e => {
+  keyDowns[e.key] = true
+  switch (e.key) {
+    case 'ArrowLeft':
+    case 'ArrowRight':
+      paddle.dx *= -1
+      break
+  }
+})
+
+window.addEventListener('keyup', e => {
+  keyDowns[e.key] = false
+})
