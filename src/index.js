@@ -17,9 +17,13 @@ const canvas = elById('gameScreen')
 
 canvas.className = 'ba db center'
 
-const screenRect = { x: 0, y: 0, w: 300, h: 200 }
+const screenRect = React.create({ x: 0, y: 0, w: 300, h: 200 })
 
-setCanvasSize(screenRect.w, screenRect.h, canvas)
+setCanvasSize(
+  Rect.getWidth(screenRect),
+  Rect.getHeight(screenRect),
+  canvas,
+)
 const ctx = canvas.getContext('2d')
 
 // DOM HELPERS
@@ -30,10 +34,4 @@ function elById(domId) {
 function setCanvasSize(w, h, canvas) {
   canvas.width = w
   canvas.height = h
-}
-
-const Rect = {
-  create: (x, y, w, h) => ({ x, y, w, h }),
-  getWidth: ({ w }) => w,
-  getHeight: ({ h }) => h,
 }
