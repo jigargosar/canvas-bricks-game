@@ -12,3 +12,11 @@ const App = function App() {
 }
 
 ReactDOM.render(<App />, document.getElementById('app'))
+
+const canvas = elById('gameScreen')
+const ctx = canvas.getContext('2d')
+
+// DOM HELPERS
+function elById(domId) {
+  return document.getElementById(domId)
+}
