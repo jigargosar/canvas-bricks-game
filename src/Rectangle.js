@@ -18,8 +18,20 @@ type XYWH = {
   height: number,
 }
 
-export function setX_(fn: number => number, r: TRectangle) {
+export function updateX(fn: number => number, r: TRectangle) {
   r.x = fn(r.x)
+}
+
+export function clampXIn(largeRect, rect) {
+  const [minX, maxX2] = [getX(largeRect), getX2(largeRect)]
+
+  const [x1, x2] = [getX(rect), getX2(rect)]
+
+  if (x < minX) {
+    setX(minX, rect)
+  } else if (x2 > max2) {
+    setX2(maxX2, rect)
+  }
 }
 
 export function toXYWH(r: TRectangle): XYWH {
@@ -57,7 +69,7 @@ function fromPointDimension(
 }
 
 export function setX(number: number, rect: TRectangle): void {
-  setX_(() => number, rect)
+  updateX(() => number, rect)
 }
 
 function alignCenterX(refRect: TRectangle, rect: TRectangle): void {
