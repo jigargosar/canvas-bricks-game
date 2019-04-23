@@ -1,5 +1,6 @@
 //@flow
 
+import type { TPoint } from './Point'
 import * as Point from './Point'
 import * as Dimension from './Dimension'
 
@@ -10,25 +11,25 @@ export opaque type Rectangle = {
   height: number,
 }
 
-function fromXYWH({ x, y, width, height }) {
+function fromXYWH({ x, y, width, height }: Rectangle) {
   return fromPointDimension(
     Point.fromXY(x, y),
     Dimension.fromWH(width, height),
   )
 }
 
-function getHeight(r) {
+function getHeight(r: Rectangle) {
   return r.height
 }
 
-function getWidth(r) {
+function getWidth(r: Rectangle) {
   return r.width
 }
 
-function fromPointDimension({ x, y }, { width, height }) {
+function fromPointDimension(pos: TPoint, { width, height }) {
   return {
-    x,
-    y,
+    x: Point.getX(pos),
+    y: Point.getY(pos),
     width,
     height,
   }

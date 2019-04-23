@@ -1,9 +1,15 @@
 // @flow
 
-export opaque type Point = { x: number, y: number }
+export opaque type TPoint = { x: number, y: number }
 
-function fromXY(x, y) {
+export function fromXY(x: number, y: number): TPoint {
   return { x, y }
 }
 
-export { fromXY }
+export function getX(p: TPoint) {
+  return p.x
+}
+
+export function getY(p: TPoint) {
+  return p.y
+}

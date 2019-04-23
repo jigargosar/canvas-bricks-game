@@ -15,13 +15,13 @@ const App = function App() {
   )
 }
 
-ReactDOM.render(<App />, document.getElementById('app'))
+ReactDOM.render(<App />, ((document.getElementById('app'): any): Element))
 
 // GAME HELPERS
 
 const Game = {
   initScreen: rect => {
-    const canvas = elById('gameScreen')
+    const canvas = ((elById('gameScreen'): any): HTMLCanvasElement)
     canvas.className = 'ba db center'
 
     setCanvasSize(Rect.getWidth(rect), Rect.getHeight(rect), canvas)
@@ -57,7 +57,7 @@ const screenRect: Rectangle = Rect.fromXYWH({
   height: 400,
 })
 
-type Paddle = { rect: Rectangle, dx: string }
+type Paddle = { rect: Rectangle, dx: Rectangle }
 
 const paddle: Paddle = {
   rect: Rect.fromXYWH({
