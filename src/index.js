@@ -4,7 +4,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import 'tachyons'
 import './index.css'
-import type { Rectangle } from './Rectangle'
+import type { TRectangle } from './Rectangle'
 import * as Rect from './Rectangle'
 
 const App = function App() {
@@ -50,14 +50,14 @@ function fillRect(rect, ctx) {
 
 // GAME
 
-const screenRect: Rectangle = Rect.fromXYWH({
+const screenRect: TRectangle = Rect.fromXYWH({
   x: 0,
   y: 0,
   width: 500,
   height: 400,
 })
 
-type Paddle = { rect: Rectangle, dx: Rectangle }
+type Paddle = { rect: TRectangle, dx: TRectangle }
 
 const paddle: Paddle = {
   rect: Rect.fromXYWH({

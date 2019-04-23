@@ -4,25 +4,25 @@ import type { TPoint } from './Point'
 import * as Point from './Point'
 import * as Dimension from './Dimension'
 
-export opaque type Rectangle = {
+export opaque type TRectangle = {
   x: number,
   y: number,
   width: number,
   height: number,
 }
 
-function fromXYWH({ x, y, width, height }: Rectangle) {
+function fromXYWH({ x, y, width, height }: TRectangle) {
   return fromPointDimension(
     Point.fromXY(x, y),
     Dimension.fromWH(width, height),
   )
 }
 
-function getHeight(r: Rectangle) {
+function getHeight(r: TRectangle) {
   return r.height
 }
 
-function getWidth(r: Rectangle) {
+function getWidth(r: TRectangle) {
   return r.width
 }
 
