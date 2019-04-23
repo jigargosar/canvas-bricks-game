@@ -42,6 +42,9 @@ const screenRect = Rectangle.create({
 
 const ctx = Game.initScreen(screenRect)
 
+ctx.fillStyle = 'orange'
+ctx.fillRect(10, 10, 100, 100)
+
 // DOM HELPERS
 function elById(domId) {
   return document.getElementById(domId)
