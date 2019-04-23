@@ -56,7 +56,7 @@ function fromPointDimension(
   }
 }
 
-function setX(number: number, rect: TRectangle): void {
+export function setX(number: number, rect: TRectangle): void {
   setX_(() => number, rect)
 }
 
@@ -66,6 +66,14 @@ function alignCenterX(refRect: TRectangle, rect: TRectangle): void {
 
 function setY(y, rect) {
   rect.y = y
+}
+
+export function getX(r: TRectangle) {
+  return r.x
+}
+
+export function getX2(r: TRectangle) {
+  return getX(r) + getWidth(r)
 }
 
 function alignBottomWithOffset(

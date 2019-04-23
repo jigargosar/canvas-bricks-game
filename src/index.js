@@ -112,9 +112,15 @@ window.addEventListener('keydown', e => {
   switch (e.key) {
     case 'ArrowLeft':
       Rect.setX_(x => x - paddle.dx, paddle.rect)
+      if (Rect.getX(paddle.rect) < Rect.getX(screenRect)) {
+        Rect.setX(Rect.getX(screenRect), paddle.rect)
+      }
       break
     case 'ArrowRight':
       Rect.setX_(x => x + paddle.dx, paddle.rect)
+      if (Rect.getX2(paddle.rect) > Rect.getX2(screenRect)) {
+        Rect.setX2(Rect.getX2(screenRect), paddle.rect)
+      }
       break
   }
 })
