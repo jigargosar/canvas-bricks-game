@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import 'tachyons'
 import './index.css'
+import { Rectangle } from './Rectangle'
 
 const App = function App() {
   return (
@@ -20,7 +21,11 @@ const Game = {
     const canvas = elById('gameScreen')
     canvas.className = 'ba db center'
 
-    setCanvasSize(Rect.getWidth(rect), Rect.getHeight(rect), canvas)
+    setCanvasSize(
+      Rectangle.getWidth(rect),
+      Rectangle.getHeight(rect),
+      canvas,
+    )
 
     return canvas.getContext('2d')
   },
@@ -28,7 +33,12 @@ const Game = {
 
 // GAME
 
-const screenRect = Rect.create({ x: 0, y: 0, width: 300, height: 200 })
+const screenRect = Rectangle.create({
+  x: 0,
+  y: 0,
+  width: 300,
+  height: 200,
+})
 
 const ctx = Game.initScreen(screenRect)
 
