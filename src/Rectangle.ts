@@ -1,6 +1,13 @@
 import { Point } from './Point'
 import { Dimension } from './Dimension'
 
+export type Rectangle = {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
 export const Rectangle = {
   fromXYWH,
   fromPointDimension,
@@ -10,7 +17,7 @@ export const Rectangle = {
   alignBottomWithOffset,
 }
 
-function fromXYWH({ x, y, width, height }) {
+function fromXYWH({ x, y, width, height }): Rectangle {
   return Rectangle.fromPointDimension(
     Point.fromXY(x, y),
     Dimension.fromWH(width, height),

@@ -51,21 +51,29 @@ function fillRect(rect, ctx) {
 
 // GAME
 
-const screenRect = Rectangle.fromXYWH({
+const screenRect: Rectangle = Rectangle.fromXYWH({
   x: 0,
   y: 0,
   width: 500,
   height: 400,
 })
 
-const paddleRect = Rectangle.fromXYWH({
-  x: 10,
-  y: 10,
-  width: 100,
-  height: 10,
-})
+type Paddle = {
+  rect: Rectangle
+  dx: number
+}
 
-paddleRect.dx = 10
+const paddle = {
+  rect: Rectangle.fromXYWH({
+    x: 10,
+    y: 10,
+    width: 100,
+    height: 10,
+  }),
+  dx: 10,
+}
+
+const paddleRect = paddle.rect
 
 Rectangle.alignCenterX(screenRect, paddleRect)
 Rectangle.alignBottomWithOffset(10, screenRect, paddleRect)
@@ -75,7 +83,7 @@ const ctx = Game.initScreen(screenRect)
 Game.start(gameStep, ctx)
 
 function update(ds) {
-  paddleRect.x += paddleRect.dx * ds
+  paddleRect.x += paddle.dx * ds
 }
 
 function render(ctx) {
