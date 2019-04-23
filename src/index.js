@@ -14,12 +14,20 @@ const App = function App() {
 ReactDOM.render(<App />, document.getElementById('app'))
 
 const canvas = elById('gameScreen')
-canvas.width = 600
-canvas.height = 400
-canvas.className = 'ba '
+
+canvas.className = 'ba db center'
+
+const screenRect = { x: 0, y: 0, w: 300, h: 200 }
+
+setCanvasSizeFromRect(screenRect, canvas)
 const ctx = canvas.getContext('2d')
 
 // DOM HELPERS
 function elById(domId) {
   return document.getElementById(domId)
+}
+
+function setCanvasSizeFromRect({ w, h }, canvas) {
+  canvas.width = w
+  canvas.height = h
 }
