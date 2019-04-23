@@ -51,14 +51,14 @@ function fillRect(rect, ctx) {
 
 // GAME
 
-const screenRect = Rectangle.create({
+const screenRect = Rectangle.fromXYWH({
   x: 0,
   y: 0,
   width: 500,
   height: 400,
 })
 
-const paddleRect = Rectangle.create({
+const paddleRect = Rectangle.fromXYWH({
   x: 10,
   y: 10,
   width: 100,

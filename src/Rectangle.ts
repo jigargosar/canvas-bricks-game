@@ -1,25 +1,41 @@
-export type Point = { x: number; y: number }
-
-export const Point = {
-  fromXY: (x, y) => ({ x, y }),
-}
+import { Point } from './Point'
+import { Dimension } from './Dimension'
 
 export const Rectangle = {
-  create: ({ x, y, width, height }) => ({ x, y, width, height }),
-  fromPointSize: ({ x, y }: Point, { width, height }) => ({
-    x,
-    y,
-    width,
-    height,
-  }),
-  getWidth: r => r.width,
-  getHeight: r => r.height,
+  fromXYWH,
+  fromPointDimension,
+  getWidth,
+  getHeight,
   alignCenterX,
   alignBottomWithOffset,
 }
 
+function fromXYWH({ x, y, width, height }) {
+  return Rectangle.fromPointDimension(
+    Point.fromXY(x, y),
+    Dimension.fromWH(width, height),
+  )
+}
+
+function getHeight(r) {
+  return r.height
+}
+
+function getWidth(r) {
+  return r.width
+}
+
+function fromPointDimension({ x, y }: Point, { width, height }) {
+  return {
+    x,
+    y,
+    width,
+    height,
+  }
+}
+
 function alignCenterX(refRect, rect) {
-  rect.x = (refRect.width - rect.width) / 2
+  rect.x = (getWidth(refRect) - getWidth(rect)) / 2
 }
 
 function alignBottomWithOffset(offset, refRect, rect) {
