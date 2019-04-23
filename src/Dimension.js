@@ -1,7 +1,7 @@
 // @flow
 
-export opaque type Dimension = { width: number, height: number }
+export type TDimension = { width: number, height: number }
 
-export function fromWH(width, height) {
+export function fromWH(width: number, height: number) {
   return { width, height }
 }

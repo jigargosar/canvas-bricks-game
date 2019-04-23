@@ -2,13 +2,13 @@
 
 import type { TPoint } from './Point'
 import * as Point from './Point'
+import type { TDimension } from './Dimension'
 import * as Dimension from './Dimension'
 
 export opaque type TRectangle = {
   x: number,
   y: number,
-  width: number,
-  height: number,
+  dimension: Dimension,
 }
 
 type XYWH = {
@@ -33,28 +33,34 @@ function fromXYWH({ x, y, width, height }: XYWH): TRectangle {
 }
 
 function getHeight(r: TRectangle) {
-  return r.height
+  return r.dimension.height
 }
 
 function getWidth(r: TRectangle) {
-  return r.width
+  return r.dimension.width
 }
 
-function fromPointDimension(pos: TPoint, { width, height }) {
+function fromPointDimension(
+  { x, y }: TPoint,
+  { width, height }: TDimension,
+) {
   return {
-    x: Point.getX(pos),
-    y: Point.getY(pos),
-    width,
-    height,
+    x,
+    y,
+    dimension: Dimension.fromWH(width, height),
   }
 }
 
-function alignCenterX(refRect, rect) {
+function alignCenterX(refRect: TRectangle, rect: TRectangle) {
   rect.x = (getWidth(refRect) - getWidth(rect)) / 2
 }
 
-function alignBottomWithOffset(offset, refRect, rect) {
-  rect.y = refRect.height - rect.height - offset
+function alignBottomWithOffset(
+  offset: number,
+  refRect: TRectangle,
+  rect: TRectangle,
+) {
+  rect.y = refRect.dimension.height - rect.dimension.height - offset
 }
 
 export {

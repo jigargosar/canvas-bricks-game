@@ -1,6 +1,6 @@
 // @flow
 
-export opaque type TPoint = { x: number, y: number }
+export type TPoint = { x: number, y: number }
 
 export function fromXY(x: number, y: number): TPoint {
   return { x, y }
