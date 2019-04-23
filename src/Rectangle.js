@@ -68,7 +68,7 @@ function setY(y, rect) {
   rect.y = y
 }
 
-function setX2(x2: number, rect: TRectangle) {
+export function setX2(x2: number, rect: TRectangle) {
   setX(x2 - getWidth(rect), rect)
 }
 
