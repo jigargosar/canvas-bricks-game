@@ -62,8 +62,11 @@ const paddleRect = Rectangle.create({
   x: 10,
   y: 10,
   width: 100,
-  height: 100,
+  height: 10,
 })
+
+paddleRect.x = (screenRect.width - paddleRect.width) / 2
+paddleRect.y = screenRect.height - paddleRect.height - 10
 
 const ctx = Game.initScreen(screenRect)
 
