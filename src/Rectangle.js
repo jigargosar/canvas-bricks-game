@@ -18,7 +18,7 @@ type XYWH = {
   height: number,
 }
 
-export function mapX(fn: number => number, r: TRectangle) {
+export function setX_(fn: number => number, r: TRectangle) {
   r.x = fn(r.x)
 }
 
@@ -56,8 +56,12 @@ function fromPointDimension(
   }
 }
 
+function setX(number, rect) {
+  setX_(() => number, rect)
+}
+
 function alignCenterX(refRect: TRectangle, rect: TRectangle) {
-  rect.x = (getWidth(refRect) - getWidth(rect)) / 2
+  setX((getWidth(refRect) - getWidth(rect)) / 2, rect)
 }
 
 function alignBottomWithOffset(

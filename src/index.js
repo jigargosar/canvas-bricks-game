@@ -79,7 +79,7 @@ const ctx = Game.initScreen(screenRect)
 Game.start(gameStep, ctx)
 
 function update(ds) {
-  Rect.mapX(x => x + paddle.dx * ds, paddle.rect)
+  Rect.setX_(x => x + paddle.dx * ds, paddle.rect)
 }
 
 function render(ctx: CanvasRenderingContext2D) {
