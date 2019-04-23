@@ -18,7 +18,7 @@ ReactDOM.render(<App />, document.getElementById('app'))
 
 const Game = {
   initScreen: rect => {
-    const canvas = elById('gameScreen')
+    const canvas = elById('gameScreen') as HTMLCanvasElement
     canvas.className = 'ba db center'
 
     setCanvasSize(
