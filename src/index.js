@@ -19,7 +19,7 @@ canvas.className = 'ba db center'
 
 const screenRect = { x: 0, y: 0, w: 300, h: 200 }
 
-setCanvasSizeFromRect(screenRect.w, screenRect.h, canvas)
+setCanvasSize(screenRect.w, screenRect.h, canvas)
 const ctx = canvas.getContext('2d')
 
 // DOM HELPERS
@@ -27,7 +27,7 @@ function elById(domId) {
   return document.getElementById(domId)
 }
 
-function setCanvasSizeFromRect(w, h, canvas) {
+function setCanvasSize(w, h, canvas) {
   canvas.width = w
   canvas.height = h
 }
