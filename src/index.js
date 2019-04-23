@@ -111,10 +111,11 @@ window.addEventListener('keydown', e => {
   keyDowns[e.key] = true
   switch (e.key) {
     case 'ArrowLeft':
-      Rect.setX_(x => x - paddle.dx, paddle.rect)
-      if (Rect.getX(paddle.rect) < Rect.getX(screenRect)) {
-        Rect.setX(Rect.getX(screenRect), paddle.rect)
-      }
+      Rect.setX_(x => {
+        const minX = Rect.getX(screenRect)
+        const newX = x - paddle.dx
+        return newX < minX ? minX : newX
+      }, paddle.rect)
       break
     case 'ArrowRight':
       Rect.setX_(x => x + paddle.dx, paddle.rect)
