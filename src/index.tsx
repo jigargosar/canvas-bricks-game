@@ -72,7 +72,9 @@ const ctx = Game.initScreen(screenRect)
 
 Game.start(gameStep, ctx)
 
-function update(ds) {}
+function update(ds) {
+  paddleRect.x += 10 * ds
+}
 
 function render(ctx) {
   ctx.fillStyle = 'orange'
