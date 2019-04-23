@@ -1,12 +1,9 @@
+//@flow
+
 import { Point } from './Point'
 import { Dimension } from './Dimension'
 
-export type Rectangle = {
-  x: number
-  y: number
-  width: number
-  height: number
-}
+export opaque type R = { x: number }
 
 export const Rectangle = {
   fromXYWH,
@@ -17,7 +14,7 @@ export const Rectangle = {
   alignBottomWithOffset,
 }
 
-function fromXYWH({ x, y, width, height }): Rectangle {
+function fromXYWH({ x, y, width, height }) {
   return Rectangle.fromPointDimension(
     Point.fromXY(x, y),
     Dimension.fromWH(width, height),
@@ -32,7 +29,7 @@ function getWidth(r) {
   return r.width
 }
 
-function fromPointDimension({ x, y }: Point, { width, height }) {
+function fromPointDimension({ x, y }, { width, height }) {
   return {
     x,
     y,
