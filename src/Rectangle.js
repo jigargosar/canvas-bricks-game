@@ -23,7 +23,12 @@ export function mapX(fn: number => number, r: TRectangle) {
 }
 
 export function toXYWH(r: TRectangle): XYWH {
-  return r
+  return {
+    x: r.x,
+    y: r.y,
+    width: r.dimension.width,
+    height: r.dimension.height,
+  }
 }
 function fromXYWH({ x, y, width, height }: XYWH): TRectangle {
   return fromPointDimension(
