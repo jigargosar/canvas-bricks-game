@@ -65,6 +65,8 @@ const paddleRect = Rectangle.create({
   height: 10,
 })
 
+paddleRect.dx = 10
+
 Rectangle.alignCenterX(screenRect, paddleRect)
 Rectangle.alignBottomWithOffset(10, screenRect, paddleRect)
 
@@ -73,7 +75,7 @@ const ctx = Game.initScreen(screenRect)
 Game.start(gameStep, ctx)
 
 function update(ds) {
-  paddleRect.x += 10 * ds
+  paddleRect.x += paddleRect.dx * ds
 }
 
 function render(ctx) {
