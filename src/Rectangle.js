@@ -8,7 +8,7 @@ import * as Dimension from './Dimension'
 export opaque type TRectangle = {
   x: number,
   y: number,
-  dimension: Dimension,
+  dimension: TDimension,
 }
 
 type XYWH = {
