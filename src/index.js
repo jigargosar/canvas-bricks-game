@@ -81,7 +81,7 @@ Game.start(gameStep, ctx)
 const keyDowns = {}
 
 function update(ds) {
-  Rect.setX_(x => x + paddle.dx * ds, paddle.rect)
+  // Rect.setX_(x => x + paddle.dx * ds, paddle.rect)
 }
 
 function render(ctx: CanvasRenderingContext2D) {
@@ -111,8 +111,10 @@ window.addEventListener('keydown', e => {
   keyDowns[e.key] = true
   switch (e.key) {
     case 'ArrowLeft':
+      Rect.setX_(x => x - paddle.dx, paddle.rect)
+      break
     case 'ArrowRight':
-      paddle.dx *= -1
+      Rect.setX_(x => x + paddle.dx, paddle.rect)
       break
   }
 })
