@@ -54,8 +54,8 @@ function fillRect(rect, ctx) {
 const screenRect = Rectangle.create({
   x: 0,
   y: 0,
-  width: 300,
-  height: 200,
+  width: 500,
+  height: 400,
 })
 
 const paddleRect = Rectangle.create({
