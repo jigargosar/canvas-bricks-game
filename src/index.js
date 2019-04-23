@@ -21,7 +21,9 @@ ReactDOM.render(<App />, ((document.getElementById('app'): any): Element))
 
 const Game = {
   initScreen: rect => {
-    const canvas = ((elById('gameScreen'): any): HTMLCanvasElement)
+    const canvas: HTMLCanvasElement = ((elById(
+      'gameScreen',
+    ): any): HTMLCanvasElement)
     canvas.className = 'ba db center'
 
     setCanvasSize(Rect.getWidth(rect), Rect.getHeight(rect), canvas)
@@ -43,7 +45,7 @@ const Game = {
   },
 }
 
-function fillRect(rect: TRectangle, ctx) {
+function fillRect(rect: TRectangle, ctx: CanvasRenderingContext2D) {
   const { x, y, width, height } = Rect.toXYWH(rect)
   ctx.fillRect(x, y, width, height)
 }
@@ -82,7 +84,7 @@ function update(ds) {
   Rect.mapX(x => x + paddle.dx * ds, paddleRect)
 }
 
-function render(ctx) {
+function render(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = 'orange'
   fillRect(paddleRect, ctx)
 }
@@ -100,7 +102,7 @@ function elById(domId) {
   return document.getElementById(domId)
 }
 
-function setCanvasSize(w, h, canvas) {
+function setCanvasSize(w: number, h: number, canvas: HTMLCanvasElement) {
   canvas.width = w
   canvas.height = h
 }
