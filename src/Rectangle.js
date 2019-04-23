@@ -3,19 +3,10 @@
 import { Point } from './Point'
 import { Dimension } from './Dimension'
 
-export opaque type R = { x: number }
-
-export const Rectangle = {
-  fromXYWH,
-  fromPointDimension,
-  getWidth,
-  getHeight,
-  alignCenterX,
-  alignBottomWithOffset,
-}
+export opaque type Rectangle = { x: number }
 
 function fromXYWH({ x, y, width, height }) {
-  return Rectangle.fromPointDimension(
+  return fromPointDimension(
     Point.fromXY(x, y),
     Dimension.fromWH(width, height),
   )
@@ -44,4 +35,13 @@ function alignCenterX(refRect, rect) {
 
 function alignBottomWithOffset(offset, refRect, rect) {
   rect.y = refRect.height - rect.height - offset
+}
+
+export {
+  fromXYWH,
+  fromPointDimension,
+  getWidth,
+  getHeight,
+  alignCenterX,
+  alignBottomWithOffset,
 }
