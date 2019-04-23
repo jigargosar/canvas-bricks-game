@@ -13,19 +13,20 @@ const App = function App() {
 
 ReactDOM.render(<App />, document.getElementById('app'))
 
-const canvas = elById('gameScreen')
-
-canvas.className = 'ba db center'
-
 const screenRect = React.create({ x: 0, y: 0, width: 300, height: 200 })
 
-setCanvasSize(
-  Rect.getWidth(screenRect),
-  Rect.getHeight(screenRect),
-  canvas,
-)
+const ctx = initGameScreen(screenRect)
 
-const ctx = canvas.getContext('2d')
+// GAME HELPERS
+
+function initGameScreen(rect) {
+  const canvas = elById('gameScreen')
+  canvas.className = 'ba db center'
+
+  setCanvasSize(Rect.getWidth(rect), Rect.getHeight(rect), canvas)
+
+  return canvas.getContext('2d')
+}
 
 // DOM HELPERS
 function elById(domId) {
