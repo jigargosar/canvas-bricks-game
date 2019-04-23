@@ -14,6 +14,9 @@ const App = function App() {
 ReactDOM.render(<App />, document.getElementById('app'))
 
 const canvas = elById('gameScreen')
+canvas.width = 600
+canvas.height = 400
+canvas.className = 'ba '
 const ctx = canvas.getContext('2d')
 
 // DOM HELPERS
