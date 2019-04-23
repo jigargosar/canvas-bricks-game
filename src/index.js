@@ -39,6 +39,14 @@ const Game = {
 
     requestAnimationFrame(loopWrapper)
   },
+  clear: ctx => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+  },
+}
+
+function fillRect(rect, ctx) {
+  const { x, y, width, height } = rect
+  ctx.fillRect(x, y, width, height)
 }
 
 // GAME
@@ -50,14 +58,30 @@ const screenRect = Rectangle.create({
   height: 200,
 })
 
+const paddleRect = Rectangle.create({
+  x: 10,
+  y: 10,
+  width: 100,
+  height: 100,
+})
+
 const ctx = Game.initScreen(screenRect)
 
 Game.start(gameStep, ctx)
 
-function gameStep(delta, ctx) {
-  // Game.clear(ctx)
+function update(ds) {}
+
+function render(ctx) {
   ctx.fillStyle = 'orange'
-  ctx.fillRect(10, 10, 100, 100)
+  fillRect(paddleRect, ctx)
+}
+
+function gameStep(delta, ctx) {
+  const ds = delta / 1000
+  Game.clear(ctx)
+
+  update(ds)
+  render(ctx)
 }
 
 // DOM HELPERS
