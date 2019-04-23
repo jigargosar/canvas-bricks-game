@@ -22,14 +22,14 @@ export function updateX(fn: number => number, r: TRectangle) {
   r.x = fn(r.x)
 }
 
-export function clampXIn(largeRect, rect) {
+export function clampXIn(largeRect: TRectangle, rect: TRectangle) {
   const [minX, maxX2] = [getX(largeRect), getX2(largeRect)]
 
   const [x1, x2] = [getX(rect), getX2(rect)]
 
-  if (x < minX) {
+  if (x1 < minX) {
     setX(minX, rect)
-  } else if (x2 > max2) {
+  } else if (x2 > maxX2) {
     setX2(maxX2, rect)
   }
 }
