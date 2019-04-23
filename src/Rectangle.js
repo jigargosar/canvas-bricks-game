@@ -56,11 +56,11 @@ function fromPointDimension(
   }
 }
 
-function setX(number, rect) {
+function setX(number: number, rect: TRectangle): void {
   setX_(() => number, rect)
 }
 
-function alignCenterX(refRect: TRectangle, rect: TRectangle) {
+function alignCenterX(refRect: TRectangle, rect: TRectangle): void {
   setX((getWidth(refRect) - getWidth(rect)) / 2, rect)
 }
 
