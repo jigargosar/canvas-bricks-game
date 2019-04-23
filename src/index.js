@@ -29,6 +29,16 @@ const Game = {
 
     return canvas.getContext('2d')
   },
+  start: (stepFn, ctx) => {
+    let lastTs = 0
+    const loopWrapper = ts => {
+      stepFn(ts - lastTs, ctx)
+      lastTs = ts
+      requestAnimationFrame(loopWrapper)
+    }
+
+    requestAnimationFrame(loopWrapper)
+  },
 }
 
 // GAME
@@ -42,8 +52,13 @@ const screenRect = Rectangle.create({
 
 const ctx = Game.initScreen(screenRect)
 
-ctx.fillStyle = 'orange'
-ctx.fillRect(10, 10, 100, 100)
+Game.start(gameStep, ctx)
+
+function gameStep(delta, ctx) {
+  // Game.clear(ctx)
+  ctx.fillStyle = 'orange'
+  ctx.fillRect(10, 10, 100, 100)
+}
 
 // DOM HELPERS
 function elById(domId) {
