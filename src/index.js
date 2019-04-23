@@ -13,10 +13,6 @@ const App = function App() {
 
 ReactDOM.render(<App />, document.getElementById('app'))
 
-const screenRect = React.create({ x: 0, y: 0, width: 300, height: 200 })
-
-const ctx = initGameScreen(screenRect)
-
 // GAME HELPERS
 
 function initGameScreen(rect) {
@@ -27,6 +23,12 @@ function initGameScreen(rect) {
 
   return canvas.getContext('2d')
 }
+
+// GAME
+
+const screenRect = React.create({ x: 0, y: 0, width: 300, height: 200 })
+
+const ctx = initGameScreen(screenRect)
 
 // DOM HELPERS
 function elById(domId) {
