@@ -111,6 +111,7 @@ window.addEventListener('keydown', e => {
   keyDowns[e.key] = true
   switch (e.key) {
     case 'ArrowLeft':
+      Rect.updateX(x => x - paddle.dx, paddle.rect)
       Rect.clampXIn(screenRect, paddle.rect)
       break
     case 'ArrowRight':
