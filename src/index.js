@@ -24,6 +24,7 @@ setCanvasSize(
   Rect.getHeight(screenRect),
   canvas,
 )
+
 const ctx = canvas.getContext('2d')
 
 // DOM HELPERS
