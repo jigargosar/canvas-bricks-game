@@ -1,5 +1,5 @@
 const Rect = {
-  create: ({ x, y, w, h }) => ({ x, y, w, h }),
-  getWidth: ({ w }) => w,
-  getHeight: ({ h }) => h,
+  create: ({ x, y, width, height }) => ({ x, y, width, height }),
+  getWidth: r => r.width,
+  getHeight: r => r.height,
 }

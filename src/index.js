@@ -17,7 +17,7 @@ const canvas = elById('gameScreen')
 
 canvas.className = 'ba db center'
 
-const screenRect = React.create({ x: 0, y: 0, w: 300, h: 200 })
+const screenRect = React.create({ x: 0, y: 0, width: 300, height: 200 })
 
 setCanvasSize(
   Rect.getWidth(screenRect),
