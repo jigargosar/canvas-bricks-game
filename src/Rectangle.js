@@ -26,8 +26,8 @@ export function toXYWH(r: TRectangle): XYWH {
   return {
     x: r.x,
     y: r.y,
-    width: r.dimension.width,
-    height: r.dimension.height,
+    width: getWidth(r),
+    height: getHeight(r),
   }
 }
 function fromXYWH({ x, y, width, height }: XYWH): TRectangle {
@@ -65,7 +65,7 @@ function alignBottomWithOffset(
   refRect: TRectangle,
   rect: TRectangle,
 ) {
-  rect.y = refRect.dimension.height - rect.dimension.height - offset
+  rect.y = getHeight(refRect) - getHeight(refRect) - offset
 }
 
 export {
