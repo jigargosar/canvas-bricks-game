@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "sourceMap": true,
-    "jsx": "react",
-    "noEmitOnError": true,
-    "noImplicitAny": false
-  },
-  "include": ["src/**/*"]
-}

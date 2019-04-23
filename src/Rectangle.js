@@ -1,9 +1,14 @@
 //@flow
 
-import { Point } from './Point'
-import { Dimension } from './Dimension'
+import * as Point from './Point'
+import * as Dimension from './Dimension'
 
-export opaque type Rectangle = { x: number }
+export opaque type Rectangle = {
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+}
 
 function fromXYWH({ x, y, width, height }) {
   return fromPointDimension(
