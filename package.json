@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "clean": "rm -fr .cache dist",
     "start": "parcel src/index.html --open"
   },
   "devDependencies": {
