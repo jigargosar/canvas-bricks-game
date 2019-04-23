@@ -71,22 +71,20 @@ const paddle: Paddle = {
   dx: 10,
 }
 
-const paddleRect = paddle.rect
-
-Rect.alignCenterX(screenRect, paddleRect)
-Rect.alignBottomWithOffset(10, screenRect, paddleRect)
+Rect.alignCenterX(screenRect, paddle.rect)
+Rect.alignBottomWithOffset(10, screenRect, paddle.rect)
 
 const ctx = Game.initScreen(screenRect)
 
 Game.start(gameStep, ctx)
 
 function update(ds) {
-  Rect.mapX(x => x + paddle.dx * ds, paddleRect)
+  Rect.mapX(x => x + paddle.dx * ds, paddle.rect)
 }
 
 function render(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = 'orange'
-  fillRect(paddleRect, ctx)
+  fillRect(paddle.rect, ctx)
 }
 
 function gameStep(delta, ctx) {
