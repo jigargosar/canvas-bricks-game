@@ -43,8 +43,8 @@ const Game = {
   },
 }
 
-function fillRect(rect, ctx) {
-  const { x, y, width, height } = rect
+function fillRect(rect: TRectangle, ctx) {
+  const { x, y, width, height } = Rect.toXYWH(rect)
   ctx.fillRect(x, y, width, height)
 }
 
@@ -57,7 +57,7 @@ const screenRect: TRectangle = Rect.fromXYWH({
   height: 400,
 })
 
-type Paddle = { rect: TRectangle, dx: TRectangle }
+type Paddle = { rect: TRectangle, dx: number }
 
 const paddle: Paddle = {
   rect: Rect.fromXYWH({
@@ -79,7 +79,7 @@ const ctx = Game.initScreen(screenRect)
 Game.start(gameStep, ctx)
 
 function update(ds) {
-  paddleRect.x += paddle.dx * ds
+  Rect.mapX(x => x + paddle.dx * ds, paddleRect)
 }
 
 function render(ctx) {

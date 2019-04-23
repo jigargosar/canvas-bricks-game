@@ -11,7 +11,21 @@ export opaque type TRectangle = {
   height: number,
 }
 
-function fromXYWH({ x, y, width, height }: TRectangle) {
+type XYWH = {
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+}
+
+export function mapX(fn: number => number, r: TRectangle) {
+  r.x = fn(r.x)
+}
+
+export function toXYWH(r: TRectangle): XYWH {
+  return r
+}
+function fromXYWH({ x, y, width, height }: XYWH): TRectangle {
   return fromPointDimension(
     Point.fromXY(x, y),
     Dimension.fromWH(width, height),
