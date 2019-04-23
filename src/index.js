@@ -28,7 +28,7 @@ const Game = {
 
 // GAME
 
-const screenRect = React.create({ x: 0, y: 0, width: 300, height: 200 })
+const screenRect = Rect.create({ x: 0, y: 0, width: 300, height: 200 })
 
 const ctx = Game.initScreen(screenRect)
 
