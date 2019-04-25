@@ -27,7 +27,7 @@ Object.assign(pad, { x: (VW - pad.w) / 2, y: VH - 10 - pad.h })
 
 const ball = { x: VW / 2, y: VH / 2, r: 10 }
 
-// KEYBOARD
+// KEYBOARD HANDLERS
 
 window.addEventListener('keydown', e => {
   switch (e.key) {
