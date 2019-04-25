@@ -3,7 +3,7 @@ import './index.css'
 
 // CONSTANTS
 
-const V_SIZE = [500, 500]
+const V_SIZE = [400, 400]
 
 const [VW, VH] = V_SIZE
 
@@ -14,7 +14,7 @@ canvas.height = VH
 Object.assign(canvas, {
   width: VW,
   height: VH,
-  className: 'db center',
+  className: 'db center ba',
 })
 
 const ctx = canvas.getContext('2d')
