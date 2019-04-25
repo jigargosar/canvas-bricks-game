@@ -52,6 +52,10 @@ function step(currentTS) {
   ball.x += ball.dx * delta
   ball.y += ball.dy * delta
 
+  if (ball.y + ball.h >= VH) {
+    ball.dy *= -1
+  }
+
   // RENDER
   ctx.clearRect(0, 0, VW, VH)
   ctx.fillStyle = 'orange'
