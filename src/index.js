@@ -52,8 +52,23 @@ function step(currentTS) {
   ball.x += ball.dx * delta
   ball.y += ball.dy * delta
 
-  if (ball.y + ball.h >= VH) {
+  if (ball.y > VH) {
+    ball.y = VH
     ball.dy *= -1
+  }
+
+  if (ball.y < 0) {
+    ball.y = 0
+    ball.dy *= -1
+  }
+
+  if (ball.x < 0) {
+    ball.x = 0
+    ball.dx *= -1
+  }
+  if (ball.x > VW) {
+    ball.x = VW
+    ball.dx *= -1
   }
 
   // RENDER
