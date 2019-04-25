@@ -22,4 +22,4 @@ const ctx = canvas.getContext('2d')
 const pad = { x: 0, y: 0, w: 100, h: 10 }
 
 ctx.fillStyle = 'orange'
-ctx.fillRect(0, 0, 100, 10)
+ctx.fillRect((VW - pad.w) / 2, VH - 10 - pad.h, 100, 10)
