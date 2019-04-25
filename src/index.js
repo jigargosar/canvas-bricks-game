@@ -25,7 +25,7 @@ const ctx = canvas.getContext('2d')
 const pad = { x: 0, y: 0, w: 100, h: 10, speed: 10 }
 Object.assign(pad, { x: (VW - pad.w) / 2, y: VH - 10 - pad.h })
 
-const ball = { x: VW / 2, y: VH / 2, r: 10, dx: 0, dy: 100 }
+const ball = { x: VW / 2, y: VH / 2, r: 10, dx: 150, dy: 100 }
 
 // KEYBOARD HANDLERS
 
