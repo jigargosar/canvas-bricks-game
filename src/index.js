@@ -25,7 +25,7 @@ const ctx = canvas.getContext('2d')
 const pad = { x: 0, y: 0, w: 100, h: 10, speed: 10 }
 Object.assign(pad, { x: (VW - pad.w) / 2, y: VH - 10 - pad.h })
 
-const ball = { x: VW / 2, y: VH / 2, r: 10 }
+const ball = { x: VW / 2, y: VH / 2, r: 10, dx: 0, dy: 1 }
 
 // KEYBOARD HANDLERS
 
@@ -42,7 +42,17 @@ window.addEventListener('keydown', e => {
 
 // MAIN
 
-function step() {
+let lastTS = window.performance.now()
+
+function step(currentTS) {
+  const delta = (currentTS - lastTS) / 1000
+  lastTS = currentTS
+  // UPDATE
+
+  ball.x += ball.dx * delta
+  ball.y += ball.dy * delta
+
+  // RENDER
   ctx.clearRect(0, 0, VW, VH)
   ctx.fillStyle = 'orange'
   ctx.fillRect(pad.x, pad.y, pad.w, pad.h)
@@ -55,4 +65,4 @@ function step() {
   requestAnimationFrame(step)
 }
 
-step()
+step(lastTS)
