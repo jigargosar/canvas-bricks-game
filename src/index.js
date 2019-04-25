@@ -11,6 +11,12 @@ const canvas = document.getElementById('gameScreen')
 canvas.width = VW
 canvas.height = VH
 
+Object.assign(canvas, {
+  width: VW,
+  height: VH,
+  className: 'db center',
+})
+
 const ctx = canvas.getContext('2d')
 
 ctx.fillStyle = 'orange'
