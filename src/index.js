@@ -20,9 +20,7 @@ Object.assign(canvas, {
 const ctx = canvas.getContext('2d')
 
 const pad = { x: 0, y: 0, w: 100, h: 10, speed: 10 }
-
-ctx.fillStyle = 'orange'
-ctx.fillRect((VW - pad.w) / 2, VH - 10 - pad.h, 100, 10)
+Object.assign(pad, { x: (VW - pad.w) / 2, y: VH - 10 - pad.h })
 
 window.addEventListener('keydown', e => {
   switch (e.key) {
@@ -34,3 +32,12 @@ window.addEventListener('keydown', e => {
       break
   }
 })
+
+function step() {
+  ctx.clearRect(0, 0, VW, VH)
+  ctx.fillStyle = 'orange'
+  ctx.fillRect(pad.x, pad.y, pad.w, pad.h)
+  requestAnimationFrame(step)
+}
+
+step()
