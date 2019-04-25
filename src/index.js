@@ -19,7 +19,18 @@ Object.assign(canvas, {
 
 const ctx = canvas.getContext('2d')
 
-const pad = { x: 0, y: 0, w: 100, h: 10 }
+const pad = { x: 0, y: 0, w: 100, h: 10, speed: 10 }
 
 ctx.fillStyle = 'orange'
 ctx.fillRect((VW - pad.w) / 2, VH - 10 - pad.h, 100, 10)
+
+window.addEventListener('keydown', e => {
+  switch (e.key) {
+    case 'ArrowLeft':
+      pad.x -= pad.speed
+      break
+    case 'ArrowRight':
+      pad.x += pad.speed
+      break
+  }
+})
