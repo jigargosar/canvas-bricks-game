@@ -44,7 +44,6 @@ function step() {
   ctx.fillStyle = 'blue'
   ctx.arc(ball.x, ball.y, ball.r, 0, 2 * Math.PI)
   ctx.fill()
-  ctx.endPath()
 
   requestAnimationFrame(step)
 }
