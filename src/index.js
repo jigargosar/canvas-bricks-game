@@ -22,6 +22,8 @@ const ctx = canvas.getContext('2d')
 const pad = { x: 0, y: 0, w: 100, h: 10, speed: 10 }
 Object.assign(pad, { x: (VW - pad.w) / 2, y: VH - 10 - pad.h })
 
+const ball = { x: VW / 2, y: VH / 2, r: 10 }
+
 window.addEventListener('keydown', e => {
   switch (e.key) {
     case 'ArrowLeft':
@@ -37,6 +39,13 @@ function step() {
   ctx.clearRect(0, 0, VW, VH)
   ctx.fillStyle = 'orange'
   ctx.fillRect(pad.x, pad.y, pad.w, pad.h)
+
+  ctx.beginPath()
+  ctx.fillStyle = 'blue'
+  ctx.arc(ball.x, ball.y, ball.r, 0, 2 * Math.PI)
+  ctx.fill()
+  ctx.endPath()
+
   requestAnimationFrame(step)
 }
 
