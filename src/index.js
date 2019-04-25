@@ -7,6 +7,7 @@ const V_SIZE = [400, 400]
 
 const [VW, VH] = V_SIZE
 
+// CANVAS
 const canvas = document.getElementById('gameScreen')
 canvas.width = VW
 canvas.height = VH
@@ -19,10 +20,14 @@ Object.assign(canvas, {
 
 const ctx = canvas.getContext('2d')
 
+// GAME OBJECTS
+
 const pad = { x: 0, y: 0, w: 100, h: 10, speed: 10 }
 Object.assign(pad, { x: (VW - pad.w) / 2, y: VH - 10 - pad.h })
 
 const ball = { x: VW / 2, y: VH / 2, r: 10 }
+
+// KEYBOARD
 
 window.addEventListener('keydown', e => {
   switch (e.key) {
@@ -34,6 +39,8 @@ window.addEventListener('keydown', e => {
       break
   }
 })
+
+// MAIN
 
 function step() {
   ctx.clearRect(0, 0, VW, VH)
