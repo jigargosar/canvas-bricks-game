@@ -97,8 +97,6 @@ function step(currentTS) {
     // ball.y = brick.y + brick.h
     ball.dy *= -1
 
-    const brickCY = brick.y + brick.h / 2
-
     if (oldBallY <= brick.y) {
       ball.y = brick.y
     } else {
