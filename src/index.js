@@ -61,6 +61,9 @@ function step(currentTS) {
   // * Game over on bottom viewport side
 
   // BOUNCE BALL OFF VIEWPORT
+
+  const [oldX, oldY] = [ball.x, ball.y]
+
   ball.x += ball.dx * delta
   ball.y += ball.dy * delta
 
@@ -81,6 +84,24 @@ function step(currentTS) {
   if (ball.x > VW) {
     ball.x = VW
     ball.dx *= -1
+  }
+
+  // BOUNCE BALL OFF BRICK
+
+  if (
+    ball.x >= brick.x &&
+    ball.x < brick.x + brick.w &&
+    ball.y >= brick.y &&
+    ball.y <= brick.y + brick.h
+  ) {
+    // ball.y = brick.y + brick.h
+    ball.dy *= -1
+    const brickCY = brick.y - brick.h / 2
+    if (ball.y > brickCY) {
+      ball.y = brick.y + brick.h
+    } else {
+      ball.y = brick.y
+    }
   }
 
   // RENDER
