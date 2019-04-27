@@ -52,9 +52,25 @@ const [ballDX, ballDY] = polarToCart(degToRad(100), 1000)
 
 const ball = { x: VW / 2, y: VH / 2, r: 10, dx: ballDX, dy: ballDY }
 
-const brick = { x: 0, y: 0, w: 150, h: 20 }
+const [brickW, brickH] = [50, 10]
+
+function createBrick(x, y) {
+  return { x, y, w: brickW, h: brickH }
+}
+
+const brick = createBrick(0, 0)
 brick.x = VCX - brick.w / 2
 brick.y = VCY - brick.h / 2
+
+function times(fn, count) {
+  return new Array(count).fill(0).map((v, i) => {
+    return fn(i)
+  })
+}
+
+const bricks = times(n => {
+  return createBrick(n * (brickW + 10), 10)
+}, 5)
 
 // KEYBOARD HANDLERS
 
@@ -151,6 +167,10 @@ function step(currentTS) {
 
   ctx.fillStyle = 'green'
   ctx.fillRect(brick.x, brick.y, brick.w, brick.h)
+
+  bricks.forEach(brick => {
+    ctx.fillRect(brick.x, brick.y, brick.w, brick.h)
+  })
 
   requestAnimationFrame(step)
 }
