@@ -27,7 +27,21 @@ const ctx = canvas.getContext('2d')
 const pad = { x: 0, y: 0, w: 100, h: 10, speed: 10 }
 Object.assign(pad, { x: (VW - pad.w) / 2, y: VH - 10 - pad.h })
 
-const ball = { x: VW / 2, y: VH / 2, r: 10, dx: 150, dy: 100 }
+function polarToCart(angle, magnitude) {
+  return [Math.cos(angle) * magnitude, Math.sin(angle) * magnitude]
+}
+
+function cartToPolar(x, y) {
+  return [Math.atan2(y, x), Math.sqrt(x * x, y * y)]
+}
+
+function degToRad(deg) {
+  return (deg * Math.PI) / 180
+}
+
+const [ballDX, ballDY] = polarToCart(degToRad(100), 1000)
+
+const ball = { x: VW / 2, y: VH / 2, r: 10, dx: ballDX, dy: ballDY }
 
 const brick = { x: 0, y: 0, w: 150, h: 20 }
 brick.x = VCX - brick.w / 2
