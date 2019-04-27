@@ -62,7 +62,7 @@ function step(currentTS) {
 
   // BOUNCE BALL OFF VIEWPORT
 
-  const [oldX, oldY] = [ball.x, ball.y]
+  const [oldBallX, oldBallY] = [ball.x, ball.y]
 
   ball.x += ball.dx * delta
   ball.y += ball.dy * delta
@@ -92,15 +92,17 @@ function step(currentTS) {
     ball.x >= brick.x &&
     ball.x < brick.x + brick.w &&
     ball.y >= brick.y &&
-    ball.y <= brick.y + brick.h
+    ball.y < brick.y + brick.h
   ) {
     // ball.y = brick.y + brick.h
     ball.dy *= -1
-    const brickCY = brick.y - brick.h / 2
-    if (ball.y > brickCY) {
-      ball.y = brick.y + brick.h
-    } else {
+
+    const brickCY = brick.y + brick.h / 2
+
+    if (oldBallY <= brick.y) {
       ball.y = brick.y
+    } else {
+      ball.y = brick.y + brick.h
     }
   }
 
