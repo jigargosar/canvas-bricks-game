@@ -49,6 +49,7 @@ function step(currentTS) {
   lastTS = currentTS
   // UPDATE
 
+  // BOUNCE BALL OFF VIEWPORT
   ball.x += ball.dx * delta
   ball.y += ball.dy * delta
 
