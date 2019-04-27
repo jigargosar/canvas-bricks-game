@@ -49,6 +49,11 @@ function step(currentTS) {
   lastTS = currentTS
   // UPDATE
 
+  // TODO:
+  // * Render bricks?
+  // * bounce of paddle?
+  // * Game over on bottom viewport side
+
   // BOUNCE BALL OFF VIEWPORT
   ball.x += ball.dx * delta
   ball.y += ball.dy * delta
