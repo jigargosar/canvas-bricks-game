@@ -111,6 +111,12 @@ function step(currentTS) {
     // ball.y = brick.y + brick.h
     ball.dy *= -1
 
+    const [angle, length] = cartToPolar(ball.dx, ball.dy)
+
+    const [newDX, newDY] = polarToCart(angle + Math.random(), length)
+    ball.dx = newDX
+    ball.dy = newDY
+
     if (oldBallY <= brick.y) {
       ball.y = brick.y
     } else {
