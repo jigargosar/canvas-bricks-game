@@ -1,6 +1,27 @@
 import 'tachyons'
 import './index.css'
 
+// MATH TRIG
+
+function polarToCart(angle, magnitude) {
+  return [Math.cos(angle) * magnitude, Math.sin(angle) * magnitude]
+}
+
+function cartToPolar(x, y) {
+  return [Math.atan2(y, x), Math.sqrt(x * x + y * y)]
+}
+
+function degToRad(deg) {
+  return (deg * Math.PI) / 180
+}
+
+// HELPERS
+
+function randomIn(num1, num2) {
+  const [min, max] = [Math.min(num1, num2), Math.max(num1, num2)]
+  return Math.random() * (max - min) + min
+}
+
 // CONSTANTS
 
 const V_SIZE = [400, 400]
@@ -26,18 +47,6 @@ const ctx = canvas.getContext('2d')
 
 const pad = { x: 0, y: 0, w: 100, h: 10, speed: 10 }
 Object.assign(pad, { x: (VW - pad.w) / 2, y: VH - 10 - pad.h })
-
-function polarToCart(angle, magnitude) {
-  return [Math.cos(angle) * magnitude, Math.sin(angle) * magnitude]
-}
-
-function cartToPolar(x, y) {
-  return [Math.atan2(y, x), Math.sqrt(x * x + y * y)]
-}
-
-function degToRad(deg) {
-  return (deg * Math.PI) / 180
-}
 
 const [ballDX, ballDY] = polarToCart(degToRad(100), 1000)
 
@@ -113,7 +122,10 @@ function step(currentTS) {
 
     const [angle, length] = cartToPolar(ball.dx, ball.dy)
 
-    const [newDX, newDY] = polarToCart(angle + Math.random(), length)
+    const [newDX, newDY] = polarToCart(
+      angle + degToRad(randomIn(-1, +1)),
+      length,
+    )
     ball.dx = newDX
     ball.dy = newDY
 
