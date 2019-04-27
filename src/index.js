@@ -30,8 +30,8 @@ Object.assign(pad, { x: (VW - pad.w) / 2, y: VH - 10 - pad.h })
 const ball = { x: VW / 2, y: VH / 2, r: 10, dx: 150, dy: 100 }
 
 const brick = { x: 0, y: 0, w: 150, h: 20 }
-brick.x = VCX
-brick.y = VCY
+brick.x = VCX - brick.w / 2
+brick.y = VCY - brick.h / 2
 
 // KEYBOARD HANDLERS
 
