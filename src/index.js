@@ -7,6 +7,8 @@ const V_SIZE = [400, 400]
 
 const [VW, VH] = V_SIZE
 
+const [VCX, VCY] = [VW / 2, VH / 2]
+
 // CANVAS
 const canvas = document.getElementById('gameScreen')
 canvas.width = VW
@@ -26,6 +28,10 @@ const pad = { x: 0, y: 0, w: 100, h: 10, speed: 10 }
 Object.assign(pad, { x: (VW - pad.w) / 2, y: VH - 10 - pad.h })
 
 const ball = { x: VW / 2, y: VH / 2, r: 10, dx: 150, dy: 100 }
+
+const brick = { x: 0, y: 0, w: 150, h: 20 }
+brick.x = VCX
+brick.y = VCY
 
 // KEYBOARD HANDLERS
 
@@ -79,6 +85,7 @@ function step(currentTS) {
 
   // RENDER
   ctx.clearRect(0, 0, VW, VH)
+
   ctx.fillStyle = 'orange'
   ctx.fillRect(pad.x, pad.y, pad.w, pad.h)
 
@@ -86,6 +93,11 @@ function step(currentTS) {
   ctx.fillStyle = 'blue'
   ctx.arc(ball.x, ball.y, ball.r, 0, 2 * Math.PI)
   ctx.fill()
+
+  // RENDER BRICK
+
+  ctx.fillStyle = 'green'
+  ctx.fillRect(brick.x, brick.y, brick.w, brick.h)
 
   requestAnimationFrame(step)
 }
