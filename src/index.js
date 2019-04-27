@@ -32,7 +32,7 @@ function polarToCart(angle, magnitude) {
 }
 
 function cartToPolar(x, y) {
-  return [Math.atan2(y, x), Math.sqrt(x * x, y * y)]
+  return [Math.atan2(y, x), Math.sqrt(x * x + y * y)]
 }
 
 function degToRad(deg) {
