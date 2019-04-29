@@ -10,7 +10,6 @@ function lineLineIntersectionPoint(
   [x4, y4],
 ) {
   const denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1)
-  debugger
 
   if (denominator === 0) return null
 
@@ -112,7 +111,7 @@ function getCY(obj) {
 const pad = { x: 0, y: 0, w: 100, h: 10, speed: 10 }
 Object.assign(pad, { x: (VW - pad.w) / 2, y: VH - 10 - pad.h })
 
-const initialBallSpeed = 700
+const initialBallSpeed = 1000
 
 const [ballDX, ballDY] = polarToCart(degToRad(100), initialBallSpeed)
 
