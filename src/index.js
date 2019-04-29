@@ -63,7 +63,9 @@ function getCY(obj) {
 const pad = { x: 0, y: 0, w: 100, h: 10, speed: 10 }
 Object.assign(pad, { x: (VW - pad.w) / 2, y: VH - 10 - pad.h })
 
-const [ballDX, ballDY] = polarToCart(degToRad(100), 1000)
+const initialBallSpeed = 2000
+
+const [ballDX, ballDY] = polarToCart(degToRad(100), initialBallSpeed)
 
 const ball = { x: VW / 2, y: VH / 2, r: 10, dx: ballDX, dy: ballDY }
 
