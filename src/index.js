@@ -3,8 +3,14 @@ import './index.css'
 
 // LINE SEGMENT INTERSECTION
 // http://www-cs.ccny.cuny.edu/~wolberg/capstone/intersection/Intersection%20point%20of%20two%20lines.html
-function lineLineIntersectionPoint([x1, y1], [x2, y2], [x3, y3], [x4, y4]) {
+function lineLineIntersectionPoint(
+  [x1, y1],
+  [x2, y2],
+  [x3, y3],
+  [x4, y4],
+) {
   const denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1)
+  debugger
 
   if (denominator === 0) return null
 
@@ -13,40 +19,33 @@ function lineLineIntersectionPoint([x1, y1], [x2, y2], [x3, y3], [x4, y4]) {
 
   if ((uaNumerator === ubNumerator) === 0) return null
 
-  if (
-    uaNumerator < 0 ||
-    uaNumerator > 1 ||
-    ubNumerator < 0 ||
-    ubNumerator > 1
-  )
-    return null
-
   const ua = uaNumerator / denominator
   const ub = ubNumerator / denominator
 
-  return [x1 + ua(x2 - x1), y1 + ub(y2 - y1)]
+  if (ua < 0 || ua > 1 || ub < 0 || ub > 1) return null
+
+  return [x1 + ua * (x2 - x1), y1 + ub * (y2 - y1)]
 }
 
-function distanceBetweenPoints([x1,y1], [x2,y2]){
-  const [dx,dy] = [x2-x1, y2-y1]
+function distanceBetweenPoints([x1, y1], [x2, y2]) {
+  const [dx, dy] = [x2 - x1, y2 - y1]
   return Math.sqrt(dx * dx + dy * dy)
 }
 
-function lineRectIntersectionPoint(p1, p2, [rx,ry,rw,rh]){
+function lineRectIntersectionPoint(p1, p2, [rx, ry, rw, rh]) {
+  const [rt3, rt4] = [[rx, ry], [rx + rw, ry]]
+  const [rb3, rb4] = [[rx, ry + rh], [rx + rw, ry + rh]]
 
-  const [rt3, rt4] = [[rx, ry], [rx+rw, ry]]
-  const [rb3, rb4] = [[rx, ry + rh], [rx+rw, ry+rh]]
-
-  const intersectionPoints = 
-    [lineLineIntersectionPoint(p1,p2, rt3, rt4), 
-      lineLineIntersectionPoint(p1,p2, rb3, rb4)]
-      .filter(point => point !== null)
+  const intersectionPoints = [
+    lineLineIntersectionPoint(p1, p2, rt3, rt4),
+    lineLineIntersectionPoint(p1, p2, rb3, rb4),
+  ].filter(point => point !== null)
 
   const sortedPoints = intersectionPoints
-  .map(point=>{
-    return {point, distance: distanceBetweenPoints(p1, point)}
-  })
-  .sort(({distance:a}, {distance:b})=>b-a)
+    .map(point => {
+      return { point, distance: distanceBetweenPoints(p1, point) }
+    })
+    .sort(({ distance: a }, { distance: b }) => b - a)
 
   return sortedPoints.length > 0 ? sortedPoints[0] : null
 }
@@ -113,7 +112,7 @@ function getCY(obj) {
 const pad = { x: 0, y: 0, w: 100, h: 10, speed: 10 }
 Object.assign(pad, { x: (VW - pad.w) / 2, y: VH - 10 - pad.h })
 
-const initialBallSpeed = 2000
+const initialBallSpeed = 700
 
 const [ballDX, ballDY] = polarToCart(degToRad(100), initialBallSpeed)
 
@@ -200,7 +199,7 @@ function step(currentTS) {
 
   // bounceBallOffBrick(oldBallY, brick)
 
-  bricks.forEach(b => bounceBallOffBrick(oldBallY, b))
+  bricks.forEach(b => bounceBallOffBrick(oldBallX, oldBallY, b))
 
   // RENDER
   ctx.clearRect(0, 0, VW, VH)
@@ -229,7 +228,7 @@ function step(currentTS) {
 
 step(lastTS)
 
-function bounceBallOffBrick(oldBallY, brick) {
+function bounceBallOffBrick(oldBallX, oldBallY, brick) {
   if (
     brick.alive &&
     ball.x >= brick.x &&
@@ -237,6 +236,15 @@ function bounceBallOffBrick(oldBallY, brick) {
     ball.y >= brick.y &&
     ball.y < brick.y + brick.h
   ) {
+    const [p1, p2] = [[oldBallX, oldBallY], [ball.x, ball.y]]
+    const ip = lineRectIntersectionPoint(p1, p2, [
+      brick.x,
+      brick.y,
+      brick.w,
+      brick.h,
+    ])
+    console.log('ip', ip)
+
     // ball.y = brick.y + brick.h
     brick.alive = false
     ball.dy *= -1
@@ -250,11 +258,6 @@ function bounceBallOffBrick(oldBallY, brick) {
     if (oldBallY <= brick.y) {
       ball.y = brick.y
     } else {
-      ball.y = brick.y + brick.h
-    }
-  }
-}
-
       ball.y = brick.y + brick.h
     }
   }
