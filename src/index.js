@@ -17,6 +17,10 @@ function degToRad(deg) {
 
 // HELPERS
 
+function times(fn, count) {
+  return new Array(count).fill(0).map((_, i) => fn(i))
+}
+
 function randomIn(num1, num2) {
   const [min, max] = [Math.min(num1, num2), Math.max(num1, num2)]
   return Math.random() * (max - min) + min
@@ -72,10 +76,6 @@ function createBrick(x, y) {
 const brick = createBrick(0, 0)
 
 setXY(VCX - getCX(brick), VCY - getCY(brick), brick)
-
-function times(fn, count) {
-  return new Array(count).fill(0).map((_, i) => fn(i))
-}
 
 const bricks = times(y => {
   return times(x => createBrick(x * (brickW + 10), y * (brickH + 10)), 5)
