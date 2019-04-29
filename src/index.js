@@ -111,7 +111,7 @@ function getCY(obj) {
 const pad = { x: 0, y: 0, w: 100, h: 10, speed: 10 }
 Object.assign(pad, { x: (VW - pad.w) / 2, y: VH - 10 - pad.h })
 
-const initialBallSpeed = 1000
+const initialBallSpeed = 2000
 
 const [ballDX, ballDY] = polarToCart(degToRad(100), initialBallSpeed)
 
@@ -196,11 +196,44 @@ function step(currentTS) {
 
   // BOUNCE BALL OFF BRICK
 
-  // bounceBallOffBrick(oldBallY, brick)
-
-  bricks
+  const brickCollisionResults = bricks
     .filter(b => b.alive)
-    .forEach(b => bounceBallOffBrick(oldBallX, oldBallY, b))
+    .map(brick => ({
+      brick,
+      intersectionResult: ballIntersectionPointWithBrick(
+        oldBallX,
+        oldBallY,
+        brick,
+      ),
+    }))
+    .filter(({ intersectionResult }) => intersectionResult !== null)
+    .map(obj => ({
+      ...obj,
+      distance: distanceBetweenPoints(
+        [oldBallX, oldBallY],
+        obj.intersectionResult.point,
+      ),
+    }))
+    .sort(({ distance: a }, { distance: b }) => b - a)
+
+  if (brickCollisionResults.length > 0) {
+    const { brick, ip } = brickCollisionResults[0]
+
+    brick.alive = false
+    ball.dy *= -1
+    const [angle, length] = cartToPolar(ball.dx, ball.dy)
+    const [newDX, newDY] = polarToCart(
+      angle + degToRad(randomIn(-1, +1)),
+      length,
+    )
+    ball.dx = newDX
+    ball.dy = newDY
+    if (oldBallY <= brick.y) {
+      ball.y = brick.y
+    } else {
+      ball.y = brick.y + brick.h
+    }
+  }
 
   // RENDER
   ctx.clearRect(0, 0, VW, VH)
@@ -229,7 +262,7 @@ function step(currentTS) {
 
 step(lastTS)
 
-function bounceBallOffBrick(oldBallX, oldBallY, brick) {
+function ballIntersectionPointWithBrick(oldBallX, oldBallY, brick) {
   const [p1, p2] = [[oldBallX, oldBallY], [ball.x, ball.y]]
   const ip = lineRectIntersectionPoint(p1, p2, [
     brick.x,
@@ -237,30 +270,5 @@ function bounceBallOffBrick(oldBallX, oldBallY, brick) {
     brick.w,
     brick.h,
   ])
-
-  const isBasicCollision =
-    ball.x >= brick.x &&
-    ball.x < brick.x + brick.w &&
-    ball.y >= brick.y &&
-    ball.y < brick.y + brick.h
-
-  if (!!ip) {
-    console.log('ip', ip)
-
-    // ball.y = brick.y + brick.h
-    brick.alive = false
-    ball.dy *= -1
-    const [angle, length] = cartToPolar(ball.dx, ball.dy)
-    const [newDX, newDY] = polarToCart(
-      angle + degToRad(randomIn(-1, +1)),
-      length,
-    )
-    ball.dx = newDX
-    ball.dy = newDY
-    if (oldBallY <= brick.y) {
-      ball.y = brick.y
-    } else {
-      ball.y = brick.y + brick.h
-    }
-  }
+  return ip
 }
