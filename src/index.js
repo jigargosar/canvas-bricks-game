@@ -73,9 +73,9 @@ function createBrick(x, y) {
   return { x, y, w: brickW, h: brickH, alive: true }
 }
 
-const brick = createBrick(0, 0)
+// const brick = createBrick(0, 0)
 
-setXY(VCX - getCX(brick), VCY - getCY(brick), brick)
+// setXY(VCX - getCX(brick), VCY - getCY(brick), brick)
 
 const bricks = times(y => {
   return times(x => createBrick(x * (brickW + 10), y * (brickH + 10)), 5)
@@ -136,7 +136,7 @@ function step(currentTS) {
 
   // BOUNCE BALL OFF BRICK
 
-  bounceBallOffBrick(oldBallY, brick)
+  // bounceBallOffBrick(oldBallY, brick)
 
   bricks.forEach(b => bounceBallOffBrick(oldBallY, b))
 
@@ -154,11 +154,13 @@ function step(currentTS) {
   // RENDER BRICK
 
   ctx.fillStyle = 'green'
-  ctx.fillRect(brick.x, brick.y, brick.w, brick.h)
+  // ctx.fillRect(brick.x, brick.y, brick.w, brick.h)
 
-  bricks.forEach(brick => {
-    ctx.fillRect(brick.x, brick.y, brick.w, brick.h)
-  })
+  bricks
+    .filter(b => b.alive)
+    .forEach(brick => {
+      ctx.fillRect(brick.x, brick.y, brick.w, brick.h)
+    })
 
   requestAnimationFrame(step)
 }
@@ -167,12 +169,14 @@ step(lastTS)
 
 function bounceBallOffBrick(oldBallY, brick) {
   if (
+    brick.alive &&
     ball.x >= brick.x &&
     ball.x < brick.x + brick.w &&
     ball.y >= brick.y &&
     ball.y < brick.y + brick.h
   ) {
     // ball.y = brick.y + brick.h
+    brick.alive = false
     ball.dy *= -1
     const [angle, length] = cartToPolar(ball.dx, ball.dy)
     const [newDX, newDY] = polarToCart(
