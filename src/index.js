@@ -199,7 +199,9 @@ function step(currentTS) {
 
   // bounceBallOffBrick(oldBallY, brick)
 
-  bricks.forEach(b => bounceBallOffBrick(oldBallX, oldBallY, b))
+  bricks
+    .filter(b => b.alive)
+    .forEach(b => bounceBallOffBrick(oldBallX, oldBallY, b))
 
   // RENDER
   ctx.clearRect(0, 0, VW, VH)
@@ -229,20 +231,21 @@ function step(currentTS) {
 step(lastTS)
 
 function bounceBallOffBrick(oldBallX, oldBallY, brick) {
-  if (
-    brick.alive &&
+  const [p1, p2] = [[oldBallX, oldBallY], [ball.x, ball.y]]
+  const ip = lineRectIntersectionPoint(p1, p2, [
+    brick.x,
+    brick.y,
+    brick.w,
+    brick.h,
+  ])
+
+  const isBasicCollision =
     ball.x >= brick.x &&
     ball.x < brick.x + brick.w &&
     ball.y >= brick.y &&
     ball.y < brick.y + brick.h
-  ) {
-    const [p1, p2] = [[oldBallX, oldBallY], [ball.x, ball.y]]
-    const ip = lineRectIntersectionPoint(p1, p2, [
-      brick.x,
-      brick.y,
-      brick.w,
-      brick.h,
-    ])
+
+  if (!!ip) {
     console.log('ip', ip)
 
     // ball.y = brick.y + brick.h
