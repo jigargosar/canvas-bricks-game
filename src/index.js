@@ -136,30 +136,9 @@ function step(currentTS) {
 
   // BOUNCE BALL OFF BRICK
 
-  if (
-    ball.x >= brick.x &&
-    ball.x < brick.x + brick.w &&
-    ball.y >= brick.y &&
-    ball.y < brick.y + brick.h
-  ) {
-    // ball.y = brick.y + brick.h
-    ball.dy *= -1
+  bounceBallOffBrick(oldBallY, brick)
 
-    const [angle, length] = cartToPolar(ball.dx, ball.dy)
-
-    const [newDX, newDY] = polarToCart(
-      angle + degToRad(randomIn(-1, +1)),
-      length,
-    )
-    ball.dx = newDX
-    ball.dy = newDY
-
-    if (oldBallY <= brick.y) {
-      ball.y = brick.y
-    } else {
-      ball.y = brick.y + brick.h
-    }
-  }
+  bricks.forEach(b => bounceBallOffBrick(oldBallY, b))
 
   // RENDER
   ctx.clearRect(0, 0, VW, VH)
@@ -185,3 +164,27 @@ function step(currentTS) {
 }
 
 step(lastTS)
+
+function bounceBallOffBrick(oldBallY, brick) {
+  if (
+    ball.x >= brick.x &&
+    ball.x < brick.x + brick.w &&
+    ball.y >= brick.y &&
+    ball.y < brick.y + brick.h
+  ) {
+    // ball.y = brick.y + brick.h
+    ball.dy *= -1
+    const [angle, length] = cartToPolar(ball.dx, ball.dy)
+    const [newDX, newDY] = polarToCart(
+      angle + degToRad(randomIn(-1, +1)),
+      length,
+    )
+    ball.dx = newDX
+    ball.dy = newDY
+    if (oldBallY <= brick.y) {
+      ball.y = brick.y
+    } else {
+      ball.y = brick.y + brick.h
+    }
+  }
+}
