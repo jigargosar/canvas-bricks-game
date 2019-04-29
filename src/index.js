@@ -3,7 +3,7 @@ import './index.css'
 
 // LINE SEGMENT INTERSECTION
 // http://www-cs.ccny.cuny.edu/~wolberg/capstone/intersection/Intersection%20point%20of%20two%20lines.html
-function lineIntersection([x1, y1], [x2, y2], [x3, y3], [x4, y4]) {
+function lineLineIntersectionPoint([x1, y1], [x2, y2], [x3, y3], [x4, y4]) {
   const denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1)
 
   if (denominator === 0) return null
@@ -25,6 +25,30 @@ function lineIntersection([x1, y1], [x2, y2], [x3, y3], [x4, y4]) {
   const ub = ubNumerator / denominator
 
   return [x1 + ua(x2 - x1), y1 + ub(y2 - y1)]
+}
+
+function distanceBetweenPoints([x1,y1], [x2,y2]){
+  const [dx,dy] = [x2-x1, y2-y1]
+  return Math.sqrt(dx * dx + dy * dy)
+}
+
+function lineRectIntersectionPoint(p1, p2, [rx,ry,rw,rh]){
+
+  const [rt3, rt4] = [[rx, ry], [rx+rw, ry]]
+  const [rb3, rb4] = [[rx, ry + rh], [rx+rw, ry+rh]]
+
+  const intersectionPoints = 
+    [lineLineIntersectionPoint(p1,p2, rt3, rt4), 
+      lineLineIntersectionPoint(p1,p2, rb3, rb4)]
+      .filter(point => point !== null)
+
+  const sortedPoints = intersectionPoints
+  .map(point=>{
+    return {point, distance: distanceBetweenPoints(p1, point)}
+  })
+  .sort(({distance:a}, {distance:b})=>b-a)
+
+  return sortedPoints.length > 0 ? sortedPoints[0] : null
 }
 
 // MATH TRIG
@@ -226,6 +250,11 @@ function bounceBallOffBrick(oldBallY, brick) {
     if (oldBallY <= brick.y) {
       ball.y = brick.y
     } else {
+      ball.y = brick.y + brick.h
+    }
+  }
+}
+
       ball.y = brick.y + brick.h
     }
   }
