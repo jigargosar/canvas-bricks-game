@@ -168,41 +168,84 @@ function step(currentTS) {
   // * bounce of paddle?
   // * Game over on bottom viewport side
 
-  // BOUNCE BALL OFF VIEWPORT
+  update(delta)
 
+  // RENDER
+  render()
+
+  requestAnimationFrame(step)
+}
+
+step(lastTS)
+
+function render() {
+  ctx.clearRect(0, 0, VW, VH)
+  ctx.fillStyle = 'orange'
+  ctx.fillRect(pad.x, pad.y, pad.w, pad.h)
+  ctx.beginPath()
+  ctx.fillStyle = 'blue'
+  ctx.arc(ball.x, ball.y, ball.r, 0, 2 * Math.PI)
+  ctx.fill()
+  // RENDER BRICK
+  ctx.fillStyle = 'green'
+  // ctx.fillRect(brick.x, brick.y, brick.w, brick.h)
+  bricks
+    .filter(b => b.alive)
+    .forEach(brick => {
+      ctx.fillRect(brick.x, brick.y, brick.w, brick.h)
+    })
+}
+
+function update(delta) {
   const [oldBallX, oldBallY] = [ball.x, ball.y]
-
+  const oldBallPos = [oldBallX, oldBallY]
   ball.x += ball.dx * delta
   ball.y += ball.dy * delta
+  if (!updateBallViewPortCollision()) {
+    updateBallBrickCollision(oldBallPos)
+  }
+}
 
+function ballIntersectionPointWithBrick([oldBallX, oldBallY], brick) {
+  const [p1, p2] = [[oldBallX, oldBallY], [ball.x, ball.y]]
+  const ip = lineRectIntersectionPoint(p1, p2, [
+    brick.x,
+    brick.y,
+    brick.w,
+    brick.h,
+  ])
+  return ip
+}
+
+function updateBallViewPortCollision() {
   if (ball.y > VH) {
     ball.y = VH
     ball.dy *= -1
-  }
-
-  if (ball.y < 0) {
+    return true
+  } else if (ball.y < 0) {
     ball.y = 0
     ball.dy *= -1
-  }
-
-  if (ball.x < 0) {
+    return true
+  } else if (ball.x < 0) {
     ball.x = 0
     ball.dx *= -1
-  }
-  if (ball.x > VW) {
+    return true
+  } else if (ball.x > VW) {
     ball.x = VW
     ball.dx *= -1
+    return true
   }
+  return false
+}
 
-  // BOUNCE BALL OFF BRICK
-
+function updateBallBrickCollision(oldBallPos) {
+  const [oldBallX, oldBallY] = oldBallPos
   const brickCollisionResults = bricks
     .filter(b => b.alive)
     .map(brick => ({
       brick,
       intersectionResult: ballIntersectionPointWithBrick(
-        oldBallX,
-        oldBallY,
+        oldBallPos,
         brick,
       ),
     }))
@@ -210,7 +253,7 @@ function step(currentTS) {
     .map(obj => ({
       ...obj,
       distance: distanceBetweenPoints(
-        [oldBallX, oldBallY],
+        oldBallPos,
         obj.intersectionResult.point,
       ),
     }))
@@ -234,41 +277,4 @@ function step(currentTS) {
       ball.y = brick.y + brick.h
     }
   }
-
-  // RENDER
-  ctx.clearRect(0, 0, VW, VH)
-
-  ctx.fillStyle = 'orange'
-  ctx.fillRect(pad.x, pad.y, pad.w, pad.h)
-
-  ctx.beginPath()
-  ctx.fillStyle = 'blue'
-  ctx.arc(ball.x, ball.y, ball.r, 0, 2 * Math.PI)
-  ctx.fill()
-
-  // RENDER BRICK
-
-  ctx.fillStyle = 'green'
-  // ctx.fillRect(brick.x, brick.y, brick.w, brick.h)
-
-  bricks
-    .filter(b => b.alive)
-    .forEach(brick => {
-      ctx.fillRect(brick.x, brick.y, brick.w, brick.h)
-    })
-
-  requestAnimationFrame(step)
-}
-
-step(lastTS)
-
-function ballIntersectionPointWithBrick(oldBallX, oldBallY, brick) {
-  const [p1, p2] = [[oldBallX, oldBallY], [ball.x, ball.y]]
-  const ip = lineRectIntersectionPoint(p1, p2, [
-    brick.x,
-    brick.y,
-    brick.w,
-    brick.h,
-  ])
-  return ip
 }
