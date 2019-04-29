@@ -77,8 +77,18 @@ function createBrick(x, y) {
 
 // setXY(VCX - getCX(brick), VCY - getCY(brick), brick)
 
+const brickVerticalSpacing = 30
+const brickHorizontalSpacing = 30
+
 const bricks = times(y => {
-  return times(x => createBrick(x * (brickW + 10), y * (brickH + 10)), 5)
+  return times(
+    x =>
+      createBrick(
+        x * (brickW + brickHorizontalSpacing),
+        y * (brickH + brickVerticalSpacing),
+      ),
+    5,
+  )
 }, 5).flatMap(x => x)
 
 // KEYBOARD HANDLERS
