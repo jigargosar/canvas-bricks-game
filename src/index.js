@@ -55,7 +55,7 @@ const ball = { x: VW / 2, y: VH / 2, r: 10, dx: ballDX, dy: ballDY }
 const [brickW, brickH] = [50, 10]
 
 function createBrick(x, y) {
-  return { x, y, w: brickW, h: brickH }
+  return { x, y, w: brickW, h: brickH, alive: true }
 }
 
 const brick = createBrick(0, 0)
