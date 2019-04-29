@@ -68,9 +68,9 @@ function times(fn, count) {
   })
 }
 
-const bricks = times(n => {
-  return createBrick(n * (brickW + 10), 10)
-}, 5)
+const bricks = times(y => {
+  return times(x => createBrick(x * (brickW + 10), y * (brickH + 10)), 5)
+}, 5).flatMap(x => x)
 
 // KEYBOARD HANDLERS
 
