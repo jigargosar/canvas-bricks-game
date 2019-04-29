@@ -1,6 +1,32 @@
 import 'tachyons'
 import './index.css'
 
+// LINE SEGMENT INTERSECTION
+// http://www-cs.ccny.cuny.edu/~wolberg/capstone/intersection/Intersection%20point%20of%20two%20lines.html
+function lineIntersection([x1, y1], [x2, y2], [x3, y3], [x4, y4]) {
+  const denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1)
+
+  if (denominator === 0) return null
+
+  const uaNumerator = (x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)
+  const ubNumerator = (x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)
+
+  if ((uaNumerator === ubNumerator) === 0) return null
+
+  if (
+    uaNumerator < 0 ||
+    uaNumerator > 1 ||
+    ubNumerator < 0 ||
+    ubNumerator > 1
+  )
+    return null
+
+  const ua = uaNumerator / denominator
+  const ub = ubNumerator / denominator
+
+  return [x1 + ua(x2 - x1), y1 + ub(y2 - y1)]
+}
+
 // MATH TRIG
 
 function polarToCart(angle, magnitude) {
