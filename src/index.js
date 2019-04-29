@@ -45,6 +45,17 @@ const ctx = canvas.getContext('2d')
 
 // GAME OBJECTS
 
+function setXY(x, y, obj) {
+  Object.assign(obj, { x, y })
+}
+
+function getCX(obj) {
+  return obj.x + obj.w / 2
+}
+function getCY(obj) {
+  return obj.y + obj.h / 2
+}
+
 const pad = { x: 0, y: 0, w: 100, h: 10, speed: 10 }
 Object.assign(pad, { x: (VW - pad.w) / 2, y: VH - 10 - pad.h })
 
@@ -59,13 +70,11 @@ function createBrick(x, y) {
 }
 
 const brick = createBrick(0, 0)
-brick.x = VCX - brick.w / 2
-brick.y = VCY - brick.h / 2
+
+setXY(VCX - getCX(brick), VCY - getCY(brick), brick)
 
 function times(fn, count) {
-  return new Array(count).fill(0).map((v, i) => {
-    return fn(i)
-  })
+  return new Array(count).fill(0).map((_, i) => fn(i))
 }
 
 const bricks = times(y => {
