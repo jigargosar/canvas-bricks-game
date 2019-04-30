@@ -14,7 +14,7 @@ import './index.css'
  * @param {Point} p2
  * @param {Point} p3
  * @param {Point} p4
- * @returns {Point | null}
+ * @returns {Point?}
  * @tutorial http://www-cs.ccny.cuny.edu/~wolberg/capstone/intersection/Intersection%20point%20of%20two%20lines.html
  */
 function lineLineIntersectionPoint(p1, p2, p3, p4) {
@@ -301,7 +301,7 @@ function rect4ToEdges(rect4) {
 * @param {Point} p1
 * @param {Point} p2
 * @param {Rect4} rect4
-* @returns {LineRectIntersection|null}
+* @returns {LineRectIntersection?}
 */
 function lineRectIntersection(p1, p2, rect4) {
 
@@ -322,7 +322,7 @@ function lineRectIntersection(p1, p2, rect4) {
 /**
  * @template T
  * @param {T[]} arr 
- * @returns {T|null}
+ * @returns {T?}
  */
 function head(arr) {
   return arr.length > 0 ? arr[0] : null
@@ -330,11 +330,12 @@ function head(arr) {
 
 /** 
  * @template A,B
- * @param { (a:A) => B } fn
- * @param { A | null } nullable
+ * @param {(a:A) => B} fn
+ * @param {A?} nullable
+ * @return {B?}
  */
 function unlessNil(fn, nullable) {
-  return isNil(nullable) ? nullable : fn(nullable)
+  return isNil(nullable) ? null : fn(nullable)
 }
 
 /**
@@ -346,7 +347,7 @@ function unlessNil(fn, nullable) {
  * 
  * @param {any} ballMove 
  * @param {Brick} brick 
- * @returns {BallRectIntersection | null}
+ * @returns {BallRectIntersection?}
  * 
  */
 function ballIntersectionWithBrick(ballMove, brick) {
@@ -356,14 +357,11 @@ function ballIntersectionWithBrick(ballMove, brick) {
   const p2 = [ballMove.nx, ballMove.ny]
   /** @type {Rect4}   */
   const rect4 = [brick.x - ball.r, brick.y - ball.r, brick.w + ball.r * 2, brick.h + ball.r * 2]
+
+  /** @type LineRectIntersection */
   const intersection = lineRectIntersection(p1, p2, rect4)
 
-  /**
-   * @param {LineRectIntersection | null} intersection
-   * @returns {BallRectIntersection| null}
-   */
-  const fn = (intersection) => ({ intersection, brick })
-  return isNil(intersection) ? null : fn(intersection)
+  return isNil(intersection) ? null : ({ intersection, brick })
 }
 
 function updateBallViewPortCollision(ballMove) {
