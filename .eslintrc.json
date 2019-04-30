@@ -22,22 +22,22 @@
             }
         ],
         "indent": [
-            "error",
+            "warn",
             2,
             {
                 "SwitchCase": 1
             }
         ],
         "linebreak-style": [
-            "error",
+            "warn",
             "unix"
         ],
         "quotes": [
-            "error",
+            "warn",
             "single"
         ],
         "semi": [
-            "error",
+            "warn",
             "never"
         ]
     }

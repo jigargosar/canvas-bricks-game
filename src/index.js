@@ -140,6 +140,14 @@ const initialBallSpeed = 700
 
 const [ballDX, ballDY] = polarToCart(degToRad(100), initialBallSpeed)
 
+/**
+ * @typedef Ball
+ * @type {{x:number, y:number, r:number, dx:number,dy:number}}
+*/
+
+/**
+ * @type {Ball}
+ */
 const ball = { x: VW / 2, y: VH / 2, r: 10, dx: ballDX, dy: ballDY }
 
 const [brickW, brickH] = [50, 10]
@@ -251,45 +259,92 @@ function update(delta) {
 }
 
 /**
+ * @typedef Rect4
+ * @type {[number,number,number,number]}
+ */
+
+/**
+ * @typedef Side
+ * @type {"top"| 'bottom'|'left'|'right'}
+ * 
+ * @typedef RectEdge 
+ * @type {{side:Side, p1:Point,p2:Point}}
+ * 
+ * @param {Rect4} rect4 
+ * @returns {RectEdge []}
+ */
+function rect4ToEdges(rect4) {
+  const [x1, y1, w, h] = rect4
+  const [x2, y2] = [x1 + w, y1 + h]
+  return [
+    { side: 'top', p1: [x1, y1], p2: [x2, y1] },
+    { side: 'bottom', p1: [x1, y2], p2: [x2, y2] },
+    { side: 'left', p1: [x1, y1], p2: [x1, y2] },
+    { side: 'right', p1: [x2, y1], p2: [x2, y2] },
+  ]
+}
+
+/**
  * @param {Point} p1
  * @param {Point} p2
- * @param {[number, number, number, number]} rect4
+ * @param {Rect4} rect4
  */
 function lineRectIntersection(p1, p2, rect4) {
-  const [rx, ry, rw, rh] = rect4
-  const [rt3, rt4] = [
-    /** @type Point  */ ([rx, ry]),
-    /** @type Point  */ ([rx + rw, ry]),
-  ]
-  const [rb3, rb4] = [
-    /** @type Point  */ ([rx, ry + rh]),
-    /** @type Point  */ ([rx + rw, ry + rh]),
-  ]
 
-  const intersectionPoints = [
-    lineLineIntersectionPoint(p1, p2, rt3, rt4),
-    lineLineIntersectionPoint(p1, p2, rb3, rb4),
-  ].filter(point => point !== null)
-
-  const sortedPoints = intersectionPoints
-    .map(point => {
-      return { point, len: distanceBetweenPoints(p1, point) }
+  const intersections = rect4ToEdges(rect4)
+    .map(edge => {
+      const intersectionPoint = lineLineIntersectionPoint(p1, p2, edge.p1, edge.p2)
+      return notNil(intersectionPoint)
+        ? ({ edge, point: intersectionPoint, len: distanceBetweenPoints(p1, intersectionPoint) })
+        : null
     })
+    .filter(notNil)
     .sort(({ len: a }, { len: b }) => b - a)
 
+  return head(intersections)
+
+  // const [rx, ry, rw, rh] = rect4
+
+  // /** @type {[Point,Point]}  */
+  // const [rt3, rt4] = [([rx, ry]), ([rx + rw, ry]),]
+
+  // /** @type {[Point,Point]}  */
+  // const [rb3, rb4] = [([rx, ry + rh]), ([rx + rw, ry + rh]),]
+
+  // const intersectionPoints = [
+  //   lineLineIntersectionPoint(p1, p2, rt3, rt4),
+  //   lineLineIntersectionPoint(p1, p2, rb3, rb4),
+  // ].filter(point => point !== null)
+
+  // const sortedPoints = intersectionPoints
+  //   .map(point => {
+  //     return { point, len: distanceBetweenPoints(p1, point) }
+  //   })
+  //   .sort(({ len: a }, { len: b }) => b - a)
+
+  // return head(sortedPoints)
+}
+
+/**
+ * @template T
+ * @param {T[]} sortedPoints 
+ * @returns {T|null}
+ */
+function head(sortedPoints) {
   return sortedPoints.length > 0 ? sortedPoints[0] : null
 }
 
-function ballIntersectionPointWithBrick(oldBallPos, brick) {
-  const [p1, p2] = [oldBallPos, [ball.x, ball.y]]
-
-  const a = 1
-
-  const intersection = lineRectIntersection(
-    p1,
-    /** @type Point  */(p2),
-    [brick.x, brick.y, brick.w, brick.h],
-  )
+/**
+ * 
+ * @param {Point} p1 
+ * @param {Brick} brick 
+ */
+function ballIntersectionWithBrick(p1, brick) {
+  /** @type {Point}   */
+  const p2 = [ball.x, ball.y]
+  /** @type {Rect4}   */
+  const rect = [brick.x, brick.y, brick.w, brick.h]
+  const intersection = lineRectIntersection(p1, p2, rect)
   return intersection ? { intersection, brick } : null
 }
 
@@ -319,7 +374,7 @@ function updateBallBrickCollision(oldBallPos) {
   const [oldBallX, oldBallY] = oldBallPos
   const brickCollisionResults = bricks
     .filter(b => b.alive)
-    .map(brick => ballIntersectionPointWithBrick(oldBallPos, brick))
+    .map(brick => ballIntersectionWithBrick(oldBallPos, brick))
     .filter(notNil)
     .sort((a, b) => b.intersection.len - a.intersection.len)
 
