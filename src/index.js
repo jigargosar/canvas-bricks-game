@@ -71,6 +71,11 @@ function notNil(nullable) {
   return !isNil(nullable)
 }
 
+/** 
+ * @template T
+ * @param { (i:number) => T } fn
+ * @param { number } count
+ */
 function times(fn, count) {
   return new Array(count).fill(0).map((_, i) => fn(i))
 }
@@ -139,6 +144,16 @@ const ball = { x: VW / 2, y: VH / 2, r: 10, dx: ballDX, dy: ballDY }
 
 const [brickW, brickH] = [50, 10]
 
+/**
+ * @typedef Brick
+ * @type {{x:number, y:number, w:number, h:number, alive:boolean}}
+*/
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @returns {Brick}
+ */
 function createBrick(x, y) {
   return { x, y, w: brickW, h: brickH, alive: true }
 }
@@ -150,16 +165,19 @@ function createBrick(x, y) {
 const brickVerticalSpacing = 30
 const brickHorizontalSpacing = 30
 
-const bricks = times(y => {
-  return times(
-    x =>
-      createBrick(
-        x * (brickW + brickHorizontalSpacing),
-        y * (brickH + brickVerticalSpacing),
-      ),
-    5,
-  )
-}, 5).flatMap(x => x)
+/**
+ * @param {number} row
+ * @param {number} column
+ * @returns {Brick} brick
+ */
+function createBrickAtRowColumn(row, column) {
+  const x = column * (brickW + brickHorizontalSpacing)
+  const y = row * (brickH + brickVerticalSpacing)
+  return createBrick(x, y)
+}
+
+const bricks = times(row => times(column => createBrickAtRowColumn(row, column), 5), 5)
+  .flatMap(x => x)
 
 // KEYBOARD HANDLERS
 
@@ -184,7 +202,6 @@ function step(currentTS) {
   // UPDATE
 
   // TODO:
-  // * Render bricks?
   // * bounce of paddle?
   // * Game over on bottom viewport side
 
