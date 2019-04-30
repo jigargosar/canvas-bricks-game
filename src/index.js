@@ -180,6 +180,11 @@ function render() {
     })
 }
 
+function move(x, y, dx, dy, dt) {
+  const [nx, ny] = [x + dx * dt, y + dy * dt]
+  return { x, y, nx, ny, len: distanceBetweenPoints([x, y], [nx, ny]) }
+}
+
 function update(delta) {
   const [oldBallX, oldBallY] = [ball.x, ball.y]
   const oldBallPos = [oldBallX, oldBallY]
@@ -201,9 +206,9 @@ function lineRectIntersection(p1, p2, [rx, ry, rw, rh]) {
 
   const sortedPoints = intersectionPoints
     .map(point => {
-      return { point, distance: distanceBetweenPoints(p1, point) }
+      return { point, len: distanceBetweenPoints(p1, point) }
     })
-    .sort(({ distance: a }, { distance: b }) => b - a)
+    .sort(({ len: a }, { len: b }) => b - a)
 
   return sortedPoints.length > 0 ? sortedPoints[0] : null
 }
@@ -247,20 +252,14 @@ function updateBallBrickCollision(oldBallPos) {
     .filter(b => b.alive)
     .map(brick => ({
       brick,
-      intersectionResult: ballIntersectionPointWithBrick(
-        oldBallPos,
-        brick,
-      ),
+      intersection: ballIntersectionPointWithBrick(oldBallPos, brick),
     }))
-    .filter(({ intersectionResult }) => intersectionResult !== null)
+    .filter(({ intersection }) => intersection !== null)
     .map(obj => ({
       ...obj,
-      distance: distanceBetweenPoints(
-        oldBallPos,
-        obj.intersectionResult.point,
-      ),
+      len: distanceBetweenPoints(oldBallPos, obj.intersection.point),
     }))
-    .sort(({ distance: a }, { distance: b }) => b - a)
+    .sort(({ len: a }, { len: b }) => b - a)
 
   if (brickCollisionResults.length > 0) {
     const { brick, ip } = brickCollisionResults[0]
