@@ -15,6 +15,7 @@
     },
     "rules": {
         "no-unused-vars": "off",
+        "no-empty": "warn",
         "no-multiple-empty-lines": [
             "warn",
             {

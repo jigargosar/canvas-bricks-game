@@ -378,11 +378,12 @@ function updateBallBrickCollision(oldBallPos) {
     .filter(notNil)
     .sort((a, b) => b.intersection.len - a.intersection.len)
 
-  if (brickCollisionResults.length > 0) {
-    const { brick, ip } = brickCollisionResults[0]
+  const bbIntersection = head(brickCollisionResults)
 
+  if (bbIntersection) {
+    const { brick, intersection: { point, edge: { side } } } = brickCollisionResults[0]
     brick.alive = false
-    ball.dy *= -1
+
     const [angle, length] = cartToPolar(ball.dx, ball.dy)
     const [newDX, newDY] = polarToCart(
       angle + degToRad(randomIn(-1, +1)),
@@ -390,10 +391,46 @@ function updateBallBrickCollision(oldBallPos) {
     )
     ball.dx = newDX
     ball.dy = newDY
-    if (oldBallY <= brick.y) {
-      ball.y = brick.y
-    } else {
-      ball.y = brick.y + brick.h
+
+    switch (side) {
+      case 'top':
+        ball.y = brick.y - ball.r
+        ball.dy *= -1
+        break
+
+      case 'bottom':
+        ball.y = brick.y + brick.h + ball.r
+        ball.dy *= -1
+        break
+
+      default:
+        break
     }
+
+    // if (oldBallY <= brick.y) {
+    //   ball.y = brick.y
+    // } else {
+    //   ball.y = brick.y + brick.h
+    // }
   }
+
+  // if (brickCollisionResults.length > 0) {
+  //   debugger
+  //   const { brick, ip } = brickCollisionResults[0]
+
+  //   brick.alive = false
+  //   ball.dy *= -1
+  //   const [angle, length] = cartToPolar(ball.dx, ball.dy)
+  //   const [newDX, newDY] = polarToCart(
+  //     angle + degToRad(randomIn(-1, +1)),
+  //     length,
+  //   )
+  //   ball.dx = newDX
+  //   ball.dy = newDY
+  //   if (oldBallY <= brick.y) {
+  //     ball.y = brick.y
+  //   } else {
+  //     ball.y = brick.y + brick.h
+  //   }
+  // }
 }
