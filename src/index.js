@@ -249,11 +249,13 @@ function move(x, y, dx, dy, dt) {
 }
 
 function update(delta) {
+  const ballMove = move(ball.x, ball.y, ball.dx, ball.dy, delta)
+
   const [oldBallX, oldBallY] = [ball.x, ball.y]
   const oldBallPos = [oldBallX, oldBallY]
   ball.x += ball.dx * delta
   ball.y += ball.dy * delta
-  if (!updateBallViewPortCollision()) {
+  if (!updateBallViewPortCollision(ballMove)) {
     updateBallBrickCollision(oldBallPos)
   }
 }
@@ -348,22 +350,29 @@ function ballIntersectionWithBrick(p1, brick) {
   return intersection ? { intersection, brick } : null
 }
 
-function updateBallViewPortCollision() {
-  if (ball.y > VH) {
+function updateBallViewPortCollision(ballMove) {
+
+  const newBallY = ballMove.ny
+  if (newBallY > VH) {
     ball.y = VH
+    ball.x = ballMove.nx
     ball.dy *= -1
     return true
-  } else if (ball.y < 0) {
+  } else if (newBallY < 0) {
     ball.y = 0
+    ball.x = ballMove.nx
     ball.dy *= -1
     return true
   }
-  if (ball.x < 0) {
+  const newBallX = ballMove.nx
+  if (newBallX < 0) {
     ball.x = 0
+    ball.y = ballMove.ny
     ball.dx *= -1
     return true
-  } else if (ball.x > VW) {
+  } else if (newBallX > VW) {
     ball.x = VW
+    ball.y = ballMove.ny
     ball.dx *= -1
     return true
   }
