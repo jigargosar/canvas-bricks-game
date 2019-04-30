@@ -234,8 +234,8 @@ function update(delta) {
 }
 
 /**
- * @param {[number, number]} p1
- * @param {[number, number]} p2
+ * @param {Point} p1
+ * @param {Point} p2
  * @param {[number, number, number, number]} rect4
  */
 function lineRectIntersection(p1, p2, rect4) {
