@@ -31,24 +31,6 @@ function distanceBetweenPoints([x1, y1], [x2, y2]) {
   return Math.sqrt(dx * dx + dy * dy)
 }
 
-function lineRectIntersectionPoint(p1, p2, [rx, ry, rw, rh]) {
-  const [rt3, rt4] = [[rx, ry], [rx + rw, ry]]
-  const [rb3, rb4] = [[rx, ry + rh], [rx + rw, ry + rh]]
-
-  const intersectionPoints = [
-    lineLineIntersectionPoint(p1, p2, rt3, rt4),
-    lineLineIntersectionPoint(p1, p2, rb3, rb4),
-  ].filter(point => point !== null)
-
-  const sortedPoints = intersectionPoints
-    .map(point => {
-      return { point, distance: distanceBetweenPoints(p1, point) }
-    })
-    .sort(({ distance: a }, { distance: b }) => b - a)
-
-  return sortedPoints.length > 0 ? sortedPoints[0] : null
-}
-
 // MATH TRIG
 
 function polarToCart(angle, magnitude) {
@@ -178,6 +160,8 @@ function step(currentTS) {
 
 step(lastTS)
 
+// RENDER & UPDATE
+
 function render() {
   ctx.clearRect(0, 0, VW, VH)
   ctx.fillStyle = 'orange'
@@ -206,9 +190,27 @@ function update(delta) {
   }
 }
 
-function ballIntersectionPointWithBrick([oldBallX, oldBallY], brick) {
-  const [p1, p2] = [[oldBallX, oldBallY], [ball.x, ball.y]]
-  const ip = lineRectIntersectionPoint(p1, p2, [
+function lineRectIntersection(p1, p2, [rx, ry, rw, rh]) {
+  const [rt3, rt4] = [[rx, ry], [rx + rw, ry]]
+  const [rb3, rb4] = [[rx, ry + rh], [rx + rw, ry + rh]]
+
+  const intersectionPoints = [
+    lineLineIntersectionPoint(p1, p2, rt3, rt4),
+    lineLineIntersectionPoint(p1, p2, rb3, rb4),
+  ].filter(point => point !== null)
+
+  const sortedPoints = intersectionPoints
+    .map(point => {
+      return { point, distance: distanceBetweenPoints(p1, point) }
+    })
+    .sort(({ distance: a }, { distance: b }) => b - a)
+
+  return sortedPoints.length > 0 ? sortedPoints[0] : null
+}
+
+function ballIntersectionPointWithBrick(oldBallPos, brick) {
+  const [p1, p2] = [oldBallPos, [ball.x, ball.y]]
+  const ip = lineRectIntersection(p1, p2, [
     brick.x,
     brick.y,
     brick.w,
@@ -226,7 +228,8 @@ function updateBallViewPortCollision() {
     ball.y = 0
     ball.dy *= -1
     return true
-  } else if (ball.x < 0) {
+  }
+  if (ball.x < 0) {
     ball.x = 0
     ball.dx *= -1
     return true
