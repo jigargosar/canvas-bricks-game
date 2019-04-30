@@ -136,7 +136,7 @@ function getCY(obj) {
 const pad = { x: 0, y: 0, w: 100, h: 10, speed: 10 }
 Object.assign(pad, { x: (VW - pad.w) / 2, y: VH - 10 - pad.h })
 
-const initialBallSpeed = 700
+const initialBallSpeed = 200
 
 const [ballDX, ballDY] = polarToCart(degToRad(100), initialBallSpeed)
 
@@ -150,7 +150,7 @@ const [ballDX, ballDY] = polarToCart(degToRad(100), initialBallSpeed)
  */
 const ball = { x: VW / 2, y: VH / 2, r: 10, dx: ballDX, dy: ballDY }
 
-const [brickW, brickH] = [50, 10]
+const [brickW, brickH] = [50, 30]
 
 /**
  * @typedef Brick
@@ -343,7 +343,7 @@ function ballIntersectionWithBrick(p1, brick) {
   /** @type {Point}   */
   const p2 = [ball.x, ball.y]
   /** @type {Rect4}   */
-  const rect = [brick.x, brick.y, brick.w, brick.h]
+  const rect = [brick.x - ball.r, brick.y - ball.r, brick.w + ball.r * 2, brick.h + ball.r * 2]
   const intersection = lineRectIntersection(p1, p2, rect)
   return intersection ? { intersection, brick } : null
 }
@@ -392,18 +392,18 @@ function updateBallBrickCollision(oldBallPos) {
     ball.dx = newDX
     ball.dy = newDY
 
+    ball.x = point[0]
+    ball.y = point[1]
+
     switch (side) {
       case 'top':
-        ball.y = brick.y - ball.r
-        ball.dy *= -1
-        break
-
       case 'bottom':
-        ball.y = brick.y + brick.h + ball.r
         ball.dy *= -1
         break
 
-      default:
+      case 'left':
+      case 'right':
+        ball.dx *= -1
         break
     }
 
