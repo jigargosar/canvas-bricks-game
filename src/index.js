@@ -257,11 +257,12 @@ function move(x, y, dx, dy, dt) {
 function update(delta) {
   const ballMove = move(ball.x, ball.y, ball.dx, ball.dy, delta)
 
-  const oldBallPos = [ball.x, ball.y]
-  ball.x += ball.dx * delta
-  ball.y += ball.dy * delta
-  if (!updateBallViewPortCollision(ballMove)) {
-    updateBallBrickCollision(oldBallPos, ballMove)
+  // ball.x += ball.dx * delta
+  // ball.y += ball.dy * delta
+
+  if (!updateBallViewPortCollision(ballMove) && !updateBallBrickCollision(ballMove)) {
+    ball.x = ballMove.nx
+    ball.y = ballMove.ny
   }
 }
 
@@ -358,7 +359,6 @@ function ballIntersectionWithBrick(ballMove, brick) {
   /** @type {Rect4}   */
   const rect4 = [brick.x - ball.r, brick.y - ball.r, brick.w + ball.r * 2, brick.h + ball.r * 2]
 
-  /** @type LineRectIntersection */
   const intersection = lineRectIntersection(p1, p2, rect4)
 
   return isNil(intersection) ? null : ({ intersection, brick })
@@ -393,7 +393,7 @@ function updateBallViewPortCollision(ballMove) {
   return false
 }
 
-function updateBallBrickCollision(oldBallPos, ballMove) {
+function updateBallBrickCollision(ballMove) {
 
   const brickCollisionResults = bricks
     .filter(b => b.alive)
@@ -402,34 +402,33 @@ function updateBallBrickCollision(oldBallPos, ballMove) {
     .sort((a, b) => b.intersection.len - a.intersection.len)
 
   const bbIntersection = head(brickCollisionResults)
+  if (!bbIntersection) return false
 
-  if (bbIntersection) {
-    const { brick, intersection: { point, edge: { side } } } = brickCollisionResults[0]
-    brick.alive = false
+  const { brick, intersection: { point, edge: { side } } } = brickCollisionResults[0]
+  brick.alive = false
 
-    const [angle, length] = cartToPolar(ball.dx, ball.dy)
-    const [newDX, newDY] = polarToCart(
-      angle + degToRad(randomIn(-1, +1)),
-      length,
-    )
-    ball.dx = newDX
-    ball.dy = newDY
+  const [angle, length] = cartToPolar(ball.dx, ball.dy)
+  const [newDX, newDY] = polarToCart(
+    angle + degToRad(randomIn(-1, +1)),
+    length,
+  )
+  ball.dx = newDX
+  ball.dy = newDY
 
-    ball.x = point[0]
-    ball.y = point[1]
+  ball.x = point[0]
+  ball.y = point[1]
 
-    switch (side) {
-      case 'top':
-      case 'bottom':
-        ball.dy *= -1
-        break
+  switch (side) {
+    case 'top':
+    case 'bottom':
+      ball.dy *= -1
+      break
 
-      case 'left':
-      case 'right':
-        ball.dx *= -1
-        break
-    }
-
+    case 'left':
+    case 'right':
+      ball.dx *= -1
+      break
   }
 
+  return true
 }
