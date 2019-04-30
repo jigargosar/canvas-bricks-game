@@ -3,15 +3,19 @@
 import 'tachyons'
 import './index.css'
 
-// LINE SEGMENT INTERSECTION
-// http://www-cs.ccny.cuny.edu/~wolberg/capstone/intersection/Intersection%20point%20of%20two%20lines.html
-
 /**
- * @param {[number, number] } p1
- * @param {[number, number] } p2
- * @param {[number, number] } p3
- * @param {[number, number] } p4
- * @returns {([number, number]|null)}
+ * @typedef Point
+ * @type {[number, number]}
+ */
+
+// LINE SEGMENT INTERSECTION
+/**
+ * @param {Point} p1
+ * @param {Point} p2
+ * @param {Point} p3
+ * @param {Point} p4
+ * @returns {Point | null}
+ * @tutorial http://www-cs.ccny.cuny.edu/~wolberg/capstone/intersection/Intersection%20point%20of%20two%20lines.html
  */
 function lineLineIntersectionPoint(p1, p2, p3, p4) {
   const [[x1, y1], [x2, y2], [x3, y3], [x4, y4]] = [p1, p2, p3, p4]
@@ -32,7 +36,13 @@ function lineLineIntersectionPoint(p1, p2, p3, p4) {
   return [x1 + ua * (x2 - x1), y1 + ub * (y2 - y1)]
 }
 
-function distanceBetweenPoints([x1, y1], [x2, y2]) {
+/**
+ * @param {Point} p1
+ * @param {Point} p2
+ * @returns {number} length
+ */
+function distanceBetweenPoints(p1, p2) {
+  const [[x1, y1], [x2, y2]] = [p1, p2]
   const [dx, dy] = [x2 - x1, y2 - y1]
   return Math.sqrt(dx * dx + dy * dy)
 }
@@ -80,9 +90,20 @@ const [VCX, VCY] = [VW / 2, VH / 2]
 
 // CANVAS
 
-const canvas = /** @type {HTMLCanvasElement} */(document.getElementById(
-  'gameScreen',
-))
+/**
+ * @param {string} id
+ * @returns {HTMLCanvasElement}
+ */
+function getCanvasById(id) {
+  const canvas = document.getElementById(id)
+  if (canvas instanceof HTMLCanvasElement) {
+    return canvas
+  }
+  throw new Error('Canvas Not Found')
+}
+
+const canvas = getCanvasById('gameScreen')
+
 canvas.width = VW
 canvas.height = VH
 
