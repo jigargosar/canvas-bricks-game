@@ -261,7 +261,7 @@ function update(delta) {
   ball.x += ball.dx * delta
   ball.y += ball.dy * delta
   if (!updateBallViewPortCollision(ballMove)) {
-    updateBallBrickCollision(oldBallPos)
+    updateBallBrickCollision(oldBallPos, ballMove)
   }
 }
 
@@ -292,10 +292,17 @@ function rect4ToEdges(rect4) {
 }
 
 /**
- * @param {Point} p1
- * @param {Point} p2
- * @param {Rect4} rect4
+ * @typedef LineRectIntersection
+ * @type {{edge:RectEdge, point:Point, len:number}}
+ * 
  */
+
+/**
+* @param {Point} p1
+* @param {Point} p2
+* @param {Rect4} rect4
+* @returns {LineRectIntersection|null}
+*/
 function lineRectIntersection(p1, p2, rect4) {
 
   const intersections = rect4ToEdges(rect4)
@@ -321,18 +328,42 @@ function head(arr) {
   return arr.length > 0 ? arr[0] : null
 }
 
+/** 
+ * @template A,B
+ * @param { (a:A) => B } fn
+ * @param { A | null } nullable
+ */
+function unlessNil(fn, nullable) {
+  return isNil(nullable) ? nullable : fn(nullable)
+}
+
+/**
+ * @typedef BallRectIntersection
+ * @type {{intersection:LineRectIntersection, brick:Brick}}
+ * 
+ */
 /**
  * 
- * @param {Point} p1 
+ * @param {any} ballMove 
  * @param {Brick} brick 
+ * @returns {BallRectIntersection | null}
+ * 
  */
-function ballIntersectionWithBrick(p1, brick) {
+function ballIntersectionWithBrick(ballMove, brick) {
   /** @type {Point}   */
-  const p2 = [ball.x, ball.y]
+  const p1 = [ballMove.x, ballMove.y]
+  /** @type {Point}   */
+  const p2 = [ballMove.nx, ballMove.ny]
   /** @type {Rect4}   */
-  const rect = [brick.x - ball.r, brick.y - ball.r, brick.w + ball.r * 2, brick.h + ball.r * 2]
-  const intersection = lineRectIntersection(p1, p2, rect)
-  return intersection ? { intersection, brick } : null
+  const rect4 = [brick.x - ball.r, brick.y - ball.r, brick.w + ball.r * 2, brick.h + ball.r * 2]
+  const intersection = lineRectIntersection(p1, p2, rect4)
+
+  /**
+   * @param {LineRectIntersection | null} intersection
+   * @returns {BallRectIntersection| null}
+   */
+  const fn = (intersection) => ({ intersection, brick })
+  return isNil(intersection) ? null : fn(intersection)
 }
 
 function updateBallViewPortCollision(ballMove) {
@@ -364,11 +395,11 @@ function updateBallViewPortCollision(ballMove) {
   return false
 }
 
-function updateBallBrickCollision(oldBallPos) {
-  const [oldBallX, oldBallY] = oldBallPos
+function updateBallBrickCollision(oldBallPos, ballMove) {
+
   const brickCollisionResults = bricks
     .filter(b => b.alive)
-    .map(brick => ballIntersectionWithBrick(oldBallPos, brick))
+    .map(brick => ballIntersectionWithBrick(ballMove, brick))
     .filter(notNil)
     .sort((a, b) => b.intersection.len - a.intersection.len)
 
