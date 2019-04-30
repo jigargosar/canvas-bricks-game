@@ -255,11 +255,7 @@ function updateBallBrickCollision(oldBallPos) {
       intersection: ballIntersectionPointWithBrick(oldBallPos, brick),
     }))
     .filter(({ intersection }) => intersection !== null)
-    .map(obj => ({
-      ...obj,
-      len: distanceBetweenPoints(oldBallPos, obj.intersection.point),
-    }))
-    .sort(({ len: a }, { len: b }) => b - a)
+    .sort((a, b) => b.intersection.len - a.intersection.len)
 
   if (brickCollisionResults.length > 0) {
     const { brick, ip } = brickCollisionResults[0]
