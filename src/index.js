@@ -1,4 +1,5 @@
 // @ts-check
+
 import 'tachyons'
 import './index.css'
 
@@ -79,9 +80,9 @@ const [VCX, VCY] = [VW / 2, VH / 2]
 
 // CANVAS
 
-const canvas = /** @type HTMLCanvasElement */ document.getElementById(
+const canvas = /** @type {HTMLCanvasElement} */(document.getElementById(
   'gameScreen',
-)
+))
 canvas.width = VW
 canvas.height = VH
 
@@ -219,12 +220,12 @@ function update(delta) {
 function lineRectIntersection(p1, p2, rect4) {
   const [rx, ry, rw, rh] = rect4
   const [rt3, rt4] = [
-    /** @type [number,number]  */ [rx, ry],
-    /** @type [number,number]  */ [rx + rw, ry],
+    /** @type [number,number]  */ ([rx, ry]),
+    /** @type [number,number]  */ ([rx + rw, ry]),
   ]
   const [rb3, rb4] = [
-    /** @type [number,number]  */ [rx, ry + rh],
-    /** @type [number,number]  */ [rx + rw, ry + rh],
+    /** @type [number,number]  */ ([rx, ry + rh]),
+    /** @type [number,number]  */ ([rx + rw, ry + rh]),
   ]
 
   const intersectionPoints = [
@@ -243,9 +244,12 @@ function lineRectIntersection(p1, p2, rect4) {
 
 function ballIntersectionPointWithBrick(oldBallPos, brick) {
   const [p1, p2] = [oldBallPos, [ball.x, ball.y]]
+
+  const a = 1
+
   const intersection = lineRectIntersection(
     p1,
-    /** @type [number,number]  */ p2,
+    /** @type [number,number]  */(p2),
     [brick.x, brick.y, brick.w, brick.h],
   )
   return intersection ? { intersection, brick } : null

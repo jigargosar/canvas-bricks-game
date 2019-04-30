@@ -8,6 +8,7 @@
     "start": "parcel src/index.html --open"
   },
   "devDependencies": {
+    "eslint": "^5.16.0",
     "flow-bin": "^0.97.0",
     "husky": "^1.3.1",
     "lint-staged": "^8.1.5",
@@ -43,8 +44,8 @@
   },
   "lint-staged": {
     "*.{js,json,css,md,html,elm,ts,tsx}": [
-      "prettier --config package.json --write",
-      "git add"
+      "echo \"prettier --config package.json --write\"",
+      "echo \"git add\""
     ]
   }
 }
