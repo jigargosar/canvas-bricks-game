@@ -47,6 +47,14 @@ function degToRad(deg) {
 
 // HELPERS
 
+function isNil(nullable) {
+  return nullable == null
+}
+
+function notNil(nullable) {
+  return !isNil(nullable)
+}
+
 function times(fn, count) {
   return new Array(count).fill(0).map((_, i) => fn(i))
 }
@@ -215,13 +223,13 @@ function lineRectIntersection(p1, p2, [rx, ry, rw, rh]) {
 
 function ballIntersectionPointWithBrick(oldBallPos, brick) {
   const [p1, p2] = [oldBallPos, [ball.x, ball.y]]
-  const ip = lineRectIntersection(p1, p2, [
+  const intersection = lineRectIntersection(p1, p2, [
     brick.x,
     brick.y,
     brick.w,
     brick.h,
   ])
-  return ip
+  return intersection ? { intersection, brick } : null
 }
 
 function updateBallViewPortCollision() {
@@ -250,11 +258,8 @@ function updateBallBrickCollision(oldBallPos) {
   const [oldBallX, oldBallY] = oldBallPos
   const brickCollisionResults = bricks
     .filter(b => b.alive)
-    .map(brick => ({
-      brick,
-      intersection: ballIntersectionPointWithBrick(oldBallPos, brick),
-    }))
-    .filter(({ intersection }) => intersection !== null)
+    .map(brick => ballIntersectionPointWithBrick(oldBallPos, brick))
+    .filter(notNil)
     .sort((a, b) => b.intersection.len - a.intersection.len)
 
   if (brickCollisionResults.length > 0) {
