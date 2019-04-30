@@ -141,11 +141,13 @@ const initialBallSpeed = 200
 const [ballDX, ballDY] = polarToCart(degToRad(100), initialBallSpeed)
 
 /**
+ * 
  * @typedef Ball
  * @type {{x:number, y:number, r:number, dx:number,dy:number}}
 */
 
 /**
+ * 
  * @type {Ball}
  */
 const ball = { x: VW / 2, y: VH / 2, r: 10, dx: ballDX, dy: ballDY }
@@ -153,6 +155,7 @@ const ball = { x: VW / 2, y: VH / 2, r: 10, dx: ballDX, dy: ballDY }
 const [brickW, brickH] = [50, 30]
 
 /**
+ * 
  * @typedef Brick
  * @type {{x:number, y:number, w:number, h:number, alive:boolean}}
 */
@@ -305,35 +308,15 @@ function lineRectIntersection(p1, p2, rect4) {
 
   return head(intersections)
 
-  // const [rx, ry, rw, rh] = rect4
-
-  // /** @type {[Point,Point]}  */
-  // const [rt3, rt4] = [([rx, ry]), ([rx + rw, ry]),]
-
-  // /** @type {[Point,Point]}  */
-  // const [rb3, rb4] = [([rx, ry + rh]), ([rx + rw, ry + rh]),]
-
-  // const intersectionPoints = [
-  //   lineLineIntersectionPoint(p1, p2, rt3, rt4),
-  //   lineLineIntersectionPoint(p1, p2, rb3, rb4),
-  // ].filter(point => point !== null)
-
-  // const sortedPoints = intersectionPoints
-  //   .map(point => {
-  //     return { point, len: distanceBetweenPoints(p1, point) }
-  //   })
-  //   .sort(({ len: a }, { len: b }) => b - a)
-
-  // return head(sortedPoints)
 }
 
 /**
  * @template T
- * @param {T[]} sortedPoints 
+ * @param {T[]} arr 
  * @returns {T|null}
  */
-function head(sortedPoints) {
-  return sortedPoints.length > 0 ? sortedPoints[0] : null
+function head(arr) {
+  return arr.length > 0 ? arr[0] : null
 }
 
 /**
@@ -416,30 +399,6 @@ function updateBallBrickCollision(oldBallPos) {
         break
     }
 
-    // if (oldBallY <= brick.y) {
-    //   ball.y = brick.y
-    // } else {
-    //   ball.y = brick.y + brick.h
-    // }
   }
 
-  // if (brickCollisionResults.length > 0) {
-  //   debugger
-  //   const { brick, ip } = brickCollisionResults[0]
-
-  //   brick.alive = false
-  //   ball.dy *= -1
-  //   const [angle, length] = cartToPolar(ball.dx, ball.dy)
-  //   const [newDX, newDY] = polarToCart(
-  //     angle + degToRad(randomIn(-1, +1)),
-  //     length,
-  //   )
-  //   ball.dx = newDX
-  //   ball.dy = newDY
-  //   if (oldBallY <= brick.y) {
-  //     ball.y = brick.y
-  //   } else {
-  //     ball.y = brick.y + brick.h
-  //   }
-  // }
 }
