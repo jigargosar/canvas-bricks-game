@@ -258,12 +258,12 @@ function update(delta) {
 function lineRectIntersection(p1, p2, rect4) {
   const [rx, ry, rw, rh] = rect4
   const [rt3, rt4] = [
-    /** @type [number,number]  */ ([rx, ry]),
-    /** @type [number,number]  */ ([rx + rw, ry]),
+    /** @type Point  */ ([rx, ry]),
+    /** @type Point  */ ([rx + rw, ry]),
   ]
   const [rb3, rb4] = [
-    /** @type [number,number]  */ ([rx, ry + rh]),
-    /** @type [number,number]  */ ([rx + rw, ry + rh]),
+    /** @type Point  */ ([rx, ry + rh]),
+    /** @type Point  */ ([rx + rw, ry + rh]),
   ]
 
   const intersectionPoints = [
@@ -287,7 +287,7 @@ function ballIntersectionPointWithBrick(oldBallPos, brick) {
 
   const intersection = lineRectIntersection(
     p1,
-    /** @type [number,number]  */(p2),
+    /** @type Point  */(p2),
     [brick.x, brick.y, brick.w, brick.h],
   )
   return intersection ? { intersection, brick } : null
