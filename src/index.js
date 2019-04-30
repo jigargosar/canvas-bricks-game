@@ -251,11 +251,13 @@ function move(x, y, dx, dy, dt) {
   return { x, y, nx, ny, len: distanceBetweenPoints([x, y], [nx, ny]) }
 }
 
+/**
+ * @param {number} delta
+ */
 function update(delta) {
   const ballMove = move(ball.x, ball.y, ball.dx, ball.dy, delta)
 
-  const [oldBallX, oldBallY] = [ball.x, ball.y]
-  const oldBallPos = [oldBallX, oldBallY]
+  const oldBallPos = [ball.x, ball.y]
   ball.x += ball.dx * delta
   ball.y += ball.dy * delta
   if (!updateBallViewPortCollision(ballMove)) {
