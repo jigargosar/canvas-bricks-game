@@ -1,14 +1,19 @@
+// @ts-check
 import 'tachyons'
 import './index.css'
 
 // LINE SEGMENT INTERSECTION
 // http://www-cs.ccny.cuny.edu/~wolberg/capstone/intersection/Intersection%20point%20of%20two%20lines.html
-function lineLineIntersectionPoint(
-  [x1, y1],
-  [x2, y2],
-  [x3, y3],
-  [x4, y4],
-) {
+
+/**
+ * @param {[number, number] } p1
+ * @param {[number, number] } p2
+ * @param {[number, number] } p3
+ * @param {[number, number] } p4
+ * @returns {([number, number]|null)}
+ */
+function lineLineIntersectionPoint(p1, p2, p3, p4) {
+  const [[x1, y1], [x2, y2], [x3, y3], [x4, y4]] = [p1, p2, p3, p4]
   const denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1)
 
   if (denominator === 0) return null
@@ -16,7 +21,7 @@ function lineLineIntersectionPoint(
   const uaNumerator = (x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)
   const ubNumerator = (x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)
 
-  if ((uaNumerator === ubNumerator) === 0) return null
+  if (uaNumerator === 0 && ubNumerator === 0) return null
 
   const ua = uaNumerator / denominator
   const ub = ubNumerator / denominator
@@ -73,7 +78,10 @@ const [VW, VH] = V_SIZE
 const [VCX, VCY] = [VW / 2, VH / 2]
 
 // CANVAS
-const canvas = document.getElementById('gameScreen')
+
+const canvas = /** @type HTMLCanvasElement */ document.getElementById(
+  'gameScreen',
+)
 canvas.width = VW
 canvas.height = VH
 
@@ -203,9 +211,21 @@ function update(delta) {
   }
 }
 
-function lineRectIntersection(p1, p2, [rx, ry, rw, rh]) {
-  const [rt3, rt4] = [[rx, ry], [rx + rw, ry]]
-  const [rb3, rb4] = [[rx, ry + rh], [rx + rw, ry + rh]]
+/**
+ * @param {[number, number]} p1
+ * @param {[number, number]} p2
+ * @param {[number, number, number, number]} rect4
+ */
+function lineRectIntersection(p1, p2, rect4) {
+  const [rx, ry, rw, rh] = rect4
+  const [rt3, rt4] = [
+    /** @type [number,number]  */ [rx, ry],
+    /** @type [number,number]  */ [rx + rw, ry],
+  ]
+  const [rb3, rb4] = [
+    /** @type [number,number]  */ [rx, ry + rh],
+    /** @type [number,number]  */ [rx + rw, ry + rh],
+  ]
 
   const intersectionPoints = [
     lineLineIntersectionPoint(p1, p2, rt3, rt4),
@@ -223,12 +243,11 @@ function lineRectIntersection(p1, p2, [rx, ry, rw, rh]) {
 
 function ballIntersectionPointWithBrick(oldBallPos, brick) {
   const [p1, p2] = [oldBallPos, [ball.x, ball.y]]
-  const intersection = lineRectIntersection(p1, p2, [
-    brick.x,
-    brick.y,
-    brick.w,
-    brick.h,
-  ])
+  const intersection = lineRectIntersection(
+    p1,
+    /** @type [number,number]  */ p2,
+    [brick.x, brick.y, brick.w, brick.h],
+  )
   return intersection ? { intersection, brick } : null
 }
 

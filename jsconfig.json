@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "lib": ["es2017", "dom", "esnext.array"],
+    "jsx": "preserve"
+  },
+  "include": ["src/**/*", "src/index.js"]
+}
