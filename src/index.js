@@ -71,7 +71,7 @@ function notNil(nullable) {
   return !isNil(nullable)
 }
 
-/** 
+/**
  * @template T
  * @param { (i:number) => T } fn
  * @param { number } count
@@ -141,13 +141,13 @@ const initialBallSpeed = 200
 const [ballDX, ballDY] = polarToCart(degToRad(100), initialBallSpeed)
 
 /**
- * 
+ *
  * @typedef Ball
  * @type {{x:number, y:number, r:number, dx:number,dy:number}}
-*/
+ */
 
 /**
- * 
+ *
  * @type {Ball}
  */
 const ball = { x: VW / 2, y: VH / 2, r: 10, dx: ballDX, dy: ballDY }
@@ -155,10 +155,10 @@ const ball = { x: VW / 2, y: VH / 2, r: 10, dx: ballDX, dy: ballDY }
 const [brickW, brickH] = [50, 30]
 
 /**
- * 
+ *
  * @typedef Brick
  * @type {{x:number, y:number, w:number, h:number, alive:boolean}}
-*/
+ */
 
 /**
  * @param {number} x
@@ -187,8 +187,15 @@ function createBrickAtRowColumn(row, column) {
   return createBrick(x, y)
 }
 
-const bricks = times(row => times(column => createBrickAtRowColumn(row, column), 5), 5)
-  .flatMap(x => x)
+function createInitialBricks() {
+  return times(
+    row => times(column => createBrickAtRowColumn(row, column), 5),
+    5,
+  ).flatMap(x => x)
+}
+
+// const bricks = createInitialBricks()
+const bricks = []
 
 // KEYBOARD HANDLERS
 
@@ -260,7 +267,10 @@ function update(delta) {
   // ball.x += ball.dx * delta
   // ball.y += ball.dy * delta
 
-  if (!updateBallViewPortCollision(ballMove) && !updateBallBrickCollision(ballMove)) {
+  if (
+    !updateBallViewPortCollision(ballMove) &&
+    !updateBallBrickCollision(ballMove)
+  ) {
     ball.x = ballMove.nx
     ball.y = ballMove.ny
   }
@@ -274,11 +284,11 @@ function update(delta) {
 /**
  * @typedef Side
  * @type {"top"| 'bottom'|'left'|'right'}
- * 
- * @typedef RectEdge 
+ *
+ * @typedef RectEdge
  * @type {{side:Side, p1:Point,p2:Point}}
- * 
- * @param {Rect4} rect4 
+ *
+ * @param {Rect4} rect4
  * @returns {RectEdge []}
  */
 function rect4ToEdges(rect4) {
@@ -295,41 +305,48 @@ function rect4ToEdges(rect4) {
 /**
  * @typedef LineRectIntersection
  * @type {{edge:RectEdge, point:Point, len:number}}
- * 
+ *
  */
 
 /**
-* @param {Point} p1
-* @param {Point} p2
-* @param {Rect4} rect4
-* @returns {LineRectIntersection?}
-*/
+ * @param {Point} p1
+ * @param {Point} p2
+ * @param {Rect4} rect4
+ * @returns {LineRectIntersection?}
+ */
 function lineRectIntersection(p1, p2, rect4) {
-
   const intersections = rect4ToEdges(rect4)
     .map(edge => {
-      const intersectionPoint = lineLineIntersectionPoint(p1, p2, edge.p1, edge.p2)
+      const intersectionPoint = lineLineIntersectionPoint(
+        p1,
+        p2,
+        edge.p1,
+        edge.p2,
+      )
       return notNil(intersectionPoint)
-        ? ({ edge, point: intersectionPoint, len: distanceBetweenPoints(p1, intersectionPoint) })
+        ? {
+            edge,
+            point: intersectionPoint,
+            len: distanceBetweenPoints(p1, intersectionPoint),
+          }
         : null
     })
     .filter(notNil)
     .sort(({ len: a }, { len: b }) => b - a)
 
   return head(intersections)
-
 }
 
 /**
  * @template T
- * @param {T[]} arr 
+ * @param {T[]} arr
  * @returns {T?}
  */
 function head(arr) {
   return arr.length > 0 ? arr[0] : null
 }
 
-/** 
+/**
  * @template A,B
  * @param {(a:A) => B} fn
  * @param {A?} nullable
@@ -342,14 +359,14 @@ function unlessNil(fn, nullable) {
 /**
  * @typedef BallRectIntersection
  * @type {{intersection:LineRectIntersection, brick:Brick}}
- * 
+ *
  */
 /**
- * 
- * @param {any} ballMove 
- * @param {Brick} brick 
+ *
+ * @param {any} ballMove
+ * @param {Brick} brick
  * @returns {BallRectIntersection?}
- * 
+ *
  */
 function ballIntersectionWithBrick(ballMove, brick) {
   /** @type {Point}   */
@@ -357,15 +374,19 @@ function ballIntersectionWithBrick(ballMove, brick) {
   /** @type {Point}   */
   const p2 = [ballMove.nx, ballMove.ny]
   /** @type {Rect4}   */
-  const rect4 = [brick.x - ball.r, brick.y - ball.r, brick.w + ball.r * 2, brick.h + ball.r * 2]
+  const rect4 = [
+    brick.x - ball.r,
+    brick.y - ball.r,
+    brick.w + ball.r * 2,
+    brick.h + ball.r * 2,
+  ]
 
   const intersection = lineRectIntersection(p1, p2, rect4)
 
-  return isNil(intersection) ? null : ({ intersection, brick })
+  return unlessNil(() => ({ intersection, brick }), intersection)
 }
 
 function updateBallViewPortCollision(ballMove) {
-
   const newBallY = ballMove.ny
   if (newBallY > VH) {
     ball.y = VH
@@ -394,7 +415,6 @@ function updateBallViewPortCollision(ballMove) {
 }
 
 function updateBallBrickCollision(ballMove) {
-
   const brickCollisionResults = bricks
     .filter(b => b.alive)
     .map(brick => ballIntersectionWithBrick(ballMove, brick))
@@ -404,7 +424,13 @@ function updateBallBrickCollision(ballMove) {
   const bbIntersection = head(brickCollisionResults)
   if (!bbIntersection) return false
 
-  const { brick, intersection: { point, edge: { side } } } = brickCollisionResults[0]
+  const {
+    brick,
+    intersection: {
+      point,
+      edge: { side },
+    },
+  } = brickCollisionResults[0]
   brick.alive = false
 
   const [angle, length] = cartToPolar(ball.dx, ball.dy)

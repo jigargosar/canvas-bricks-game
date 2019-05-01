@@ -44,8 +44,8 @@
   },
   "lint-staged": {
     "*.{js,json,css,md,html,elm,ts,tsx}": [
-      "echo \"prettier --config package.json --write\"",
-      "echo \"git add\""
+      "prettier --config package.json --write",
+      "git add"
     ]
   }
 }
