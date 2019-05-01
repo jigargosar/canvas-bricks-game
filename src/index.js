@@ -14,7 +14,7 @@ import './index.css'
  * @param {Point} p2
  * @param {Point} p3
  * @param {Point} p4
- * @returns {Point?}
+ * @returns {Point | null}
  * @tutorial http://www-cs.ccny.cuny.edu/~wolberg/capstone/intersection/Intersection%20point%20of%20two%20lines.html
  */
 function lineLineIntersectionPoint(p1, p2, p3, p4) {
@@ -63,6 +63,11 @@ function degToRad(deg) {
 
 // HELPERS
 
+/**
+ * @template A
+ * @param {A} nullable
+ * @returns {boolean}
+ */
 function isNil(nullable) {
   return nullable == null
 }
@@ -118,7 +123,19 @@ Object.assign(canvas, {
   className: 'db center ba',
 })
 
-const ctx = canvas.getContext('2d')
+/**
+ * @template T
+ * @param {T | null} obj
+ * @returns T
+ */
+function assertNotNil(obj) {
+  if (obj == null) {
+    throw new Error('assertNotNil')
+  }
+  return obj
+}
+
+const ctx = assertNotNil(canvas.getContext('2d'))
 
 // GAME OBJECTS
 
@@ -194,8 +211,9 @@ function createInitialBricks() {
   ).flatMap(x => x)
 }
 
-// const bricks = createInitialBricks()
-const bricks = []
+const bricks = createInitialBricks()
+
+// const bricks = []
 
 // KEYBOARD HANDLERS
 
@@ -302,6 +320,16 @@ function rect4ToEdges(rect4) {
 }
 
 /**
+ * @template T
+ * @param {(T|null)[]} arr
+ * @returns {T[]}
+ */
+function rejectNil(arr) {
+  // @ts-ignore
+  return arr.filter(notNil)
+}
+
+/**
  * @typedef LineRectIntersection
  * @type {{edge:RectEdge, point:Point, len:number}}
  *
@@ -310,21 +338,23 @@ function rect4ToEdges(rect4) {
  * @param {Point} p1
  * @param {Point} p2
  * @param {Rect4} rect4
- * @returns {LineRectIntersection?}
+ * @returns {LineRectIntersection | null}
  */
 function lineRectIntersection(p1, p2, rect4) {
-  const intersections = rect4ToEdges(rect4)
-    .map(edge => {
-      const pInter = lineLineIntersectionPoint(p1, p2, edge.p1, edge.p2)
-      const result = {
-        edge,
-        point: pInter,
-        len: distanceBetweenPoints(p1, pInter),
-      }
-      return notNil(pInter) ? result : null
-    })
-    .filter(notNil)
-    .sort(({ len: a }, { len: b }) => b - a)
+  const intersections = rejectNil(
+    rect4ToEdges(rect4).map(edge => {
+      const pIntersec = lineLineIntersectionPoint(p1, p2, edge.p1, edge.p2)
+
+      return unlessNil(
+        point => ({
+          edge,
+          point,
+          len: distanceBetweenPoints(p1, point),
+        }),
+        pIntersec,
+      )
+    }),
+  ).sort(({ len: a }, { len: b }) => b - a)
 
   return head(intersections)
 }
@@ -345,7 +375,7 @@ function head(arr) {
  * @return {B?}
  */
 function unlessNil(fn, nullable) {
-  return isNil(nullable) ? null : fn(nullable)
+  return nullable == null ? null : fn(nullable)
 }
 
 /**
@@ -356,6 +386,15 @@ function unlessNil(fn, nullable) {
 function expandRect4By(num, rect4) {
   const [x, y, w, h] = rect4
   return [x - num, y - num, w + num * 2, h + num * 2]
+}
+
+/**
+ * @param {{ x: number; y: number; w: number; h: number }} rectRecord
+ * @returns {Rect4}
+ */
+function rect4FromRecord(rectRecord) {
+  const { x, y, w, h } = rectRecord
+  return [x, y, w, h]
 }
 
 /**
@@ -375,12 +414,14 @@ function ballIntersectionWithBrick(ballMove, brick) {
   const p1 = [ballMove.x, ballMove.y]
   /** @type {Point}   */
   const p2 = [ballMove.nx, ballMove.ny]
+
   /** @type {Rect4}   */
-  const rect4 = expandRect4By(ball.r, [brick.y, brick.x, brick.w, brick.h])
+  const rect4 = expandRect4By(ball.r, rect4FromRecord(brick))
 
-  const intersection = lineRectIntersection(p1, p2, rect4)
-
-  return unlessNil(() => ({ intersection, brick }), intersection)
+  return unlessNil(
+    intersection => ({ intersection, brick }),
+    lineRectIntersection(p1, p2, rect4),
+  )
 }
 
 function updateBallViewPortCollision(ballMove) {
@@ -412,11 +453,11 @@ function updateBallViewPortCollision(ballMove) {
 }
 
 function updateBallBrickCollision(ballMove) {
-  const brickCollisionResults = bricks
-    .filter(b => b.alive)
-    .map(brick => ballIntersectionWithBrick(ballMove, brick))
-    .filter(notNil)
-    .sort((a, b) => b.intersection.len - a.intersection.len)
+  const brickCollisionResults = rejectNil(
+    bricks
+      .filter(b => b.alive)
+      .map(brick => ballIntersectionWithBrick(ballMove, brick)),
+  ).sort((a, b) => b.intersection.len - a.intersection.len)
 
   const bbIntersection = head(brickCollisionResults)
   if (!bbIntersection) return false
@@ -427,7 +468,7 @@ function updateBallBrickCollision(ballMove) {
       point,
       edge: { side },
     },
-  } = brickCollisionResults[0]
+  } = bbIntersection
   brick.alive = false
 
   ball.x = point[0]

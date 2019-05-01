@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "strictNullChecks": true,
     "target": "es2015",
     "lib": ["es2017", "dom", "esnext.array"],
     "jsx": "preserve"
