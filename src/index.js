@@ -317,18 +317,13 @@ function rect4ToEdges(rect4) {
 function lineRectIntersection(p1, p2, rect4) {
   const intersections = rect4ToEdges(rect4)
     .map(edge => {
-      const intersectionPoint = lineLineIntersectionPoint(
-        p1,
-        p2,
-        edge.p1,
-        edge.p2,
-      )
+      const pInter = lineLineIntersectionPoint(p1, p2, edge.p1, edge.p2)
       const result = {
         edge,
-        point: intersectionPoint,
-        len: distanceBetweenPoints(p1, intersectionPoint),
+        point: pInter,
+        len: distanceBetweenPoints(p1, pInter),
       }
-      return notNil(intersectionPoint) ? result : null
+      return notNil(pInter) ? result : null
     })
     .filter(notNil)
     .sort(({ len: a }, { len: b }) => b - a)
