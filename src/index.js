@@ -349,6 +349,16 @@ function unlessNil(fn, nullable) {
 }
 
 /**
+ * @param {number} num
+ * @param {Rect4} rect4
+ * @returns {Rect4}
+ */
+function expandRect4By(num, rect4) {
+  const [x, y, w, h] = rect4
+  return [x - num, y - num, w + num * 2, h + num * 2]
+}
+
+/**
  * @typedef BallRectIntersection
  * @type {{intersection:LineRectIntersection, brick:Brick}}
  *
@@ -366,12 +376,7 @@ function ballIntersectionWithBrick(ballMove, brick) {
   /** @type {Point}   */
   const p2 = [ballMove.nx, ballMove.ny]
   /** @type {Rect4}   */
-  const rect4 = [
-    brick.x - ball.r,
-    brick.y - ball.r,
-    brick.w + ball.r * 2,
-    brick.h + ball.r * 2,
-  ]
+  const rect4 = expandRect4By(ball.r, [brick.y, brick.x, brick.w, brick.h])
 
   const intersection = lineRectIntersection(p1, p2, rect4)
 
