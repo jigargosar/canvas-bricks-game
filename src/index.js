@@ -271,9 +271,26 @@ function render() {
     })
 }
 
+/**
+ * @typedef Move
+ * @type {{p:Point, np:Point, len:number}}
+ */
+/**
+ *
+ * @param {number} x
+ * @param {number} y
+ * @param {number} dx
+ * @param {number} dy
+ * @param {number} dt
+ * @returns {Move}
+ */
 function move(x, y, dx, dy, dt) {
   const [nx, ny] = [x + dx * dt, y + dy * dt]
-  return { x, y, nx, ny, len: distanceBetweenPoints([x, y], [nx, ny]) }
+  return {
+    p: [x, y],
+    np: [nx, ny],
+    len: distanceBetweenPoints([x, y], [nx, ny]),
+  }
 }
 
 /**
@@ -289,8 +306,9 @@ function update(delta) {
     !updateBallViewPortCollision(ballMove) &&
     !updateBallBrickCollision(ballMove)
   ) {
-    ball.x = ballMove.nx
-    ball.y = ballMove.ny
+    const [nx, ny] = ballMove.np
+    ball.x = nx
+    ball.y = ny
   }
 }
 
@@ -404,48 +422,47 @@ function rect4FromRecord(rectRecord) {
  */
 /**
  *
- * @param {any} ballMove
+ * @param {Move} ballMove
  * @param {Brick} brick
  * @returns {BallRectIntersection?}
  *
  */
 function ballIntersectionWithBrick(ballMove, brick) {
-  /** @type {Point}   */
-  const p1 = [ballMove.x, ballMove.y]
-  /** @type {Point}   */
-  const p2 = [ballMove.nx, ballMove.ny]
-
-  /** @type {Rect4}   */
   const rect4 = expandRect4By(ball.r, rect4FromRecord(brick))
 
   return unlessNil(
     intersection => ({ intersection, brick }),
-    lineRectIntersection(p1, p2, rect4),
+    lineRectIntersection(ballMove.p, ballMove.np, rect4),
   )
 }
 
+/**
+ *
+ * @param {Move} ballMove
+ *
+ */
 function updateBallViewPortCollision(ballMove) {
-  const newBallY = ballMove.ny
-  if (newBallY > VH) {
+  const [nx, ny] = ballMove.np
+  if (ny > VH) {
     ball.y = VH
-    ball.x = ballMove.nx
+    ball.x = nx
     ball.dy *= -1
     return true
-  } else if (newBallY < 0) {
+  } else if (ny < 0) {
     ball.y = 0
-    ball.x = ballMove.nx
+    ball.x = nx
     ball.dy *= -1
     return true
   }
-  const newBallX = ballMove.nx
-  if (newBallX < 0) {
+
+  if (nx < 0) {
     ball.x = 0
-    ball.y = ballMove.ny
+    ball.y = ny
     ball.dx *= -1
     return true
-  } else if (newBallX > VW) {
+  } else if (nx > VW) {
     ball.x = VW
-    ball.y = ballMove.ny
+    ball.y = ny
     ball.dx *= -1
     return true
   }
