@@ -280,7 +280,6 @@ function update(delta) {
  * @typedef Rect4
  * @type {[number,number,number,number]}
  */
-
 /**
  * @typedef Side
  * @type {"top"| 'bottom'|'left'|'right'}
@@ -307,7 +306,6 @@ function rect4ToEdges(rect4) {
  * @type {{edge:RectEdge, point:Point, len:number}}
  *
  */
-
 /**
  * @param {Point} p1
  * @param {Point} p2
