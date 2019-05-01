@@ -425,14 +425,6 @@ function updateBallBrickCollision(ballMove) {
   } = brickCollisionResults[0]
   brick.alive = false
 
-  const [angle, length] = cartToPolar(ball.dx, ball.dy)
-  const [newDX, newDY] = polarToCart(
-    angle + degToRad(randomIn(-1, +1)),
-    length,
-  )
-  ball.dx = newDX
-  ball.dy = newDY
-
   ball.x = point[0]
   ball.y = point[1]
 
@@ -447,6 +439,14 @@ function updateBallBrickCollision(ballMove) {
       ball.dx *= -1
       break
   }
+
+  const [angle, length] = cartToPolar(ball.dx, ball.dy)
+  const [newDX, newDY] = polarToCart(
+    angle + degToRad(randomIn(-1, +1)),
+    length,
+  )
+  ball.dx = newDX
+  ball.dy = newDY
 
   return true
 }
