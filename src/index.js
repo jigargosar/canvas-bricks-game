@@ -469,6 +469,10 @@ function updateBallViewPortCollision(ballMove) {
   return false
 }
 
+/**
+ *
+ * @param {Move} ballMove
+ */
 function updateBallBrickCollision(ballMove) {
   const brickCollisionResults = rejectNil(
     bricks
