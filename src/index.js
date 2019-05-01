@@ -323,13 +323,12 @@ function lineRectIntersection(p1, p2, rect4) {
         edge.p1,
         edge.p2,
       )
-      return notNil(intersectionPoint)
-        ? {
-            edge,
-            point: intersectionPoint,
-            len: distanceBetweenPoints(p1, intersectionPoint),
-          }
-        : null
+      const result = {
+        edge,
+        point: intersectionPoint,
+        len: distanceBetweenPoints(p1, intersectionPoint),
+      }
+      return notNil(intersectionPoint) ? result : null
     })
     .filter(notNil)
     .sort(({ len: a }, { len: b }) => b - a)
