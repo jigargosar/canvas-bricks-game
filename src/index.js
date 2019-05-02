@@ -118,6 +118,18 @@ function randomIn(num1, num2) {
   return Math.random() * (max - min) + min
 }
 
+/**
+ * @template T
+ * @param {T | null} obj
+ * @returns T
+ */
+function assertNotNil(obj) {
+  if (obj == null) {
+    throw new Error('assertNotNil')
+  }
+  return obj
+}
+
 // CONSTANTS
 
 const V_SIZE = [400, 400]
@@ -150,18 +162,6 @@ Object.assign(canvas, {
   height: VH,
   className: 'db center ba',
 })
-
-/**
- * @template T
- * @param {T | null} obj
- * @returns T
- */
-function assertNotNil(obj) {
-  if (obj == null) {
-    throw new Error('assertNotNil')
-  }
-  return obj
-}
 
 const ctx = assertNotNil(canvas.getContext('2d'))
 
