@@ -273,7 +273,7 @@ function render() {
 
 /**
  * @typedef Move
- * @type {{p:Point, np:Point, len:number}}
+ * @type {{p:Point, np:Point, dt:number,len:number}}
  */
 /**
  *
@@ -289,6 +289,7 @@ function move(x, y, dx, dy, dt) {
   return {
     p: [x, y],
     np: [nx, ny],
+    dt,
     len: distanceBetweenPoints([x, y], [nx, ny]),
   }
 }
@@ -297,15 +298,16 @@ function move(x, y, dx, dy, dt) {
  * @param {number} delta
  */
 function update(delta) {
-  const ballMove = move(ball.x, ball.y, ball.dx, ball.dy, delta)
-
   // ball.x += ball.dx * delta
   // ball.y += ball.dy * delta
 
-  if (
-    !updateBallViewPortCollision(ballMove) &&
-    !updateBallBrickCollision(ballMove)
-  ) {
+  const newDelta = updateBallViewPortCollision(delta)
+  if (newDelta > 0) {
+    update(delta)
+  }
+
+  const ballMove = move(ball.x, ball.y, ball.dx, ball.dy, delta)
+  if (!updateBallBrickCollision(ballMove)) {
     const [nx, ny] = ballMove.np
     ball.x = nx
     ball.y = ny
@@ -438,35 +440,71 @@ function ballIntersectionWithBrick(ballMove, brick) {
 
 /**
  *
- * @param {Move} ballMove
- *
+ * @param {number} delta
+ * @returns {number}
  */
-function updateBallViewPortCollision(ballMove) {
-  const [nx, ny] = ballMove.np
-  if (ny > VH) {
-    ball.y = VH
-    ball.x = nx
-    ball.dy *= -1
-    return true
-  } else if (ny < 0) {
-    ball.y = 0
-    ball.x = nx
-    ball.dy *= -1
-    return true
+function updateBallViewPortCollision(delta) {
+  const ballMove = move(ball.x, ball.y, ball.dx, ball.dy, delta)
+
+  const bvIntersection = ballViewportIntersection(ballMove)
+  if (!bvIntersection) return 0
+  const {
+    point: [ix, iy],
+    edge: { side },
+  } = bvIntersection
+
+  ball.x = ix
+  ball.y = iy
+
+  // constrainBallInViewPort()
+
+  switch (side) {
+    case 'top':
+    case 'bottom':
+      ball.dy *= -1
+      break
+
+    case 'left':
+    case 'right':
+      ball.dx *= -1
+      break
   }
 
-  if (nx < 0) {
-    ball.x = 0
-    ball.y = ny
-    ball.dx *= -1
-    return true
-  } else if (nx > VW) {
-    ball.x = VW
-    ball.y = ny
-    ball.dx *= -1
-    return true
-  }
-  return false
+  return (bvIntersection.len * ballMove.dt) / ballMove.len
+
+  // const [nx, ny] = ballMove.np
+  // if (ny > VH) {
+  //   ball.y = VH
+  //   ball.x = nx
+  //   ball.dy *= -1
+  //   return true
+  // } else if (ny < 0) {
+  //   ball.y = 0
+  //   ball.x = nx
+  //   ball.dy *= -1
+  //   return true
+  // }
+
+  // if (nx < 0) {
+  //   ball.x = 0
+  //   ball.y = ny
+  //   ball.dx *= -1
+  //   return true
+  // } else if (nx > VW) {
+  //   ball.x = VW
+  //   ball.y = ny
+  //   ball.dx *= -1
+  //   return true
+  // }
+  // return false
+}
+
+/**
+ * @param {Move} ballMove
+ */
+function ballViewportIntersection(ballMove) {
+  const rect4 = expandRect4By(ball.r * -1, [0, 0, VW, VH])
+  return lineRectIntersection(ballMove.p, ballMove.np, rect4)
 }
 
 /**
