@@ -371,15 +371,13 @@ function lineRectIntersection(p1, p2, rect4) {
   const intersections = rejectNil(
     rect4ToEdges(rect4).map(edge => {
       const pIntersec = lineLineIntersectionPoint(p1, p2, edge.p1, edge.p2)
-
-      return unlessNil(
-        point => ({
-          edge,
-          point,
-          len: distanceBetweenPoints(p1, point),
-        }),
-        pIntersec,
-      )
+      return pIntersec
+        ? {
+            edge,
+            point: pIntersec,
+            len: distanceBetweenPoints(p1, pIntersec),
+          }
+        : null
     }),
   ).sort(({ len: a }, { len: b }) => b - a)
 
