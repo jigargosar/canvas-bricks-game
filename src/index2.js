@@ -20,15 +20,25 @@ function gameLoop(step) {
   requestAnimationFrame(callback)
 }
 
-function step(ctx) {
+function step(ctx, ball) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
   ctx.fillStyle = 'green'
-  ctx.fillRect(10, 10, 100, 100)
+  ctx.beginPath()
+  ctx.arc(ball.pos.x, ball.pos.y, ball.r, 0, Math.PI * 2, false)
+  ctx.fillStyle = 'green'
+  ctx.fill()
 }
 
+function getCtxCenter({ canvas }) {
+  return { x: canvas.width / 2, y: canvas.height / 2 }
+}
 function start() {
   const ctx = initCanvas()
-  gameLoop(() => step(ctx))
+  const ball = { pos: { x: 0, y: 0 }, r: 30 }
+
+  ball.pos = getCtxCenter(ctx)
+
+  gameLoop(() => step(ctx, ball))
 }
 
 start()
