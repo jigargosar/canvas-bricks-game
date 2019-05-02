@@ -75,6 +75,24 @@ function isNil(nullable) {
 function notNil(nullable) {
   return !isNil(nullable)
 }
+/**
+ * @template T
+ * @param {T[]} arr
+ * @returns {T?}
+ */
+function head(arr) {
+  return arr.length > 0 ? arr[0] : null
+}
+
+/**
+ * @template A,B
+ * @param {(a:A) => B} fn
+ * @param {A?} nullable
+ * @return {B?}
+ */
+function unlessNil(fn, nullable) {
+  return nullable == null ? null : fn(nullable)
+}
 
 /**
  * @template T
@@ -83,6 +101,16 @@ function notNil(nullable) {
  */
 function times(fn, count) {
   return new Array(count).fill(0).map((_, i) => fn(i))
+}
+
+/**
+ * @template T
+ * @param {(T|null)[]} arr
+ * @returns {T[]}
+ */
+function rejectNil(arr) {
+  // @ts-ignore
+  return arr.filter(notNil)
 }
 
 function randomIn(num1, num2) {
@@ -186,10 +214,6 @@ function createBrick(x, y) {
   return { x, y, w: brickW, h: brickH, alive: true }
 }
 
-// const brick = createBrick(0, 0)
-
-// setXY(VCX - getCX(brick), VCY - getCY(brick), brick)
-
 const brickVerticalSpacing = 30
 const brickHorizontalSpacing = 30
 
@@ -235,15 +259,8 @@ let lastTS = window.performance.now()
 function step(currentTS) {
   const delta = (currentTS - lastTS) / 1000
   lastTS = currentTS
-  // UPDATE
-
-  // TODO:
-  // * bounce of paddle?
-  // * Game over on bottom viewport side
 
   update(delta)
-
-  // RENDER
   render()
 
   requestAnimationFrame(step)
@@ -340,16 +357,6 @@ function rect4ToEdges(rect4) {
 }
 
 /**
- * @template T
- * @param {(T|null)[]} arr
- * @returns {T[]}
- */
-function rejectNil(arr) {
-  // @ts-ignore
-  return arr.filter(notNil)
-}
-
-/**
  * @typedef LineRectIntersection
  * @type {{edge:RectEdge, point:Point, len:number}}
  *
@@ -377,25 +384,6 @@ function lineRectIntersection(p1, p2, rect4) {
   ).sort(({ len: a }, { len: b }) => b - a)
 
   return head(intersections)
-}
-
-/**
- * @template T
- * @param {T[]} arr
- * @returns {T?}
- */
-function head(arr) {
-  return arr.length > 0 ? arr[0] : null
-}
-
-/**
- * @template A,B
- * @param {(a:A) => B} fn
- * @param {A?} nullable
- * @return {B?}
- */
-function unlessNil(fn, nullable) {
-  return nullable == null ? null : fn(nullable)
 }
 
 /**
