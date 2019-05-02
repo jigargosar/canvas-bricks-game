@@ -441,6 +441,7 @@ function updateBallViewPortCollision(delta) {
 
   ball.x = ix
   ball.y = iy
+  restrictBallWithinViewport()
 
   // constrainBallInViewPort()
 
@@ -456,7 +457,9 @@ function updateBallViewPortCollision(delta) {
       break
   }
 
-  return (bvIntersection.len * ballMove.dt) / ballMove.len
+  const ballMoveLen = distanceBetweenPoints(ballMove.p, [ball.x, ball.y])
+
+  return (ballMoveLen * ballMove.dt) / ballMove.len
 
   // const [nx, ny] = ballMove.np
   // if (ny > VH) {
@@ -483,6 +486,25 @@ function updateBallViewPortCollision(delta) {
   //   return true
   // }
   // return false
+}
+
+/**
+ * @param {number} min
+ * @param {number} max
+ * @param {number} num
+ * @returns {number}
+ */
+function truncateBetween(min, max, num) {
+  return num < min ? min : num > max ? max : num
+}
+
+function restrictBallWithinViewport() {
+  const [x, y, w, h] = expandRect4By(ball.r * -1, [0, 0, VW, VH])
+
+  const [minX, maxX, minY, maxY] = [x, x + w, y, y + h]
+
+  ball.x = truncateBetween(minX, maxX, ball.x)
+  ball.y = truncateBetween(minY, maxY, ball.y)
 }
 
 /**
