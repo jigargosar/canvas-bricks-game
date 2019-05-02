@@ -50,7 +50,7 @@ const Ball = {
     const newPos = Ball.nextPos(ball)
     const clampedPos = clampCircleInViewPort(viewport, {
       pos: newPos,
-      radius: ball.r,
+      radius: ball.radius,
     })
     ball.pos = clampedPos
   },
@@ -62,7 +62,7 @@ function step(ctx, { ball, viewport }) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
   ctx.fillStyle = 'green'
   ctx.beginPath()
-  ctx.arc(ball.pos.x, ball.pos.y, ball.r, 0, Math.PI * 2, false)
+  ctx.arc(ball.pos.x, ball.pos.y, ball.radius, 0, Math.PI * 2, false)
   ctx.fillStyle = 'green'
   ctx.fill()
 }
@@ -94,7 +94,7 @@ function start() {
   const ctx = initCanvas()
   const ball = {
     pos: { x: 0, y: 0 },
-    r: 30,
+    radius: 30,
     vel: Velocity.fromPolar(deg(100), 10),
   }
 
