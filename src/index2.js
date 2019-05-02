@@ -20,55 +20,21 @@ function gameLoop(step) {
   requestAnimationFrame(callback)
 }
 
-function clampCircleInViewPort(viewport, { pos, radius }) {
-  let x = pos.x
-
-  const [minX, maxX] = [radius, viewport.width - radius]
-  if (x < minX) {
-    x = minX
-  } else if (x > maxX) {
-    x = maxX
-  }
-
-  let y = pos.y
-  const [minY, maxY] = [radius, viewport.height - radius]
-
-  if (y < minY) {
-    y = minY
-  } else if (y > maxY) {
-    y = maxY
-  }
-
-  return { x, y }
-}
-
-const Ball = {
-  nextPos(ball) {
-    return { x: ball.pos.x + ball.vel.dx, y: ball.pos.y + ball.vel.dy }
+const Position = {
+  zero() {
+    return Position.fromXY(0, 0)
   },
-  update(viewport, ball) {
-    const newPos = Ball.nextPos(ball)
-    const clampedPos = clampCircleInViewPort(viewport, {
-      pos: newPos,
-      radius: ball.radius,
-    })
-    ball.pos = clampedPos
+  fromXY(x, y) {
+    return { x, y }
   },
-}
+  mapEach(xFn, yFn, pos) {
+    return Position.fromXY(xFn(pos.x), yFn(pos.y))
+  },
 
-function step(ctx, { ball, viewport }) {
-  Ball.update(viewport, ball)
-
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-  ctx.fillStyle = 'green'
-  ctx.beginPath()
-  ctx.arc(ball.pos.x, ball.pos.y, ball.radius, 0, Math.PI * 2, false)
-  ctx.fillStyle = 'green'
-  ctx.fill()
-}
-
-function getCtxCenter({ canvas }) {
-  return { x: canvas.width / 2, y: canvas.height / 2 }
+  addVelocity(vel, pos) {
+    const [dx, dy] = Velocity.toCartTuple(vel)
+    return Position.mapEach(x => x + dx, y => y + dy, pos)
+  },
 }
 
 const Velocity = {
@@ -78,11 +44,38 @@ const Velocity = {
       dy: Math.sin(angle) * magnitude,
     }
   },
+  toCartTuple(vel) {
+    return [vel.dx, vel.dy]
+  },
 }
 
 const Viewport = {
   fromCtx({ canvas: { width, height } }) {
     return { width, height }
+  },
+  center(viewport) {
+    return Position.fromXY(viewport.width / 2, viewport.height / 2)
+  },
+  clampCircle({ pos, radius }, viewport) {
+    let x = pos.x
+
+    const [minX, maxX] = [radius, viewport.width - radius]
+    if (x < minX) {
+      x = minX
+    } else if (x > maxX) {
+      x = maxX
+    }
+
+    let y = pos.y
+    const [minY, maxY] = [radius, viewport.height - radius]
+
+    if (y < minY) {
+      y = minY
+    } else if (y > maxY) {
+      y = maxY
+    }
+
+    return { x, y }
   },
 }
 
@@ -90,17 +83,54 @@ function deg(degrees) {
   return (degrees * Math.PI) / 180
 }
 
+const Ball = {
+  init(options) {
+    const pos = options.pos || Position.zero()
+    return {
+      pos,
+      radius: 30,
+      vel: Velocity.fromPolar(deg(100), 10),
+    }
+  },
+  mapPos(fn, ball) {
+    return { ...ball, pos: fn(ball.pos) }
+  },
+  update(viewport, ball) {
+    const newPos = Position.addVelocity(ball.vel, ball.pos)
+    const clampedPos = Viewport.clampCircle(
+      {
+        pos: newPos,
+        radius: ball.radius,
+      },
+      viewport,
+    )
+    ball.pos = clampedPos
+  },
+
+  render(ctx, ball) {
+    ctx.beginPath()
+    ctx.arc(ball.pos.x, ball.pos.y, ball.radius, 0, Math.PI * 2, false)
+    ctx.fillStyle = 'green'
+    ctx.fill()
+  },
+}
+
+function step(ctx, { ball, viewport }) {
+  Ball.update(viewport, ball)
+
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+
+  Ball.render(ctx, ball)
+}
+
+function getCtxCenter({ canvas }) {
+  return { x: canvas.width / 2, y: canvas.height / 2 }
+}
+
 function start() {
   const ctx = initCanvas()
-  const ball = {
-    pos: { x: 0, y: 0 },
-    radius: 30,
-    vel: Velocity.fromPolar(deg(100), 10),
-  }
-
-  ball.pos = getCtxCenter(ctx)
-
   const viewport = Viewport.fromCtx(ctx)
+  const ball = Ball.init({ pos: Viewport.center(viewport) })
 
   gameLoop(() => step(ctx, { ball, viewport }))
 }
