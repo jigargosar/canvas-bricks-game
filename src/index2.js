@@ -72,6 +72,14 @@ const Velocity = {
   toCartTuple(vel) {
     return [vel.dx, vel.dy]
   },
+
+  fromXY(dx, dy) {
+    return { dx, dy }
+  },
+
+  mapEach(xFn, yFn, vel) {
+    return Velocity.fromXY(xFn(vel.dx), yFn(vel.dy))
+  },
 }
 const I = x => x
 
@@ -151,6 +159,14 @@ const Bounds = {
   },
 }
 
+function ensurePositive(num) {
+  return Math.abs(num)
+}
+
+function ensureNegative(num) {
+  return Math.abs(num) * -1
+}
+
 const Ball = {
   init(options) {
     const pos = options.pos || Position.zero()
@@ -170,21 +186,22 @@ const Ball = {
     )
 
     const newPos = Position.addVelocity(ball.vel, ball.pos)
-
     const clampedPos = Bounds.clampPos(newPos, bounds)
 
-    if (newPos.x < bounds.minX) {
-      ball.vel.dx = Math.abs(ball.vel.dx)
-    } else if (newPos.x > bounds.maxX) {
-      ball.vel.dx = Math.abs(ball.vel.dx) * -1
-    }
+    const dxFn =
+      newPos.x < bounds.minX
+        ? ensurePositive
+        : newPos.x > bounds.maxX
+        ? ensureNegative
+        : I
+    const dyFn =
+      newPos.y < bounds.minY
+        ? ensurePositive
+        : newPos.y > bounds.maxY
+        ? ensureNegative
+        : I
 
-    if (newPos.y < bounds.minY) {
-      ball.vel.dy = Math.abs(ball.vel.dy)
-    } else if (newPos.y > bounds.maxY) {
-      ball.vel.dy = Math.abs(ball.vel.dy) * -1
-    }
-
+    ball.vel = Velocity.mapEach(dxFn, dyFn, ball.vel)
     ball.pos = clampedPos
   },
 
