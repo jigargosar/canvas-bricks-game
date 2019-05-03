@@ -173,11 +173,16 @@ const Ball = {
 
     const clampedPos = Bounds.clampPos(newPos, bounds)
 
-    if (newPos.x < bounds.minX || newPos.x > bounds.maxX) {
-      ball.vel.dx *= -1
+    if (newPos.x < bounds.minX) {
+      ball.vel.dx = Math.abs(ball.vel.dx)
+    } else if (newPos.x > bounds.maxX) {
+      ball.vel.dx = Math.abs(ball.vel.dx) * -1
     }
-    if (newPos.y < bounds.minY || newPos.y > bounds.maxY) {
-      ball.vel.dy *= -1
+
+    if (newPos.y < bounds.minY) {
+      ball.vel.dy = Math.abs(ball.vel.dy)
+    } else if (newPos.y > bounds.maxY) {
+      ball.vel.dy = Math.abs(ball.vel.dy) * -1
     }
 
     ball.pos = clampedPos
