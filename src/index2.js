@@ -83,27 +83,11 @@ const Viewport = {
     return Position.fromXY(viewport.width / 2, viewport.height / 2)
   },
   clampCircle(circle, viewport) {
-    const cBounds = Bounds.fromCircle(circle)
-    const vBounds = Bounds.fromViewport(viewport)
-
-    let mapX = I
-    let mapY = I
-    if (cBounds.minX < vBounds.minX) {
-      mapX = x => x + (vBounds.minX - cBounds.minX)
-    } else if (cBounds.maxX > vBounds.maxX) {
-      mapX = x => x - (cBounds.maxX - vBounds.maxX)
-    }
-
-    if (cBounds.minY < vBounds.minY) {
-      mapY = y => y + (vBounds.minY - cBounds.minY)
-    } else if (cBounds.maxY > vBounds.maxY) {
-      mapY = y => y - (cBounds.maxY - vBounds.maxY)
-    }
-
-    return Circle.mapCenter(
-      pos => Position.mapEach(mapX, mapY, pos),
-      circle,
+    const bounds = Bounds.shrinkBy(
+      circle.radius,
+      Bounds.fromViewport(viewport),
     )
+    return Circle.mapCenter(pos => Bounds.clampPos(pos, bounds), circle)
   },
 }
 
@@ -143,6 +127,23 @@ const Bounds = {
       minY: minPos.y,
       maxY: maxPos.y,
     }
+  },
+  shrinkBy(num, bounds) {
+    const { minX, maxX, minY, maxY } = bounds
+    return {
+      minX: minX + num,
+      maxX: maxX - num,
+      minY: minY + num,
+      maxY: maxY - num,
+    }
+  },
+
+  clampPos(pos, bounds) {
+    const { minX, maxX, minY, maxY } = bounds
+    const xFn = x => clamp(minX, maxX, x)
+    const yFn = y => clamp(minY, maxY, y)
+
+    return Position.mapEach(xFn, yFn, pos)
   },
   fromViewport(viewport) {
     const minPos = Position.zero()
