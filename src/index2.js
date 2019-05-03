@@ -214,7 +214,7 @@ const Ball = {
 }
 
 const Paddle = {
-  init(options) {
+  init(options = {}) {
     const pos = options.pos || Position.zero()
     return {
       pos,
@@ -244,11 +244,12 @@ function start() {
   const ctx = initCanvas()
   const viewport = Viewport.fromCtx(ctx)
   const ball = Ball.init({ pos: Viewport.center(viewport) })
-  const paddle = Paddle.init({
-    pos: Position.fromXY((viewport.width + 100) / 2, viewport.height - 20),
-  })
-
-  gameLoop(() => step(ctx, { ball, paddle, viewport }))
+  const paddle = Paddle.init()
+  ;(paddle.pos = Position.fromXY(
+    (viewport.width - paddle.size.width) / 2,
+    viewport.height - paddle.size.height - 20,
+  )),
+    gameLoop(() => step(ctx, { ball, paddle, viewport }))
 }
 
 setTimeout(start, 0)
