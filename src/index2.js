@@ -188,18 +188,18 @@ const Ball = {
     const newPos = Position.addVelocity(ball.vel, ball.pos)
     const clampedPos = Bounds.clampPos(newPos, bounds)
 
-    const dxFn =
-      newPos.x < bounds.minX
-        ? ensurePositive
-        : newPos.x > bounds.maxX
-        ? ensureNegative
-        : I
-    const dyFn =
-      newPos.y < bounds.minY
-        ? ensurePositive
-        : newPos.y > bounds.maxY
-        ? ensureNegative
-        : I
+    function velocityFn(min, max, val) {
+      if (val < min) {
+        return ensurePositive
+      } else if (val > max) {
+        return ensureNegative
+      } else {
+        return I
+      }
+    }
+
+    const dxFn = velocityFn(bounds.minX, bounds.maxX, newPos.x)
+    const dyFn = velocityFn(bounds.minY, bounds.maxY, newPos.y)
 
     ball.vel = Velocity.mapEach(dxFn, dyFn, ball.vel)
     ball.pos = clampedPos
