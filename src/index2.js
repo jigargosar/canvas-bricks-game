@@ -38,6 +38,9 @@ function gameLoop(step) {
 }
 
 const Position = {
+  equals(p1, p2) {
+    return p1.x === p2.x && p1.y === p2.y
+  },
   zero() {
     return Position.fromXY(0, 0)
   },
@@ -109,19 +112,17 @@ const Circle = {
   mapCenter(cFn, circle) {
     return Circle.fromCenterRadius(cFn(circle.center), circle.radius)
   },
-
-  minPos(circle) {
-    return Position.mapBoth(num => num - circle.radius, circle.center)
-  },
-  maxPos(circle) {
-    return Position.mapBoth(num => num + circle.radius, circle.center)
-  },
 }
 
 const Bounds = {
-  fromCircle(circle) {
-    const minPos = Position.toRecord(Circle.minPos(circle))
-    const maxPos = Position.toRecord(Circle.maxPos(circle))
+  fromPosSize(pos, size) {
+    const minPos = pos
+    const maxPos = Position.mapEach(
+      x => x + size.width,
+      y => y + size.height,
+      pos,
+    )
+
     return {
       minX: minPos.x,
       maxX: maxPos.x,
@@ -129,6 +130,7 @@ const Bounds = {
       maxY: maxPos.y,
     }
   },
+
   shrinkBy(num, bounds) {
     const { minX, maxX, minY, maxY } = bounds
     return {
@@ -138,6 +140,9 @@ const Bounds = {
       maxY: maxY - num,
     }
   },
+  growBy(num, bounds) {
+    return Bounds.shrinkBy(num * -1, bounds)
+  },
 
   clampPos(pos, bounds) {
     const { minX, maxX, minY, maxY } = bounds
@@ -146,6 +151,12 @@ const Bounds = {
 
     return Position.mapEach(xFn, yFn, pos)
   },
+
+  containsPos(pos, bounds) {
+    const cp = Bounds.clampPos(pos, bounds)
+    return Position.equals(cp, pos)
+  },
+
   fromViewport(viewport) {
     const minPos = Position.zero()
     const maxPos = Position.fromXY(viewport.width, viewport.height)
@@ -179,13 +190,36 @@ const Ball = {
   circle(ball) {
     return Circle.fromCenterRadius(ball.pos, ball.radius)
   },
-  update(viewport, ball) {
+
+  update(viewport, ball, paddle) {
     const bounds = Bounds.shrinkBy(
       ball.radius,
       Bounds.fromViewport(viewport),
     )
 
     const newPos = Position.addVelocity(ball.vel, ball.pos)
+
+    const paddleBounds = Bounds.growBy(
+      ball.radius,
+      Bounds.fromPosSize(paddle.pos, paddle.size),
+    )
+
+    const isCollidingWithPaddle = Bounds.containsPos(newPos, paddleBounds)
+
+    if (isCollidingWithPaddle) {
+      let x = newPos.x
+      let y = newPos.y
+      let dyFn = I
+      if (newPos.y >= paddleBounds.minY) {
+        y = paddleBounds.minY - 1
+        dyFn = ensureNegative
+      }
+
+      ball.vel = Velocity.mapEach(I, dyFn, ball.vel)
+      ball.pos = Position.fromXY(x, y)
+      return
+    }
+
     const clampedPos = Bounds.clampPos(newPos, bounds)
 
     function velocityFn(min, max, val) {
@@ -232,7 +266,7 @@ const Paddle = {
 }
 
 function step(ctx, { ball, paddle, viewport }) {
-  Ball.update(viewport, ball)
+  Ball.update(viewport, ball, paddle)
 
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
