@@ -73,6 +73,7 @@ const Velocity = {
     return [vel.dx, vel.dy]
   },
 }
+const I = x => x
 
 const Viewport = {
   fromCtx({ canvas: { width, height } }) {
@@ -81,14 +82,25 @@ const Viewport = {
   center(viewport) {
     return Position.fromXY(viewport.width / 2, viewport.height / 2)
   },
-  clampCircle({ pos, radius }, viewport) {
-    const [minX, maxX] = [radius, viewport.width - radius]
-    const x = clamp(minX, maxX, pos.x)
-
-    const [minY, maxY] = [radius, viewport.height - radius]
-    const y = clamp(minY, maxY, pos.y)
-
-    return { x, y }
+  clampCircle(circle, viewport) {
+    const cBounds = Bounds.fromCircle(circle)
+    const vBounds = Bounds.fromViewport(viewport)
+    debugger
+    if (cBounds.xMin < vBounds.xMin) {
+      return Circle.mapCenter(
+        pos =>
+          Position.mapEach(x => x + (vBounds.minX - cBounds.minX), I, pos),
+        circle,
+      )
+    } else if (cBounds.xMax > vBounds.xMax) {
+      return Circle.mapCenter(
+        pos =>
+          Position.mapEach(x => x - (cBounds.maxX - vBounds.maxX), I, pos),
+        circle,
+      )
+    } else {
+      return circle
+    }
   },
 }
 
@@ -97,27 +109,31 @@ function deg(degrees) {
 }
 
 const Circle = {
-  fromPosRadius(pos, radius) {
+  fromCenterRadius(center, radius) {
     invariant(radius >= 0, 'radius of circle cannot be negative')
-    return { pos, radius }
+    return { center, radius }
   },
-  toRecord(circle) {
-    return Object.assign({}, Position.toRecord(circle.pos), {
-      radius: circle.radius,
-    })
+
+  center(circle) {
+    return circle.center
   },
+
+  mapCenter(cFn, circle) {
+    return Circle.fromCenterRadius(cFn(circle.center), circle.radius)
+  },
+
   minPos(circle) {
-    return Position.mapBoth(num => num - circle.radius, circle.pos)
+    return Position.mapBoth(num => num - circle.radius, circle.center)
   },
   maxPos(circle) {
-    return Position.mapBoth(num => num + circle.radius, circle.pos)
+    return Position.mapBoth(num => num + circle.radius, circle.center)
   },
 }
 
 const Bounds = {
   fromCircle(circle) {
-    const minPos = Circle.minPos(circle)
-    const maxPos = Circle.maxPos(circle)
+    const minPos = Position.toRecord(Circle.minPos(circle))
+    const maxPos = Position.toRecord(Circle.maxPos(circle))
     return {
       minX: minPos.x,
       maxX: maxPos.x,
@@ -147,18 +163,19 @@ const Ball = {
       vel: Velocity.fromPolar(deg(100), 10),
     }
   },
-  mapPos(fn, ball) {
-    return { ...ball, pos: fn(ball.pos) }
+  circle(ball) {
+    return Circle.fromCenterRadius(ball.pos, ball.radius)
   },
   update(viewport, ball) {
-    const newPos = Position.addVelocity(ball.vel, ball.pos)
+    const oldCircle = Ball.circle(ball)
+    const newCircle = Circle.mapCenter(
+      pos => Position.addVelocity(ball.vel, pos),
+      oldCircle,
+    )
+    const newBounds = Bounds.fromCircle(newCircle)
 
-    const clampedPos = Viewport.clampCircle(
-      {
-        pos: newPos,
-        radius: ball.radius,
-      },
-      viewport,
+    const clampedPos = Circle.center(
+      Viewport.clampCircle(newCircle, viewport),
     )
     ball.pos = clampedPos
   },
@@ -187,4 +204,4 @@ function start() {
   gameLoop(() => step(ctx, { ball, viewport }))
 }
 
-start()
+setTimeout(start, 0)
