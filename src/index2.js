@@ -163,7 +163,7 @@ const Ball = {
     return {
       pos,
       radius: 30,
-      vel: Velocity.fromPolar(deg(100), 10),
+      vel: Velocity.fromPolar(deg(79.99), 9.99),
     }
   },
   circle(ball) {
