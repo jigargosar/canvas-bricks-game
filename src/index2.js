@@ -85,7 +85,7 @@ const Viewport = {
   clampCircle(circle, viewport) {
     const cBounds = Bounds.fromCircle(circle)
     const vBounds = Bounds.fromViewport(viewport)
-    debugger
+
     if (cBounds.xMin < vBounds.xMin) {
       return Circle.mapCenter(
         pos =>
