@@ -82,13 +82,6 @@ const Viewport = {
   center(viewport) {
     return Position.fromXY(viewport.width / 2, viewport.height / 2)
   },
-  clampCircle(circle, viewport) {
-    const bounds = Bounds.shrinkBy(
-      circle.radius,
-      Bounds.fromViewport(viewport),
-    )
-    return Circle.mapCenter(pos => Bounds.clampPos(pos, bounds), circle)
-  },
 }
 
 function deg(degrees) {
@@ -171,16 +164,22 @@ const Ball = {
     return Circle.fromCenterRadius(ball.pos, ball.radius)
   },
   update(viewport, ball) {
-    const oldCircle = Ball.circle(ball)
-    const newCircle = Circle.mapCenter(
-      pos => Position.addVelocity(ball.vel, pos),
-      oldCircle,
+    const bounds = Bounds.shrinkBy(
+      ball.radius,
+      Bounds.fromViewport(viewport),
     )
-    const newBounds = Bounds.fromCircle(newCircle)
 
-    const clampedPos = Circle.center(
-      Viewport.clampCircle(newCircle, viewport),
-    )
+    const newPos = Position.addVelocity(ball.vel, ball.pos)
+
+    const clampedPos = Bounds.clampPos(newPos, bounds)
+
+    if (newPos.x < bounds.minX || newPos.x > bounds.maxX) {
+      ball.vel.dx *= -1
+    }
+    if (newPos.y < bounds.minY || newPos.y > bounds.maxY) {
+      ball.vel.dy *= -1
+    }
+
     ball.pos = clampedPos
   },
 
