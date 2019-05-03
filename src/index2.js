@@ -213,20 +213,42 @@ const Ball = {
   },
 }
 
-function step(ctx, { ball, viewport }) {
+const Paddle = {
+  init(options) {
+    const pos = options.pos || Position.zero()
+    return {
+      pos,
+      size: { width: 100, height: 10 },
+    }
+  },
+  render(ctx, paddle) {
+    ctx.beginPath()
+    const { x, y } = Position.toRecord(paddle.pos)
+    const { width, height } = paddle.size
+    ctx.rect(x, y, width, height)
+    ctx.fillStyle = 'orange'
+    ctx.fill()
+  },
+}
+
+function step(ctx, { ball, paddle, viewport }) {
   Ball.update(viewport, ball)
 
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
   Ball.render(ctx, ball)
+  Paddle.render(ctx, paddle)
 }
 
 function start() {
   const ctx = initCanvas()
   const viewport = Viewport.fromCtx(ctx)
   const ball = Ball.init({ pos: Viewport.center(viewport) })
+  const paddle = Paddle.init({
+    pos: Position.fromXY((viewport.width + 100) / 2, viewport.height - 20),
+  })
 
-  gameLoop(() => step(ctx, { ball, viewport }))
+  gameLoop(() => step(ctx, { ball, paddle, viewport }))
 }
 
 setTimeout(start, 0)
