@@ -48,9 +48,17 @@ const Position = {
     return Position.fromXY(xFn(pos.x), yFn(pos.y))
   },
 
+  mapBoth(xyFn, pos) {
+    return Position.fromXY(xyFn(pos.x), xyFn(pos.y))
+  },
+
   addVelocity(vel, pos) {
     const [dx, dy] = Velocity.toCartTuple(vel)
     return Position.mapEach(x => x + dx, y => y + dy, pos)
+  },
+
+  toRecord(pos) {
+    return { x: pos.x, y: pos.y }
   },
 }
 
@@ -88,6 +96,48 @@ function deg(degrees) {
   return (degrees * Math.PI) / 180
 }
 
+const Circle = {
+  fromPosRadius(pos, radius) {
+    invariant(radius >= 0, 'radius of circle cannot be negative')
+    return { pos, radius }
+  },
+  toRecord(circle) {
+    return Object.assign({}, Position.toRecord(circle.pos), {
+      radius: circle.radius,
+    })
+  },
+  minPos(circle) {
+    return Position.mapBoth(num => num - circle.radius, circle.pos)
+  },
+  maxPos(circle) {
+    return Position.mapBoth(num => num + circle.radius, circle.pos)
+  },
+}
+
+const Bounds = {
+  fromCircle(circle) {
+    const minPos = Circle.minPos(circle)
+    const maxPos = Circle.maxPos(circle)
+    return {
+      minX: minPos.x,
+      maxX: maxPos.x,
+      minY: minPos.y,
+      maxY: maxPos.y,
+    }
+  },
+  fromViewport(viewport) {
+    const minPos = Position.zero()
+    const maxPos = Position.fromXY(viewport.width, viewport.height)
+
+    return {
+      minX: minPos.x,
+      maxX: maxPos.x,
+      minY: minPos.y,
+      maxY: maxPos.y,
+    }
+  },
+}
+
 const Ball = {
   init(options) {
     const pos = options.pos || Position.zero()
@@ -102,6 +152,7 @@ const Ball = {
   },
   update(viewport, ball) {
     const newPos = Position.addVelocity(ball.vel, ball.pos)
+
     const clampedPos = Viewport.clampCircle(
       {
         pos: newPos,
