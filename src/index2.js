@@ -1,6 +1,23 @@
 import 'tachyons'
 import './index.css'
 
+function invariant(pred, msg = 'invariant failed') {
+  if (!pred) {
+    throw new Error(msg)
+  }
+}
+
+function clamp(min, max, num) {
+  invariant(min < max, 'min should be less than max')
+  if (num < min) {
+    return min
+  } else if (num > max) {
+    return max
+  } else {
+    return num
+  }
+}
+
 function initCanvas() {
   const canvas = document.getElementById('gameScreen')
   const ctx = canvas.getContext('2d')
@@ -57,23 +74,11 @@ const Viewport = {
     return Position.fromXY(viewport.width / 2, viewport.height / 2)
   },
   clampCircle({ pos, radius }, viewport) {
-    let x = pos.x
-
     const [minX, maxX] = [radius, viewport.width - radius]
-    if (x < minX) {
-      x = minX
-    } else if (x > maxX) {
-      x = maxX
-    }
+    const x = clamp(minX, maxX, pos.x)
 
-    let y = pos.y
     const [minY, maxY] = [radius, viewport.height - radius]
-
-    if (y < minY) {
-      y = minY
-    } else if (y > maxY) {
-      y = maxY
-    }
+    const y = clamp(minY, maxY, pos.y)
 
     return { x, y }
   },
@@ -121,10 +126,6 @@ function step(ctx, { ball, viewport }) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
   Ball.render(ctx, ball)
-}
-
-function getCtxCenter({ canvas }) {
-  return { x: canvas.width / 2, y: canvas.height / 2 }
 }
 
 function start() {
