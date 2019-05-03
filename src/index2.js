@@ -86,21 +86,24 @@ const Viewport = {
     const cBounds = Bounds.fromCircle(circle)
     const vBounds = Bounds.fromViewport(viewport)
 
-    if (cBounds.xMin < vBounds.xMin) {
-      return Circle.mapCenter(
-        pos =>
-          Position.mapEach(x => x + (vBounds.minX - cBounds.minX), I, pos),
-        circle,
-      )
-    } else if (cBounds.xMax > vBounds.xMax) {
-      return Circle.mapCenter(
-        pos =>
-          Position.mapEach(x => x - (cBounds.maxX - vBounds.maxX), I, pos),
-        circle,
-      )
-    } else {
-      return circle
+    let mapX = I
+    let mapY = I
+    if (cBounds.minX < vBounds.minX) {
+      mapX = x => x + (vBounds.minX - cBounds.minX)
+    } else if (cBounds.maxX > vBounds.maxX) {
+      mapX = x => x - (cBounds.maxX - vBounds.maxX)
     }
+
+    if (cBounds.minY < vBounds.minY) {
+      mapY = y => y + (vBounds.minY - cBounds.minY)
+    } else if (cBounds.maxY > vBounds.maxY) {
+      mapY = y => y - (cBounds.maxY - vBounds.maxY)
+    }
+
+    return Circle.mapCenter(
+      pos => Position.mapEach(mapX, mapY, pos),
+      circle,
+    )
   },
 }
 
