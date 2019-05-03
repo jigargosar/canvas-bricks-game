@@ -245,11 +245,11 @@ function start() {
   const viewport = Viewport.fromCtx(ctx)
   const ball = Ball.init({ pos: Viewport.center(viewport) })
   const paddle = Paddle.init()
-  ;(paddle.pos = Position.fromXY(
+  paddle.pos = Position.fromXY(
     (viewport.width - paddle.size.width) / 2,
     viewport.height - paddle.size.height - 20,
-  )),
-    gameLoop(() => step(ctx, { ball, paddle, viewport }))
+  )
+  gameLoop(() => step(ctx, { ball, paddle, viewport }))
 }
 
 setTimeout(start, 0)
