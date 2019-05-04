@@ -39,6 +39,9 @@ const Vector = {
   add([x, y], [x2, y2]) {
     return Vector.fromXY(x + x2, y + y2)
   },
+  scale(num, vec) {
+    return vec.map(n => n * num)
+  },
 }
 
 function clamp(min, max, num) {
@@ -73,7 +76,8 @@ function gameLoop(step) {
 
 const Rect = {
   fromWH(width, height) {
-    return { center: [width / 2, height / 2], size: [width, height] }
+    const size = Vector.fromXY(width, height)
+    return { center: Vector.scale(0.5, size), size }
   },
   cp(rect) {
     return rect.center
