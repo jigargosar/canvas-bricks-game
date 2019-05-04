@@ -11,6 +11,10 @@ function invariant(pred, msg = 'invariant failed') {
   }
 }
 
+function I(x) {
+  return x
+}
+
 const Vector = {
   fromXY(x, y) {
     return [x, y]
@@ -36,14 +40,30 @@ const Vector = {
   mag([x, y]) {
     return Math.sqrt(x * x + y * y)
   },
-  add([x, y], [x2, y2]) {
-    return Vector.fromXY(x + x2, y + y2)
+  add(v1) {
+    return function add2_(v2) {
+      return Vector.add2(v1, v2)
+    }
   },
-  sub([x, y], [x2, y2]) {
-    return Vector.fromXY(x - x2, y - y2)
+  add2([x1, y1], [x2, y2]) {
+    return Vector.fromXY(x1 + x2, y1 + y2)
+  },
+  sub([x1, y1], [x2, y2]) {
+    return Vector.fromXY(x1 - x2, y1 - y2)
   },
   scale(num, vec) {
     return vec.map(n => n * num)
+  },
+  mapEach(xf, yf, [x, y]) {
+    return Vector.fromXY(xf(x), yf(y))
+  },
+  mapX(xf, vec) {
+    return Vector.mapEach(xf, I, vec)
+  },
+  mapY(yf) {
+    return function mapY_(vec) {
+      return Vector.mapEach(I, yf, vec)
+    }
   },
 }
 
@@ -103,30 +123,20 @@ const Rect = {
   mapCP(cf, rect) {
     return { ...rect, center: cf(rect.center) }
   },
-  mapCX(xf, rect) {
-    return Rect.mapCP(([x, y]) => [xf(x), y], rect)
-  },
-  addCX(offset, rect) {
-    return Rect.mapCX(x => x + offset, rect)
-  },
   translate(vec, rect) {
-    return Rect.mapCP(c => Vector.add(vec, c), rect)
-  },
-  mapCY(yf, rect) {
-    return Rect.mapCP(([x, y]) => [x, yf(y)], rect)
-  },
-  toTLXYWH(rect) {
-    return [...Rect.tl(rect), ...Rect.size(rect)]
+    return Rect.mapCP(Vector.add(vec), rect)
   },
   alignBottom(fromRect, rect) {
     return Rect.mapCP(
-      ([x, y]) => [x, Rect.maxY(fromRect) - Rect.h(rect) / 2],
+      Vector.mapY(() => Rect.maxY(fromRect) - Rect.h(rect) / 2),
       rect,
     )
   },
-
   alignCenter(fromRect, rect) {
     return Rect.mapCP(() => Rect.cp(fromRect), rect)
+  },
+  toTLXYWH(rect) {
+    return [...Rect.tl(rect), ...Rect.size(rect)]
   },
 }
 
@@ -164,11 +174,12 @@ function start() {
   const paddleSpeed = 10
 
   paddleRect = Rect.alignCenter(vpRect, paddleRect)
+
   paddleRect = Rect.alignBottom(vpRect, paddleRect)
   paddleRect = Rect.translate([0, -Rect.h(paddleRect)], paddleRect)
 
   function update() {
-    ballRect = Rect.mapCP(cp => Vector.add(ballVel, cp), ballRect)
+    ballRect = Rect.mapCP(Vector.add(ballVel), ballRect)
   }
 
   function render() {
