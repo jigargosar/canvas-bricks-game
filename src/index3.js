@@ -90,6 +90,10 @@ const Rect = {
     return rect.size[1]
   },
 
+  width(rect) {
+    return rect.size[0]
+  },
+
   size(rect) {
     return rect.size
   },
@@ -131,11 +135,23 @@ const RenderRect = {
     ctx.fillStyle = fillStyle
     ctx.fillRect(x, y, w, h)
   },
+
+  fillCircleMin(ctx, fillStyle, rect) {
+    const [x, y] = Rect.cp(rect)
+    const radius = Math.min(Rect.width(rect, Rect.height(rect))) / 2
+    ctx.beginPath()
+    ctx.arc(x, y, radius, 0, degToRadians(360), false)
+    ctx.fillStyle = fillStyle
+    ctx.fill()
+  },
 }
 
 function start() {
   const ctx = initCanvas()
   const vpRect = Rect.fromWH(ctx.canvas.width, ctx.canvas.height)
+  let ballRect = Rect.fromWH(20, 20)
+  ballRect = Rect.alignCenter(vpRect, ballRect)
+
   let paddleRect = Rect.fromWH(100, 10)
   const paddleSpeed = 10
 
@@ -147,6 +163,7 @@ function start() {
 
   function render() {
     RenderRect.fillRect(ctx, 'orange', paddleRect)
+    RenderRect.fillCircleMin(ctx, 'blue', ballRect)
   }
 
   gameLoop(() => {
