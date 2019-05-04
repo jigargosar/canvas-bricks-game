@@ -1,6 +1,26 @@
 import 'tachyons'
 import './index.css'
 
+function Vector2(x, y) {
+  return {
+    get x() {
+      return x
+    },
+    get y() {
+      return y
+    },
+    get angle() {
+      return Math.atan2(y, x)
+    },
+    get mag() {
+      return Math.sqrt(x * x + y * y)
+    },
+    add(vec2) {
+      return Vector2(x + vec2.x, y + vec2.y)
+    },
+  }
+}
+
 function invariant(pred, msg = 'invariant failed') {
   if (!pred) {
     throw new Error(msg)
@@ -183,8 +203,8 @@ const Ball = {
     const pos = options.pos || Position.zero()
     return {
       pos,
-      radius: 30,
-      vel: Velocity.fromPolar(deg(79.99), 9.99),
+      radius: 10,
+      vel: Velocity.fromPolar(deg(79.99), 5),
     }
   },
   circle(ball) {
