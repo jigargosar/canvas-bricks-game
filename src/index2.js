@@ -272,8 +272,30 @@ const Ball = {
 }
 
 function Paddle(options) {
+  const PaddleF = {
+    init(options = {}) {
+      const pos = options.pos || Position.zero()
+      const size = options.size || { width: 100, height: 10 }
+      return {
+        pos,
+        size,
+      }
+    },
+    render(ctx, paddle) {
+      ctx.beginPath()
+      const { x, y } = Position.toRecord(paddle.pos)
+      const { width, height } = paddle.size
+      ctx.rect(x, y, width, height)
+      ctx.fillStyle = 'orange'
+      ctx.fill()
+    },
+  }
+
   const paddle = PaddleF.init(options)
   return {
+    mapXY(fn) {
+      return Paddle({ ...paddle, pos: fn(paddle.pos) })
+    },
     get pos() {
       return paddle.pos
     },
@@ -289,24 +311,6 @@ function Paddle(options) {
   }
 }
 
-const PaddleF = {
-  init(options = {}) {
-    const pos = options.pos || Position.zero()
-    return {
-      pos,
-      size: { width: 100, height: 10 },
-    }
-  },
-  render(ctx, paddle) {
-    ctx.beginPath()
-    const { x, y } = Position.toRecord(paddle.pos)
-    const { width, height } = paddle.size
-    ctx.rect(x, y, width, height)
-    ctx.fillStyle = 'orange'
-    ctx.fill()
-  },
-}
-
 function step(ctx, { ball, paddle, viewport }) {
   Ball.update(viewport, ball, paddle)
 
@@ -320,11 +324,14 @@ function start() {
   const ctx = initCanvas()
   const viewport = Viewport.fromCtx(ctx)
   const ball = Ball.init({ pos: Viewport.center(viewport) })
-  const paddle = Paddle()
-  paddle.pos = Position.fromXY(
-    (viewport.width - paddle.size.width) / 2,
-    viewport.height - paddle.size.height - 20,
+  let paddle = Paddle()
+  paddle = paddle.mapXY(() =>
+    Position.fromXY(
+      (viewport.width - paddle.size.width) / 2,
+      viewport.height - paddle.size.height - 20,
+    ),
   )
+
   gameLoop(() => step(ctx, { ball, paddle, viewport }))
 }
 
