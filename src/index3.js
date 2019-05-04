@@ -88,6 +88,12 @@ const Rect = {
   mapCP(cf, rect) {
     return { ...rect, center: cf(rect.center) }
   },
+  mapCX(xf, rect) {
+    return Rect.mapCP(([x, y]) => [xf(x), y], rect)
+  },
+  mapCY(yf, rect) {
+    return Rect.mapCP(([x, y]) => [x, yf(y)], rect)
+  },
   toTLXYWH(rect) {
     return [...Rect.tl(rect), ...Rect.size(rect)]
   },
@@ -129,10 +135,10 @@ function start() {
   window.addEventListener('keydown', e => {
     switch (e.key) {
       case 'ArrowLeft':
-        paddleRect = Rect.mapCP(
-          ([x, y]) => [x - paddleSpeed, y],
-          paddleRect,
-        )
+        paddleRect = Rect.mapCX(x => x - paddleSpeed, paddleRect)
+        break
+      case 'ArrowRight':
+        paddleRect = Rect.mapCX(x => x + paddleSpeed, paddleRect)
         break
     }
   })
