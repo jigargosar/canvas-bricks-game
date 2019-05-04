@@ -82,6 +82,14 @@ const Rect = {
       rect.center[1] - rect.size[1] / 2,
     ]
   },
+  maxY(rect) {
+    return rect.center[1] + rect.size[1] / 2
+  },
+
+  height(rect) {
+    return rect.size[1]
+  },
+
   size(rect) {
     return rect.size
   },
@@ -99,6 +107,16 @@ const Rect = {
   },
   toTLXYWH(rect) {
     return [...Rect.tl(rect), ...Rect.size(rect)]
+  },
+  alignBottom(fromRect, rect) {
+    return Rect.mapCY(
+      () => Rect.maxY(fromRect) - Rect.height(rect) / 2,
+      rect,
+    )
+  },
+
+  alignCenter(fromRect, rect) {
+    return Rect.mapCP(() => Rect.cp(fromRect), rect)
   },
 }
 
@@ -121,7 +139,9 @@ function start() {
   let paddleRect = Rect.fromWH(100, 10)
   const paddleSpeed = 10
 
-  paddleRect = Rect.mapCP(() => Rect.cp(vpRect), paddleRect)
+  paddleRect = Rect.alignCenter(vpRect, paddleRect)
+  paddleRect = Rect.alignBottom(vpRect, paddleRect)
+  paddleRect = Rect.mapCY(y => y - Rect.height(paddleRect), paddleRect)
 
   function update() {}
 
@@ -147,4 +167,4 @@ function start() {
   })
 }
 
-setTimeout(start, 0)
+setTimeout(start, 1)
