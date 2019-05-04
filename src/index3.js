@@ -28,6 +28,9 @@ function Vector(x, y) {
     add(vec2) {
       return Vector(x + vec2.x, y + vec2.y)
     },
+    toTuple() {
+      return [x, y]
+    },
   }
 }
 
@@ -37,6 +40,10 @@ Vector.fromAngleMag = function(angle, mag) {
 
 Vector.fromDegreesMag = function(degrees, mag) {
   return Vector.fromAngleMag(degToRadians(degrees), mag)
+}
+
+Vector.fromTuple = function([x, y]) {
+  return Vector(x, y)
 }
 
 function clamp(min, max, num) {
@@ -149,7 +156,9 @@ const RenderRect = {
 function start() {
   const ctx = initCanvas()
   const vpRect = Rect.fromWH(ctx.canvas.width, ctx.canvas.height)
+
   let ballRect = Rect.fromWH(20, 20)
+  let ballVel = Vector.fromDegreesMag(20, 0.5)
   ballRect = Rect.alignCenter(vpRect, ballRect)
 
   let paddleRect = Rect.fromWH(100, 10)
@@ -159,7 +168,15 @@ function start() {
   paddleRect = Rect.alignBottom(vpRect, paddleRect)
   paddleRect = Rect.mapCY(y => y - Rect.height(paddleRect), paddleRect)
 
-  function update() {}
+  function update() {
+    ballRect = Rect.mapCP(
+      ([x, y]) =>
+        Vector(x, y)
+          .add(ballVel)
+          .toTuple(),
+      ballRect,
+    )
+  }
 
   function render() {
     RenderRect.fillRect(ctx, 'orange', paddleRect)
