@@ -69,16 +69,72 @@ function gameLoop(step) {
   requestAnimationFrame(callback)
 }
 
+const Rect = {
+  fromWH(width, height) {
+    return { center: [width / 2, height / 2], size: [width, height] }
+  },
+  cp(rect) {
+    return rect.center
+  },
+  tl(rect) {
+    return [
+      rect.center[0] - rect.size[0] / 2,
+      rect.center[1] - rect.size[1] / 2,
+    ]
+  },
+  size(rect) {
+    return rect.size
+  },
+  mapCP(cf, rect) {
+    return { ...rect, center: cf(rect.center) }
+  },
+  toTLXYWH(rect) {
+    return [...Rect.tl(rect), ...Rect.size(rect)]
+  },
+}
+
+const RenderRect = {
+  clear(ctx, rect) {
+    const [x, y, w, h] = Rect.toTLXYWH(rect)
+    ctx.clearRect(x, y, w, h)
+  },
+
+  fillRect(ctx, fillStyle, rect) {
+    const [x, y, w, h] = Rect.toTLXYWH(rect)
+    ctx.fillStyle = fillStyle
+    ctx.fillRect(x, y, w, h)
+  },
+}
+
 function start() {
   const ctx = initCanvas()
+  const vpRect = Rect.fromWH(ctx.canvas.width, ctx.canvas.height)
+  let paddleRect = Rect.fromWH(100, 10)
+  const paddleSpeed = 10
+
+  paddleRect = Rect.mapCP(() => Rect.cp(vpRect), paddleRect)
 
   function update() {}
 
-  function render() {}
+  function render() {
+    RenderRect.fillRect(ctx, 'orange', paddleRect)
+  }
 
   gameLoop(() => {
     update()
+    RenderRect.clear(ctx, vpRect)
     render()
+  })
+
+  window.addEventListener('keydown', e => {
+    switch (e.key) {
+      case 'ArrowLeft':
+        paddleRect = Rect.mapCP(
+          ([x, y]) => [x - paddleSpeed, y],
+          paddleRect,
+        )
+        break
+    }
   })
 }
 
