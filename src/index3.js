@@ -45,17 +45,23 @@ const Vector = {
   add2([x1, y1], [x2, y2]) {
     return Vector.fromXY(x1 + x2, y1 + y2)
   },
-  sub([x1, y1], [x2, y2]) {
+  sub2([x1, y1], [x2, y2]) {
     return Vector.fromXY(x1 - x2, y1 - y2)
   },
-  scale(num, vec) {
+  scale2(num, vec) {
     return vec.map(n => n * num)
   },
-  mapEach: xf => yf => ([x, y]) => Vector.fromXY(xf(x), yf(y)),
-  mapX(xf, vec) {
+  mapEach: xf => yf => vec => Vector.mapEach3(xf, yf, vec),
+  mapEach3(xf, yf, [x, y]) {
+    return Vector.fromXY(xf(x), yf(y))
+  },
+  mapX2(xf, vec) {
     return Vector.mapEach(xf)(I)(vec)
   },
-  mapY: yf => vec => Vector.mapEach(I)(yf)(vec),
+  mapY: yf => vec => Vector.mapY2(yf, vec),
+  mapY2(yf, vec) {
+    return Vector.mapEach(I)(yf)(vec)
+  },
 }
 
 function clamp(min, max, num) {
@@ -91,13 +97,13 @@ function gameLoop(step) {
 const Rect = {
   fromWH(width, height) {
     const size = Vector.fromXY(width, height)
-    return { center: Vector.scale(0.5, size), size }
+    return { center: Vector.scale2(0.5, size), size }
   },
   cp(rect) {
     return rect.center
   },
   tl(rect) {
-    return Vector.sub(rect.center, Vector.scale(0.5, rect.size))
+    return Vector.sub2(rect.center, Vector.scale2(0.5, rect.size))
   },
   maxY(rect) {
     return rect.center[1] + rect.size[1] / 2
