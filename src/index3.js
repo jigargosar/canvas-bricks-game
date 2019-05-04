@@ -88,8 +88,12 @@ function initCanvas() {
 
 function gameLoop(step) {
   const callback = () => {
-    step()
-    requestAnimationFrame(callback)
+    try {
+      step()
+      requestAnimationFrame(callback)
+    } catch (e) {
+      debugger
+    }
   }
   requestAnimationFrame(callback)
 }
@@ -99,7 +103,10 @@ const Rect = {
     const size = Vector.fromXY(width, height)
     return { center: Vector.scale2(0.5, size), size }
   },
-  cp(rect) {
+  fromWHTuple([width, height]) {
+    return Rect.fromWH(width, height)
+  },
+  center(rect) {
     return rect.center
   },
   tl(rect) {
@@ -130,10 +137,31 @@ const Rect = {
     )
   },
   alignCenter(fromRect, rect) {
-    return Rect.mapCP(() => Rect.cp(fromRect), rect)
+    return Rect.mapCP(() => Rect.center(fromRect), rect)
   },
   toTLXYWH(rect) {
     return [...Rect.tl(rect), ...Rect.size(rect)]
+  },
+  halfSize(rect) {
+    return Vector.scale2(0.5, rect.size)
+  },
+  minP(rect) {
+    return Vector.sub2(rect.center, Rect.halfSize(rect))
+  },
+  maxP(rect) {
+    return Vector.add2(rect.center, Rect.halfSize(rect))
+  },
+  mapSize(sfn, rect) {
+    return { ...rect, size: sfn(rect.size) }
+  },
+  constrainPointOffsets([x, y], rect) {
+    const [minX, minY] = Rect.minP(rect)
+    const [maxX, maxY] = Rect.maxP(rect)
+
+    return [
+      x < minX ? minX - x : x > maxX ? maxX - x : 0,
+      y < minY ? minY - y : y > maxY ? maxY - y : 0,
+    ]
   },
 }
 
@@ -150,7 +178,7 @@ const RenderRect = {
   },
 
   fillCircleMin(ctx, fillStyle, rect) {
-    const [x, y] = Rect.cp(rect)
+    const [x, y] = Rect.center(rect)
     const radius = Math.min(Rect.w(rect, Rect.h(rect))) / 2
     ctx.beginPath()
     ctx.arc(x, y, radius, 0, degToRadians(360), false)
@@ -163,8 +191,9 @@ function start() {
   const ctx = initCanvas()
   const vpRect = Rect.fromWH(ctx.canvas.width, ctx.canvas.height)
 
-  let ballRect = Rect.fromWH(20, 20)
-  let ballVel = Vector.fromDegreesMag(20, 0.5)
+  const ballSize = Vector.fromXY(20, 20)
+  let ballRect = Rect.fromWHTuple(ballSize)
+  let ballVel = Vector.fromDegreesMag(20, 10)
   ballRect = Rect.alignCenter(vpRect, ballRect)
 
   let paddleRect = Rect.fromWH(100, 10)
@@ -176,7 +205,22 @@ function start() {
   paddleRect = Rect.translate([0, -Rect.h(paddleRect)], paddleRect)
 
   function update() {
-    ballRect = Rect.mapCP(Vector.add(ballVel), ballRect)
+    const newBR = Rect.mapCP(Vector.add(ballVel), ballRect)
+    const newBallC = Rect.center(newBR)
+    const newVP = Rect.mapSize(
+      vpSize => Vector.sub2(vpSize, ballSize),
+      vpRect,
+    )
+
+    const [xo, yo] = Rect.constrainPointOffsets(newBallC, newVP)
+
+    ballVel = Vector.mapEach3(
+      dx => (xo === 0 ? dx : xo < 0 ? Math.abs(dx) * -1 : Math.abs(dx)),
+      dy => (yo === 0 ? dy : yo < 0 ? Math.abs(dy) * -1 : Math.abs(dy)),
+      ballVel,
+    )
+
+    ballRect = newBR
   }
 
   function render() {
@@ -202,4 +246,10 @@ function start() {
   })
 }
 
-setTimeout(start, 1)
+setTimeout(() => {
+  try {
+    start()
+  } catch (error) {
+    debugger
+  }
+}, 100)
