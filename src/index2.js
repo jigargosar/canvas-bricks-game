@@ -271,7 +271,25 @@ const Ball = {
   },
 }
 
-const Paddle = {
+function Paddle(options) {
+  const paddle = PaddleF.init(options)
+  return {
+    get pos() {
+      return paddle.pos
+    },
+    get size() {
+      return paddle.size
+    },
+    set pos(pos) {
+      paddle.pos = pos
+    },
+    render(ctx) {
+      PaddleF.render(ctx, paddle)
+    },
+  }
+}
+
+const PaddleF = {
   init(options = {}) {
     const pos = options.pos || Position.zero()
     return {
@@ -295,14 +313,14 @@ function step(ctx, { ball, paddle, viewport }) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
   Ball.render(ctx, ball)
-  Paddle.render(ctx, paddle)
+  paddle.render(ctx)
 }
 
 function start() {
   const ctx = initCanvas()
   const viewport = Viewport.fromCtx(ctx)
   const ball = Ball.init({ pos: Viewport.center(viewport) })
-  const paddle = Paddle.init()
+  const paddle = Paddle()
   paddle.pos = Position.fromXY(
     (viewport.width - paddle.size.width) / 2,
     viewport.height - paddle.size.height - 20,
