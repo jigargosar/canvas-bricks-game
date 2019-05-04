@@ -39,6 +39,9 @@ const Vector = {
   add([x, y], [x2, y2]) {
     return Vector.fromXY(x + x2, y + y2)
   },
+  sub([x, y], [x2, y2]) {
+    return Vector.fromXY(x - x2, y - y2)
+  },
   scale(num, vec) {
     return vec.map(n => n * num)
   },
@@ -83,18 +86,15 @@ const Rect = {
     return rect.center
   },
   tl(rect) {
-    return [
-      rect.center[0] - rect.size[0] / 2,
-      rect.center[1] - rect.size[1] / 2,
-    ]
+    return Vector.sub(rect.center, Vector.scale(0.5, rect.size))
   },
   maxY(rect) {
     return rect.center[1] + rect.size[1] / 2
   },
-  height(rect) {
+  h(rect) {
     return rect.size[1]
   },
-  width(rect) {
+  w(rect) {
     return rect.size[0]
   },
   size(rect) {
@@ -109,6 +109,9 @@ const Rect = {
   addCX(offset, rect) {
     return Rect.mapCX(x => x + offset, rect)
   },
+  translate(vec, rect) {
+    return Rect.mapCP(c => Vector.add(vec, c), rect)
+  },
   mapCY(yf, rect) {
     return Rect.mapCP(([x, y]) => [x, yf(y)], rect)
   },
@@ -116,10 +119,7 @@ const Rect = {
     return [...Rect.tl(rect), ...Rect.size(rect)]
   },
   alignBottom(fromRect, rect) {
-    return Rect.mapCY(
-      () => Rect.maxY(fromRect) - Rect.height(rect) / 2,
-      rect,
-    )
+    return Rect.mapCY(() => Rect.maxY(fromRect) - Rect.h(rect) / 2, rect)
   },
 
   alignCenter(fromRect, rect) {
@@ -141,7 +141,7 @@ const RenderRect = {
 
   fillCircleMin(ctx, fillStyle, rect) {
     const [x, y] = Rect.cp(rect)
-    const radius = Math.min(Rect.width(rect, Rect.height(rect))) / 2
+    const radius = Math.min(Rect.w(rect, Rect.h(rect))) / 2
     ctx.beginPath()
     ctx.arc(x, y, radius, 0, degToRadians(360), false)
     ctx.fillStyle = fillStyle
@@ -162,7 +162,7 @@ function start() {
 
   paddleRect = Rect.alignCenter(vpRect, paddleRect)
   paddleRect = Rect.alignBottom(vpRect, paddleRect)
-  paddleRect = Rect.mapCY(y => y - Rect.height(paddleRect), paddleRect)
+  paddleRect = Rect.translate([0, -Rect.h(paddleRect)], paddleRect)
 
   function update() {
     ballRect = Rect.mapCP(cp => Vector.add(ballVel, cp), ballRect)
@@ -182,10 +182,10 @@ function start() {
   window.addEventListener('keydown', e => {
     switch (e.key) {
       case 'ArrowLeft':
-        paddleRect = Rect.addCX(-paddleSpeed, paddleRect)
+        paddleRect = Rect.translate([-paddleSpeed, 0], paddleRect)
         break
       case 'ArrowRight':
-        paddleRect = Rect.addCX(paddleSpeed, paddleRect)
+        paddleRect = Rect.translate([paddleSpeed, 0], paddleRect)
         break
     }
   })
