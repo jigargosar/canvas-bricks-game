@@ -87,15 +87,12 @@ const Rect = {
   maxY(rect) {
     return rect.center[1] + rect.size[1] / 2
   },
-
   height(rect) {
     return rect.size[1]
   },
-
   width(rect) {
     return rect.size[0]
   },
-
   size(rect) {
     return rect.size
   },
