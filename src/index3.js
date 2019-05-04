@@ -91,6 +91,9 @@ const Rect = {
   mapCX(xf, rect) {
     return Rect.mapCP(([x, y]) => [xf(x), y], rect)
   },
+  addCX(offset, rect) {
+    return Rect.mapCX(x => x + offset, rect)
+  },
   mapCY(yf, rect) {
     return Rect.mapCP(([x, y]) => [x, yf(y)], rect)
   },
@@ -135,10 +138,10 @@ function start() {
   window.addEventListener('keydown', e => {
     switch (e.key) {
       case 'ArrowLeft':
-        paddleRect = Rect.mapCX(x => x - paddleSpeed, paddleRect)
+        paddleRect = Rect.addCX(-paddleSpeed, paddleRect)
         break
       case 'ArrowRight':
-        paddleRect = Rect.mapCX(x => x + paddleSpeed, paddleRect)
+        paddleRect = Rect.addCX(paddleSpeed, paddleRect)
         break
     }
   })
