@@ -1,5 +1,6 @@
 import 'tachyons'
 import './index.css'
+import * as R from 'ramda'
 
 function degToRadians(degrees) {
   return (degrees * Math.PI) / 180
@@ -40,11 +41,7 @@ const Vector = {
   mag([x, y]) {
     return Math.sqrt(x * x + y * y)
   },
-  add(v1) {
-    return function add2_(v2) {
-      return Vector.add2(v1, v2)
-    }
-  },
+  add: v1 => v2 => Vector.add2(v1, v2),
   add2([x1, y1], [x2, y2]) {
     return Vector.fromXY(x1 + x2, y1 + y2)
   },
@@ -54,17 +51,11 @@ const Vector = {
   scale(num, vec) {
     return vec.map(n => n * num)
   },
-  mapEach(xf, yf, [x, y]) {
-    return Vector.fromXY(xf(x), yf(y))
-  },
+  mapEach: xf => yf => ([x, y]) => Vector.fromXY(xf(x), yf(y)),
   mapX(xf, vec) {
-    return Vector.mapEach(xf, I, vec)
+    return Vector.mapEach(xf)(I)(vec)
   },
-  mapY(yf) {
-    return function mapY_(vec) {
-      return Vector.mapEach(I, yf, vec)
-    }
-  },
+  mapY: yf => vec => Vector.mapEach(I)(yf)(vec),
 }
 
 function clamp(min, max, num) {
