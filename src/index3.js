@@ -11,39 +11,34 @@ function invariant(pred, msg = 'invariant failed') {
   }
 }
 
-function Vector(x, y) {
-  return {
-    get x() {
-      return x
-    },
-    get y() {
-      return y
-    },
-    get angle() {
-      return Math.atan2(y, x)
-    },
-    get mag() {
-      return Math.sqrt(x * x + y * y)
-    },
-    add(vec2) {
-      return Vector(x + vec2.x, y + vec2.y)
-    },
-    toTuple() {
-      return [x, y]
-    },
-  }
-}
-
-Vector.fromAngleMag = function(angle, mag) {
-  return Vector(Math.cos(angle) * mag, Math.sin(angle) * mag)
-}
-
-Vector.fromDegreesMag = function(degrees, mag) {
-  return Vector.fromAngleMag(degToRadians(degrees), mag)
-}
-
-Vector.fromTuple = function([x, y]) {
-  return Vector(x, y)
+const Vector = {
+  fromXY(x, y) {
+    return [x, y]
+  },
+  fromAngleMag(angle, mag) {
+    return Vector.fromXY(Math.cos(angle) * mag, Math.sin(angle) * mag)
+  },
+  fromDegreesMag(degrees, mag) {
+    return Vector.fromAngleMag(degToRadians(degrees), mag)
+  },
+  fromTuple([x, y]) {
+    return Vector.fromXY(x, y)
+  },
+  x(v) {
+    return v[0]
+  },
+  y(v) {
+    return v[1]
+  },
+  angle([x, y]) {
+    return Math.atan2(y, x)
+  },
+  mag([x, y]) {
+    return Math.sqrt(x * x + y * y)
+  },
+  add([x, y], [x2, y2]) {
+    return Vector.fromXY(x + x2, y + y2)
+  },
 }
 
 function clamp(min, max, num) {
@@ -169,13 +164,7 @@ function start() {
   paddleRect = Rect.mapCY(y => y - Rect.height(paddleRect), paddleRect)
 
   function update() {
-    ballRect = Rect.mapCP(
-      ([x, y]) =>
-        Vector(x, y)
-          .add(ballVel)
-          .toTuple(),
-      ballRect,
-    )
+    ballRect = Rect.mapCP(cp => Vector.add(ballVel, cp), ballRect)
   }
 
   function render() {
