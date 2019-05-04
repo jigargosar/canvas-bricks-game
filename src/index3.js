@@ -119,7 +119,10 @@ const Rect = {
     return [...Rect.tl(rect), ...Rect.size(rect)]
   },
   alignBottom(fromRect, rect) {
-    return Rect.mapCY(() => Rect.maxY(fromRect) - Rect.h(rect) / 2, rect)
+    return Rect.mapCP(
+      ([x, y]) => [x, Rect.maxY(fromRect) - Rect.h(rect) / 2],
+      rect,
+    )
   },
 
   alignCenter(fromRect, rect) {
