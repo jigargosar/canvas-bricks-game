@@ -1,7 +1,17 @@
 import 'tachyons'
 import './index.css'
 
-function Vector2(x, y) {
+function degToRadians(degrees) {
+  return (degrees * Math.PI) / 180
+}
+
+function invariant(pred, msg = 'invariant failed') {
+  if (!pred) {
+    throw new Error(msg)
+  }
+}
+
+function Vector(x, y) {
   return {
     get x() {
       return x
@@ -16,15 +26,17 @@ function Vector2(x, y) {
       return Math.sqrt(x * x + y * y)
     },
     add(vec2) {
-      return Vector2(x + vec2.x, y + vec2.y)
+      return Vector(x + vec2.x, y + vec2.y)
     },
   }
 }
 
-function invariant(pred, msg = 'invariant failed') {
-  if (!pred) {
-    throw new Error(msg)
-  }
+Vector.fromAngleMag = function(angle, mag) {
+  return Vector(Math.cos(angle) * mag, Math.sin(angle) * mag)
+}
+
+Vector.fromDegreesMag = function(degrees, mag) {
+  return Vector.fromAngleMag(degToRadians(degrees), mag)
 }
 
 function clamp(min, max, num) {
@@ -71,10 +83,6 @@ const Position = {
     return Position.fromXY(xFn(pos.x), yFn(pos.y))
   },
 
-  mapBoth(xyFn, pos) {
-    return Position.fromXY(xyFn(pos.x), xyFn(pos.y))
-  },
-
   addVelocity(vel, pos) {
     const [dx, dy] = Velocity.toCartTuple(vel)
     return Position.mapEach(x => x + dx, y => y + dy, pos)
@@ -113,10 +121,6 @@ const Viewport = {
   center(viewport) {
     return Position.fromXY(viewport.width / 2, viewport.height / 2)
   },
-}
-
-function deg(degrees) {
-  return (degrees * Math.PI) / 180
 }
 
 const Circle = {
@@ -204,7 +208,7 @@ const Ball = {
     return {
       pos,
       radius: 10,
-      vel: Velocity.fromPolar(deg(79.99), 5),
+      vel: Velocity.fromPolar(degToRadians(79.99), 5),
     }
   },
   circle(ball) {
