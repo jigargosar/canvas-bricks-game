@@ -289,37 +289,35 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
   const ballP1 = Rect.center(ballRV.rect)
   const ballP2 = Vector.add(ballP1, ballRV.vel)
 
-  const [x2, y2] = Vector.toTuple(ballP2)
-
   const ei = lineRectEdgeIntersection(ballP1, ballP2, grownPaddleRect)
 
   if (ei) {
-    let x = x2
-    let y = y2
-    let dxfn = R.identity
-    let dyfn = R.identity
+    let xfn = I
+    let yfn = I
+    let dxfn = I
+    let dyfn = I
 
     switch (ei.edge.side) {
       case 'top':
-        y = Vector.y(ei.edge.p1)
+        yfn = R.always(Vector.y(ei.edge.p1))
         dyfn = absNeg
         break
       case 'bottom':
-        y = Vector.y(ei.edge.p1)
+        yfn = R.always(Vector.y(ei.edge.p1))
         dyfn = Math.abs
         break
       case 'left':
-        x = Vector.x(ei.edge.p1)
+        xfn = R.always(Vector.x(ei.edge.p1))
         dxfn = absNeg
         break
       case 'right':
-        x = Vector.x(ei.edge.p1)
+        xfn = R.always(Vector.x(ei.edge.p1))
         dxfn = Math.abs
         break
     }
 
     return {
-      rect: Rect.mapCenter(Vector.mapEach(() => x, () => y), ballRV.rect),
+      rect: Rect.mapCenter(Vector.mapEach(xfn, yfn), ballRV.rect),
       vel: Vector.mapEach(dxfn, dyfn, ballRV.vel),
     }
   }
