@@ -289,21 +289,16 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
   const [minX, minY] = Rect.minP(grownPaddleRect)
   const [maxX, maxY] = Rect.maxP(grownPaddleRect)
 
-  const oldBallCenter = Rect.center(ballRV.rect)
-  const newBallCenter = Vector.add(oldBallCenter, ballRV.vel)
+  const ballP1 = Rect.center(ballRV.rect)
+  const ballP2 = Vector.add(ballP1, ballRV.vel)
 
-  const [x2, y2] = Vector.toTuple(newBallCenter)
+  const [x2, y2] = Vector.toTuple(ballP2)
 
-  const lli = R.partial(lineLineIntersectionPoint, [
-    oldBallCenter,
-    newBallCenter,
-  ])
+  const lli = R.partial(lineLineIntersectionPoint, [ballP1, ballP2])
 
   const sortedEdgeIntersection = R.compose(
     R.sortWith([R.ascend(R.prop('len'))]),
-    R.map(ei =>
-      R.assoc('len', distanceBetweenPoints(newBallCenter, ei.ipt), ei),
-    ),
+    R.map(ei => R.assoc('len', distanceBetweenPoints(ballP2, ei.ipt), ei)),
     R.reject(
       R.compose(
         R.isNil,
