@@ -131,20 +131,20 @@ let Rect = {
   size(rect) {
     return rect.size
   },
-  mapCP(cf, rect) {
+  mapCenter(cf, rect) {
     return { ...rect, center: cf(rect.center) }
   },
   translate(vec, rect) {
-    return Rect.mapCP(Vector.add(vec), rect)
+    return Rect.mapCenter(Vector.add(vec), rect)
   },
   alignBottom(fromRect, rect) {
-    return Rect.mapCP(
+    return Rect.mapCenter(
       Vector.mapY(() => Rect.maxY(fromRect) - Rect.h(rect) / 2),
       rect,
     )
   },
   alignCenter(fromRect, rect) {
-    return Rect.mapCP(() => Rect.center(fromRect), rect)
+    return Rect.mapCenter(() => Rect.center(fromRect), rect)
   },
   toTLXYWH(rect) {
     return [...Rect.tl(rect), ...Rect.size(rect)]
@@ -202,28 +202,27 @@ function start() {
   const vpRect = Rect.fromWH(ctx.canvas.width, ctx.canvas.height)
 
   const ballSize = Vector.fromXY(20, 20)
-  let ballRect = Rect.fromWHTuple(ballSize)
-  let ballVel = Vector.fromDegreesMag(20, 10)
-  ballRect = Rect.alignCenter(vpRect, ballRect)
-
-  let paddleRect = Rect.fromWH(100, 10)
-  const paddleSpeed = 10
-
-  paddleRect = R.pipe(
+  let ballRect = R.compose(
     Rect.alignCenter(vpRect),
+    Rect.fromWHTuple,
+  )(ballSize)
+  let ballVel = Vector.fromDegreesMag(20, 10)
+
+  const paddleSpeed = 10
+  let paddleRect = R.compose(
+    r => Rect.translate([0, -Rect.h(r)])(r),
     Rect.alignBottom(vpRect),
-    Rect.translate([0, -Rect.h(paddleRect)]),
-  )(paddleRect)
+    Rect.alignCenter(vpRect),
+    Rect.fromWH,
+  )(100, 10)
 
   function update() {
-    const newBR = Rect.mapCP(Vector.add(ballVel), ballRect)
-    const newBallC = Rect.center(newBR)
-    const newVP = Rect.mapSize(
-      vpSize => Vector.sub(vpSize, ballSize),
-      vpRect,
-    )
+    const newBallRect = Rect.mapCenter(Vector.add(ballVel), ballRect)
+    const newBallC = Rect.center(newBallRect)
 
-    const [xo, yo] = Rect.constrainPointOffsets(newBallC, newVP)
+    const newVPR = Rect.mapSize(Vector.sub(R.__, ballSize))(vpRect)
+
+    const [xo, yo] = Rect.constrainPointOffsets(newBallC, newVPR)
 
     ballVel = Vector.mapEach(
       dx => (xo === 0 ? dx : xo < 0 ? Math.abs(dx) * -1 : Math.abs(dx)),
@@ -231,7 +230,7 @@ function start() {
       ballVel,
     )
 
-    ballRect = newBR
+    ballRect = newBallRect
   }
 
   function render() {
