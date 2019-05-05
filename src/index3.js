@@ -210,53 +210,99 @@ let RenderRect = {
 
 RenderRect = curryAll(RenderRect)
 
+function ballCollisionWithViewPort(ballRV, vpRect) {
+  const { rect: ballRect, vel: ballVel } = ballRV
+
+  const offset = Rect.constrainRectOffset(ballRect, vpRect)
+  const [xOffset, yOffset] = Vector.toTuple(offset)
+
+  const newVel = Vector.mapEach(
+    dx =>
+      xOffset === 0 ? dx : xOffset < 0 ? Math.abs(dx) * -1 : Math.abs(dx),
+    dy =>
+      yOffset === 0 ? dy : yOffset < 0 ? Math.abs(dy) * -1 : Math.abs(dy),
+    ballVel,
+  )
+  const newRect = Rect.translate(offset, ballRect)
+
+  return { rect: newRect, vel: newVel }
+}
+
+function ballCollisionWithPaddle(ballRV, paddleRect) {
+  const grownPaddleRect = Rect.mapSize(Vector.add(Rect.size(ballRV.rect)))(
+    paddleRect,
+  )
+
+  const [minX, minY] = Rect.minP(grownPaddleRect)
+  const [maxX, maxY] = Rect.maxP(grownPaddleRect)
+
+  const [x1, y1] = Vector.toTuple(Rect.center(ballRV.rect))
+  const [x2, y2] = Vector.toTuple(Vector.add(ballRV.vel))
+
+  let x = x2,
+    y = y2
+  let dxfn = R.identity,
+    dyfn = R.identity
+  if (minX < x < maxX && minY < y < maxY) {
+    if (x1 <= x2) {
+      // LEFT
+    } else {
+      // RIGHT
+    }
+    return ballRV
+  } else {
+    return ballRV
+  }
+}
+
 function start() {
   const ctx = initCanvas()
   const vpRect = Rect.fromWH(ctx.canvas.width, ctx.canvas.height)
 
   const ballSize = Vector.fromXY(20, 20)
-  let ballRect = R.compose(
-    Rect.alignCenter(vpRect),
-    Rect.fromWHTuple,
-  )(ballSize)
-  let ballVel = Vector.fromDegreesMag(20, 10)
+
+  const ballRV = {
+    rect: R.compose(
+      Rect.alignCenter(vpRect),
+      Rect.fromWHTuple,
+    )(ballSize),
+    vel: Vector.fromDegreesMag(90, 2),
+  }
 
   const paddleSpeed = 10
   let paddleRect = R.compose(
-    r => Rect.translate([0, -Rect.h(r)])(r),
+    r => Rect.translate([0, -Rect.h(r) * 8])(r),
     Rect.alignBottom(vpRect),
     Rect.alignCenter(vpRect),
     Rect.fromWH,
   )(100, 10)
 
   function update() {
-    const newBallRect = Rect.mapCenter(Vector.add(ballVel), ballRect)
+    const newBallRect = Rect.mapCenter(Vector.add(ballRV.vel), ballRV.rect)
 
-    const offset = Rect.constrainRectOffset(newBallRect, vpRect)
-    const [xOffset, yOffset] = Vector.toTuple(offset)
-
-    ballVel = Vector.mapEach(
-      dx =>
-        xOffset === 0
-          ? dx
-          : xOffset < 0
-          ? Math.abs(dx) * -1
-          : Math.abs(dx),
-      dy =>
-        yOffset === 0
-          ? dy
-          : yOffset < 0
-          ? Math.abs(dy) * -1
-          : Math.abs(dy),
-      ballVel,
+    const beforeCollision = { rect: newBallRect, vel: ballRV.vel }
+    const afterCollision = ballCollisionWithViewPort(
+      beforeCollision,
+      vpRect,
     )
 
-    ballRect = Rect.translate(offset, newBallRect)
+    ballRV.rect = afterCollision.rect
+    ballRV.vel = afterCollision.vel
+
+    if (R.equals(beforeCollision, afterCollision)) {
+      //TODO: check collision with paddle
+      const afterCollision = ballCollisionWithPaddle(ballRV, paddleRect)
+      ballRV.rect = afterCollision.rect
+      ballRV.vel = afterCollision.vel
+      if (R.equals(beforeCollision, afterCollision)) {
+        //TODO: check collision with bricks
+      }
+    }
   }
 
   function render() {
     RenderRect.fillRect(ctx, 'orange', paddleRect)
-    RenderRect.fillCircleMin(ctx, 'blue', ballRect)
+    RenderRect.fillCircleMin(ctx, 'blue', ballRV.rect)
   }
 
   gameLoop(() => {
