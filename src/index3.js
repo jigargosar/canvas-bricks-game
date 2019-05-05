@@ -16,7 +16,14 @@ function I(x) {
   return x
 }
 
-const Vector = {
+/**
+ * @template T
+ * @param T
+ * @returns T
+ */
+const curryAll = R.mapObjIndexed(R.curry)
+
+let Vector = {
   fromXY(x, y) {
     return [x, y]
   },
@@ -41,28 +48,27 @@ const Vector = {
   mag([x, y]) {
     return Math.sqrt(x * x + y * y)
   },
-  add: v1 => v2 => Vector.add2(v1, v2),
-  add2([x1, y1], [x2, y2]) {
+  add([x1, y1], [x2, y2]) {
     return Vector.fromXY(x1 + x2, y1 + y2)
   },
-  sub2([x1, y1], [x2, y2]) {
+  sub([x1, y1], [x2, y2]) {
     return Vector.fromXY(x1 - x2, y1 - y2)
   },
-  scale2(num, vec) {
+  scale(num, vec) {
     return vec.map(n => n * num)
   },
-  mapEach: xf => yf => vec => Vector.mapEach3(xf, yf, vec),
-  mapEach3(xf, yf, [x, y]) {
+  mapEach(xf, yf, [x, y]) {
     return Vector.fromXY(xf(x), yf(y))
   },
-  mapX2(xf, vec) {
+  mapX(xf, vec) {
     return Vector.mapEach(xf)(I)(vec)
   },
-  mapY: yf => vec => Vector.mapY2(yf, vec),
-  mapY2(yf, vec) {
+  mapY(yf, vec) {
     return Vector.mapEach(I)(yf)(vec)
   },
 }
+
+Vector = curryAll(Vector)
 
 function clamp(min, max, num) {
   invariant(min < max, 'min should be less than max')
@@ -92,6 +98,7 @@ function gameLoop(step) {
       step()
       requestAnimationFrame(callback)
     } catch (e) {
+      // eslint-disable-next-line no-debugger
       debugger
     }
   }
@@ -101,7 +108,7 @@ function gameLoop(step) {
 const Rect = {
   fromWH(width, height) {
     const size = Vector.fromXY(width, height)
-    return { center: Vector.scale2(0.5, size), size }
+    return { center: Vector.scale(0.5, size), size }
   },
   fromWHTuple([width, height]) {
     return Rect.fromWH(width, height)
@@ -110,7 +117,7 @@ const Rect = {
     return rect.center
   },
   tl(rect) {
-    return Vector.sub2(rect.center, Vector.scale2(0.5, rect.size))
+    return Vector.sub(rect.center, Vector.scale(0.5, rect.size))
   },
   maxY(rect) {
     return rect.center[1] + rect.size[1] / 2
@@ -143,13 +150,13 @@ const Rect = {
     return [...Rect.tl(rect), ...Rect.size(rect)]
   },
   halfSize(rect) {
-    return Vector.scale2(0.5, rect.size)
+    return Vector.scale(0.5, rect.size)
   },
   minP(rect) {
-    return Vector.sub2(rect.center, Rect.halfSize(rect))
+    return Vector.sub(rect.center, Rect.halfSize(rect))
   },
   maxP(rect) {
-    return Vector.add2(rect.center, Rect.halfSize(rect))
+    return Vector.add(rect.center, Rect.halfSize(rect))
   },
   mapSize(sfn, rect) {
     return { ...rect, size: sfn(rect.size) }
@@ -208,13 +215,13 @@ function start() {
     const newBR = Rect.mapCP(Vector.add(ballVel), ballRect)
     const newBallC = Rect.center(newBR)
     const newVP = Rect.mapSize(
-      vpSize => Vector.sub2(vpSize, ballSize),
+      vpSize => Vector.sub(vpSize, ballSize),
       vpRect,
     )
 
     const [xo, yo] = Rect.constrainPointOffsets(newBallC, newVP)
 
-    ballVel = Vector.mapEach3(
+    ballVel = Vector.mapEach(
       dx => (xo === 0 ? dx : xo < 0 ? Math.abs(dx) * -1 : Math.abs(dx)),
       dy => (yo === 0 ? dy : yo < 0 ? Math.abs(dy) * -1 : Math.abs(dy)),
       ballVel,
@@ -250,6 +257,7 @@ setTimeout(() => {
   try {
     start()
   } catch (error) {
+    // eslint-disable-next-line no-debugger
     debugger
   }
 }, 100)
