@@ -286,9 +286,6 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
     paddleRect,
   )
 
-  const [minX, minY] = Rect.minP(grownPaddleRect)
-  const [maxX, maxY] = Rect.maxP(grownPaddleRect)
-
   const ballP1 = Rect.center(ballRV.rect)
   const ballP2 = Vector.add(ballP1, ballRV.vel)
 
@@ -304,19 +301,19 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
 
     switch (ei.edge.side) {
       case 'top':
-        y = minY
+        y = Vector.y(ei.edge.p1)
         dyfn = absNeg
         break
       case 'bottom':
-        y = maxY
+        y = Vector.y(ei.edge.p1)
         dyfn = Math.abs
         break
       case 'left':
-        x = minX
+        x = Vector.x(ei.edge.p1)
         dxfn = absNeg
         break
       case 'right':
-        x = maxX
+        x = Vector.x(ei.edge.p1)
         dxfn = Math.abs
         break
     }
