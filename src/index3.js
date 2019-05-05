@@ -255,20 +255,20 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
   if (x > minX && x < maxX && y > minY && y < maxY) {
     if (x1 < x2) {
       // LEFT
-      x = minX
+      x = minX - 10
       dxfn = absNeg
     } else if (x2 < x1) {
       // RIGHT
-      x = maxX
+      x = maxX + 10
       dxfn = Math.abs
     }
     if (y1 < y2) {
       // TOP
-      y = minY
+      y = minY - 10
       dyfn = absNeg
     } else if (y2 < y1) {
       // BOTTOM
-      y = maxY
+      y = maxY + 10
       dyfn = Math.abs
     }
     return {
@@ -291,10 +291,10 @@ function start() {
       Rect.alignCenter(vpRect),
       Rect.fromWHTuple,
     )(ballSize),
-    vel: Vector.fromDegreesMag(90, 2),
+    vel: Vector.fromDegreesMag(99, 5),
   }
 
-  const paddleSpeed = 10
+  const paddleSpeed = 20
   let paddleRect = R.compose(
     r => Rect.translate([0, -Rect.h(r) * 8])(r),
     Rect.alignBottom(vpRect),
