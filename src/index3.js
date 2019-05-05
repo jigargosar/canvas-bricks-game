@@ -1,3 +1,4 @@
+/* eslint-disable no-debugger */
 import 'tachyons'
 import './index.css'
 import * as R from 'ramda'
@@ -125,13 +126,8 @@ function initCanvas() {
 
 function gameLoop(step) {
   const callback = () => {
-    try {
-      step()
-      requestAnimationFrame(callback)
-    } catch (e) {
-      // eslint-disable-next-line no-debugger
-      debugger
-    }
+    step()
+    requestAnimationFrame(callback)
   }
   requestAnimationFrame(callback)
 }
@@ -286,31 +282,34 @@ function distanceBetweenPoints(p1, p2) {
 }
 
 function ballCollisionWithPaddle(ballRV, paddleRect) {
-  debugger
   const grownPaddleRect = Rect.mapSize(Vector.add(Rect.size(ballRV.rect)))(
     paddleRect,
   )
-  debugger
+
   const [minX, minY] = Rect.minP(grownPaddleRect)
   const [maxX, maxY] = Rect.maxP(grownPaddleRect)
-  debugger
+
   const oldBallCenter = Rect.center(ballRV.rect)
   const newBallCenter = Vector.add(oldBallCenter, ballRV.vel)
-  debugger
+
   const [x1, y1] = Vector.toTuple(oldBallCenter)
   const [x2, y2] = Vector.toTuple(Vector.add(oldBallCenter, ballRV.vel))
 
-  debugger
   const lli = R.partial(lineLineIntersectionPoint, [
     oldBallCenter,
     newBallCenter,
   ])
-  debugger
+
   const shortestEdges = R.compose(
     R.map(ei =>
       R.assoc('len', distanceBetweenPoints(newBallCenter, ei.ipt), ei),
     ),
-    R.reject(R.prop('ipt')),
+    R.reject(
+      R.compose(
+        R.isNil,
+        R.prop('ipt'),
+      ),
+    ),
     R.map(edge => ({ edge, ipt: lli(edge.p1, edge.p2) })),
     Rect.edgesTRBL,
   )(grownPaddleRect)
@@ -416,11 +415,4 @@ function start() {
   })
 }
 
-setTimeout(() => {
-  try {
-    start()
-  } catch (error) {
-    // eslint-disable-next-line no-debugger
-    debugger
-  }
-}, 100)
+start()
