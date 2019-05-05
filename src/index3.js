@@ -36,6 +36,9 @@ let Vector = {
   fromTuple([x, y]) {
     return Vector.fromXY(x, y)
   },
+  toTuple([x, y]) {
+    return [x, y]
+  },
   x(v) {
     return v[0]
   },
@@ -161,7 +164,7 @@ let Rect = {
   mapSize(sfn, rect) {
     return { ...rect, size: sfn(rect.size) }
   },
-  constrainPointOffsets([x, y], rect) {
+  constrainPointOffset([x, y], rect) {
     const [minX, minY] = Rect.minP(rect)
     const [maxX, maxY] = Rect.maxP(rect)
 
@@ -169,6 +172,16 @@ let Rect = {
       x < minX ? minX - x : x > maxX ? maxX - x : 0,
       y < minY ? minY - y : y > maxY ? maxY - y : 0,
     ]
+  },
+  constrainRectOffset(smallRect, bigRect) {
+    invariant(Rect.w(smallRect) < Rect.w(bigRect))
+    invariant(Rect.h(smallRect) < Rect.h(bigRect))
+
+    const smallCenter = Rect.center(smallRect)
+    const shrinkedBigRect = Rect.mapSize(
+      Vector.sub(R.__, Rect.size(smallRect)),
+    )(bigRect)
+    return Rect.constrainPointOffset(smallCenter, shrinkedBigRect)
   },
 }
 Rect = curryAll(Rect)
@@ -218,19 +231,27 @@ function start() {
 
   function update() {
     const newBallRect = Rect.mapCenter(Vector.add(ballVel), ballRect)
-    const newBallC = Rect.center(newBallRect)
 
-    const newVPR = Rect.mapSize(Vector.sub(R.__, ballSize))(vpRect)
-
-    const [xo, yo] = Rect.constrainPointOffsets(newBallC, newVPR)
+    const offset = Rect.constrainRectOffset(newBallRect, vpRect)
+    const [xOffset, yOffset] = Vector.toTuple(offset)
 
     ballVel = Vector.mapEach(
-      dx => (xo === 0 ? dx : xo < 0 ? Math.abs(dx) * -1 : Math.abs(dx)),
-      dy => (yo === 0 ? dy : yo < 0 ? Math.abs(dy) * -1 : Math.abs(dy)),
+      dx =>
+        xOffset === 0
+          ? dx
+          : xOffset < 0
+          ? Math.abs(dx) * -1
+          : Math.abs(dx),
+      dy =>
+        yOffset === 0
+          ? dy
+          : yOffset < 0
+          ? Math.abs(dy) * -1
+          : Math.abs(dy),
       ballVel,
     )
 
-    ballRect = newBallRect
+    ballRect = Rect.translate(offset, newBallRect)
   }
 
   function render() {
