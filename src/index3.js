@@ -105,7 +105,7 @@ function gameLoop(step) {
   requestAnimationFrame(callback)
 }
 
-const Rect = {
+let Rect = {
   fromWH(width, height) {
     const size = Vector.fromXY(width, height)
     return { center: Vector.scale(0.5, size), size }
@@ -193,6 +193,8 @@ const RenderRect = {
     ctx.fill()
   },
 }
+
+Rect = curryAll(Rect)
 
 function start() {
   const ctx = initCanvas()
