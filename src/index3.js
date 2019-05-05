@@ -294,22 +294,7 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
 
   const [x2, y2] = Vector.toTuple(ballP2)
 
-  const llip = R.partial(lineLineIntersectionPoint, [ballP1, ballP2])
-
-  const sortedEdgeIntersection = R.compose(
-    R.sortWith([R.ascend(R.prop('len'))]),
-    R.map(ei => R.assoc('len', distanceBetweenPoints(ballP2, ei.ipt), ei)),
-    R.reject(
-      R.compose(
-        R.isNil,
-        R.prop('ipt'),
-      ),
-    ),
-    R.map(edge => ({ edge, ipt: llip(edge.p1, edge.p2) })),
-    Rect.edgesTRBL,
-  )(grownPaddleRect)
-
-  const ei = R.head(sortedEdgeIntersection)
+  const ei = lineRectEdgeIntersection(ballP1, ballP2, grownPaddleRect)
 
   if (ei) {
     let x = x2
@@ -344,6 +329,24 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
     }
   }
   return ballRV
+}
+
+function lineRectEdgeIntersection(p1, p2, rect) {
+  const llip = R.partial(lineLineIntersectionPoint, [p1, p2])
+  const distFromBallP2To = R.partial(distanceBetweenPoints, [p2])
+  return R.compose(
+    R.head,
+    R.sortWith([R.ascend(R.prop('len'))]),
+    R.map(ei => R.assoc('len', distFromBallP2To(ei.ipt), ei)),
+    R.reject(
+      R.compose(
+        R.isNil,
+        R.prop('ipt'),
+      ),
+    ),
+    R.map(edge => ({ edge, ipt: llip(edge.p1, edge.p2) })),
+    Rect.edgesTRBL,
+  )(rect)
 }
 
 function start() {
