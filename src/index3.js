@@ -318,8 +318,6 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
         break
     }
 
-    // if (x > minX && x < maxX && y > minY && y < maxY) {
-
     return {
       rect: Rect.mapCenter(Vector.mapEach(() => x, () => y), ballRV.rect),
       vel: Vector.mapEach(dxfn, dyfn, ballRV.vel),
