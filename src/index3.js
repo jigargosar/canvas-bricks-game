@@ -236,8 +236,9 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
   const [minX, minY] = Rect.minP(grownPaddleRect)
   const [maxX, maxY] = Rect.maxP(grownPaddleRect)
 
-  const [x1, y1] = Vector.toTuple(Rect.center(ballRV.rect))
-  const [x2, y2] = Vector.toTuple(Vector.add(ballRV.vel))
+  const oldBallCenter = Rect.center(ballRV.rect)
+  const [x1, y1] = Vector.toTuple(oldBallCenter)
+  const [x2, y2] = Vector.toTuple(Vector.add(oldBallCenter, ballRV.vel))
 
   let x = x2,
     y = y2
