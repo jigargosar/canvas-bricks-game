@@ -14,7 +14,6 @@ function invariant(pred, msg = 'invariant failed') {
  * @param T
  * @returns T
  */
-
 const curryAll = R.mapObjIndexed(R.curry)
 
 function I(x) {
