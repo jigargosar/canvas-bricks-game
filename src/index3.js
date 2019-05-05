@@ -292,7 +292,7 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
   const oldBallCenter = Rect.center(ballRV.rect)
   const newBallCenter = Vector.add(oldBallCenter, ballRV.vel)
 
-  const [x1, y1] = Vector.toTuple(oldBallCenter)
+  // const [x1, y1] = Vector.toTuple(oldBallCenter)
   const [x2, y2] = Vector.toTuple(Vector.add(oldBallCenter, ballRV.vel))
 
   const lli = R.partial(lineLineIntersectionPoint, [
@@ -300,7 +300,8 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
     newBallCenter,
   ])
 
-  const shortestEdges = R.compose(
+  const sortedEdgeIntersection = R.compose(
+    R.sortWith([R.ascend(R.prop('len'))]),
     R.map(ei =>
       R.assoc('len', distanceBetweenPoints(newBallCenter, ei.ipt), ei),
     ),
@@ -314,37 +315,41 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
     Rect.edgesTRBL,
   )(grownPaddleRect)
 
-  let x = x2
-  let y = y2
-  let dxfn = R.identity
-  let dyfn = R.identity
+  const ei = R.head(sortedEdgeIntersection)
 
-  if (x > minX && x < maxX && y > minY && y < maxY) {
-    if (x1 < x2) {
-      // LEFT
-      x = minX
-      dxfn = absNeg
-    } else if (x2 < x1) {
-      // RIGHT
-      x = maxX
-      dxfn = Math.abs
+  if (ei) {
+    let x = x2
+    let y = y2
+    let dxfn = R.identity
+    let dyfn = R.identity
+
+    switch (ei.edge.side) {
+      case 'top':
+        y = minY
+        dyfn = absNeg
+        break
+      case 'bottom':
+        y = maxY
+        dyfn = Math.abs
+        break
+      case 'left':
+        x = minX
+        dxfn = absNeg
+        break
+      case 'right':
+        x = maxX
+        dxfn = Math.abs
+        break
     }
-    if (y1 < y2) {
-      // TOP
-      y = minY
-      dyfn = absNeg
-    } else if (y2 < y1) {
-      // BOTTOM
-      y = maxY
-      dyfn = Math.abs
-    }
+
+    // if (x > minX && x < maxX && y > minY && y < maxY) {
+
     return {
       rect: Rect.mapCenter(Vector.mapEach(() => x, () => y), ballRV.rect),
       vel: Vector.mapEach(dxfn, dyfn, ballRV.vel),
     }
-  } else {
-    return ballRV
   }
+  return ballRV
 }
 
 function start() {
