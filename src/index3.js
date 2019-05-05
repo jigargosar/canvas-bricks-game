@@ -292,8 +292,7 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
   const oldBallCenter = Rect.center(ballRV.rect)
   const newBallCenter = Vector.add(oldBallCenter, ballRV.vel)
 
-  // const [x1, y1] = Vector.toTuple(oldBallCenter)
-  const [x2, y2] = Vector.toTuple(Vector.add(oldBallCenter, ballRV.vel))
+  const [x2, y2] = Vector.toTuple(newBallCenter)
 
   const lli = R.partial(lineLineIntersectionPoint, [
     oldBallCenter,
