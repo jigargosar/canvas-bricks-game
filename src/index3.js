@@ -3,18 +3,44 @@ import 'tachyons'
 import './index.css'
 import * as R from 'ramda'
 
-function degToRadians(degrees) {
-  return (degrees * Math.PI) / 180
-}
-
 function invariant(pred, msg = 'invariant failed') {
   if (!pred) {
     throw new Error(msg)
   }
 }
 
+/**
+ * @template T
+ * @param T
+ * @returns T
+ */
+
+const curryAll = R.mapObjIndexed(R.curry)
+
 function I(x) {
   return x
+}
+
+function degToRadians(degrees) {
+  return (degrees * Math.PI) / 180
+}
+
+function absNeg(num) {
+  return Math.abs(num) * -1
+}
+
+function absPos(num) {
+  return Math.abs(num)
+}
+/**
+ * @param {Point} p1
+ * @param {Point} p2
+ * @returns {number} length
+ */
+function distanceBetweenPoints(p1, p2) {
+  const [[x1, y1], [x2, y2]] = [p1, p2]
+  const [dx, dy] = [x2 - x1, y2 - y1]
+  return Math.sqrt(dx * dx + dy * dy)
 }
 
 // LINE SEGMENT INTERSECTION
@@ -44,13 +70,6 @@ function lineLineIntersectionPoint(p1, p2, p3, p4) {
 
   return [x1 + ua * (x2 - x1), y1 + ub * (y2 - y1)]
 }
-
-/**
- * @template T
- * @param T
- * @returns T
- */
-const curryAll = R.mapObjIndexed(R.curry)
 
 let Vector = {
   fromXY(x, y) {
@@ -101,36 +120,6 @@ let Vector = {
 }
 
 Vector = curryAll(Vector)
-
-function clamp(min, max, num) {
-  invariant(min < max, 'min should be less than max')
-  if (num < min) {
-    return min
-  } else if (num > max) {
-    return max
-  } else {
-    return num
-  }
-}
-
-function initCanvas() {
-  const canvas = document.getElementById('gameScreen')
-  const ctx = canvas.getContext('2d')
-  Object.assign(canvas, {
-    width: 400,
-    height: 400,
-    className: 'db center ba',
-  })
-  return ctx
-}
-
-function gameLoop(step) {
-  const callback = () => {
-    step()
-    requestAnimationFrame(callback)
-  }
-  requestAnimationFrame(callback)
-}
 
 let Rect = {
   fromWH(width, height) {
@@ -221,6 +210,24 @@ let Rect = {
 }
 Rect = curryAll(Rect)
 
+function lineRectEdgeIntersection(p1, p2, rect) {
+  const llip = R.partial(lineLineIntersectionPoint, [p1, p2])
+  const distFromBallP2To = R.partial(distanceBetweenPoints, [p2])
+  return R.compose(
+    R.head,
+    R.sortWith([R.ascend(R.prop('len'))]),
+    R.map(ei => R.assoc('len', distFromBallP2To(ei.ipt), ei)),
+    R.reject(
+      R.compose(
+        R.isNil,
+        R.prop('ipt'),
+      ),
+    ),
+    R.map(edge => ({ edge, ipt: llip(edge.p1, edge.p2) })),
+    Rect.edgesTRBL,
+  )(rect)
+}
+
 let RenderRect = {
   clear(ctx, rect) {
     const [x, y, w, h] = Rect.toTLXYWH(rect)
@@ -242,8 +249,26 @@ let RenderRect = {
     ctx.fill()
   },
 }
-
 RenderRect = curryAll(RenderRect)
+
+function initCanvas() {
+  const canvas = document.getElementById('gameScreen')
+  const ctx = canvas.getContext('2d')
+  Object.assign(canvas, {
+    width: 400,
+    height: 400,
+    className: 'db center ba',
+  })
+  return ctx
+}
+
+function gameLoop(step) {
+  const callback = () => {
+    step()
+    requestAnimationFrame(callback)
+  }
+  requestAnimationFrame(callback)
+}
 
 function ballCollisionWithViewPort(ballRV, vpRect) {
   const { rect: ballRect, vel: ballVel } = ballRV
@@ -261,24 +286,6 @@ function ballCollisionWithViewPort(ballRV, vpRect) {
   const newRect = Rect.translate(offset, ballRect)
 
   return { rect: newRect, vel: newVel }
-}
-
-function absNeg(num) {
-  return Math.abs(num) * -1
-}
-
-function absPos(num) {
-  return Math.abs(num)
-}
-/**
- * @param {Point} p1
- * @param {Point} p2
- * @returns {number} length
- */
-function distanceBetweenPoints(p1, p2) {
-  const [[x1, y1], [x2, y2]] = [p1, p2]
-  const [dx, dy] = [x2 - x1, y2 - y1]
-  return Math.sqrt(dx * dx + dy * dy)
 }
 
 function ballCollisionWithPaddle(ballRV, paddleRect) {
@@ -322,24 +329,6 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
     }
   }
   return ballRV
-}
-
-function lineRectEdgeIntersection(p1, p2, rect) {
-  const llip = R.partial(lineLineIntersectionPoint, [p1, p2])
-  const distFromBallP2To = R.partial(distanceBetweenPoints, [p2])
-  return R.compose(
-    R.head,
-    R.sortWith([R.ascend(R.prop('len'))]),
-    R.map(ei => R.assoc('len', distFromBallP2To(ei.ipt), ei)),
-    R.reject(
-      R.compose(
-        R.isNil,
-        R.prop('ipt'),
-      ),
-    ),
-    R.map(edge => ({ edge, ipt: llip(edge.p1, edge.p2) })),
-    Rect.edgesTRBL,
-  )(rect)
 }
 
 function start() {
