@@ -16,6 +16,34 @@ function I(x) {
   return x
 }
 
+// LINE SEGMENT INTERSECTION
+/**
+ * @param {Point} p1
+ * @param {Point} p2
+ * @param {Point} p3
+ * @param {Point} p4
+ * @returns {Point | null}
+ * @tutorial http://www-cs.ccny.cuny.edu/~wolberg/capstone/intersection/Intersection%20point%20of%20two%20lines.html
+ */
+function lineLineIntersectionPoint(p1, p2, p3, p4) {
+  const [[x1, y1], [x2, y2], [x3, y3], [x4, y4]] = [p1, p2, p3, p4]
+  const denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1)
+
+  if (denominator === 0) return null
+
+  const uaNumerator = (x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)
+  const ubNumerator = (x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)
+
+  if (uaNumerator === 0 && ubNumerator === 0) return null
+
+  const ua = uaNumerator / denominator
+  const ub = ubNumerator / denominator
+
+  if (ua < 0 || ua > 1 || ub < 0 || ub > 1) return null
+
+  return [x1 + ua * (x2 - x1), y1 + ub * (y2 - y1)]
+}
+
 /**
  * @template T
  * @param T
@@ -183,6 +211,17 @@ let Rect = {
     )(bigRect)
     return Rect.constrainPointOffset(smallCenter, shrinkedBigRect)
   },
+  edgesTRBL(rect) {
+    const [minX, minY] = Rect.minP(rect)
+    const [maxX, maxY] = Rect.maxP(rect)
+
+    return [
+      { p1: [minX, minY], p2: [maxX, minY], side: 'top' },
+      { p1: [maxX, minY], p2: [maxX, maxY], side: 'right' },
+      { p1: [maxX, maxY], p2: [minX, maxY], side: 'bottom' },
+      { p1: [minX, maxY], p2: [minX, minY], side: 'left' },
+    ]
+  },
 }
 Rect = curryAll(Rect)
 
@@ -245,13 +284,25 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
   const [maxX, maxY] = Rect.maxP(grownPaddleRect)
 
   const oldBallCenter = Rect.center(ballRV.rect)
+  const newBallCenter = Vector.add(oldBallCenter, ballRV.vel)
   const [x1, y1] = Vector.toTuple(oldBallCenter)
   const [x2, y2] = Vector.toTuple(Vector.add(oldBallCenter, ballRV.vel))
 
-  let x = x2,
-    y = y2
-  let dxfn = R.identity,
-    dyfn = R.identity
+  const lli = R.partial(lineLineIntersectionPoint, [
+    oldBallCenter,
+    newBallCenter,
+  ])
+
+  const shortestEdges = R.compose(
+    R.map(edge => ({ edge, ipt: lli(edge.p1, edge.p2) })),
+    Rect.edgesTRBL,
+  )(grownPaddleRect)
+
+  let x = x2
+  let y = y2
+  let dxfn = R.identity
+  let dyfn = R.identity
+
   if (x > minX && x < maxX && y > minY && y < maxY) {
     if (x1 < x2) {
       // LEFT
