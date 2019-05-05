@@ -171,8 +171,9 @@ let Rect = {
     ]
   },
 }
+Rect = curryAll(Rect)
 
-const RenderRect = {
+let RenderRect = {
   clear(ctx, rect) {
     const [x, y, w, h] = Rect.toTLXYWH(rect)
     ctx.clearRect(x, y, w, h)
@@ -194,7 +195,7 @@ const RenderRect = {
   },
 }
 
-Rect = curryAll(Rect)
+RenderRect = curryAll(RenderRect)
 
 function start() {
   const ctx = initCanvas()
