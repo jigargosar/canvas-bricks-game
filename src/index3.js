@@ -228,6 +228,14 @@ function ballCollisionWithViewPort(ballRV, vpRect) {
   return { rect: newRect, vel: newVel }
 }
 
+function absNeg(num) {
+  return Math.abs(num) * -1
+}
+
+function absPos(num) {
+  return Math.abs(num)
+}
+
 function ballCollisionWithPaddle(ballRV, paddleRect) {
   const grownPaddleRect = Rect.mapSize(Vector.add(Rect.size(ballRV.rect)))(
     paddleRect,
@@ -244,13 +252,29 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
     y = y2
   let dxfn = R.identity,
     dyfn = R.identity
-  if (minX < x < maxX && minY < y < maxY) {
-    if (x1 <= x2) {
+  if (x > minX && x < maxX && y > minY && y < maxY) {
+    if (x1 < x2) {
       // LEFT
-    } else {
+      x = minX
+      dxfn = absNeg
+    } else if (x2 < x1) {
       // RIGHT
+      x = maxX
+      dxfn = Math.abs
     }
-    return ballRV
+    if (y1 < y2) {
+      // TOP
+      y = minY
+      dyfn = absNeg
+    } else if (y2 < y1) {
+      // BOTTOM
+      y = maxY
+      dyfn = Math.abs
+    }
+    return {
+      rect: Rect.mapCenter(Vector.mapEach(() => x, () => y), ballRV.rect),
+      vel: Vector.mapEach(dxfn, dyfn, ballRV.vel),
+    }
   } else {
     return ballRV
   }
