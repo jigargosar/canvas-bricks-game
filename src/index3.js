@@ -255,20 +255,20 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
   if (x > minX && x < maxX && y > minY && y < maxY) {
     if (x1 < x2) {
       // LEFT
-      x = minX - 10
+      x = minX
       dxfn = absNeg
     } else if (x2 < x1) {
       // RIGHT
-      x = maxX + 10
+      x = maxX
       dxfn = Math.abs
     }
     if (y1 < y2) {
       // TOP
-      y = minY - 10
+      y = minY
       dyfn = absNeg
     } else if (y2 < y1) {
       // BOTTOM
-      y = maxY + 10
+      y = maxY
       dyfn = Math.abs
     }
     return {
