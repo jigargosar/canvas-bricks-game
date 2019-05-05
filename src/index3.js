@@ -209,10 +209,11 @@ function start() {
   let paddleRect = Rect.fromWH(100, 10)
   const paddleSpeed = 10
 
-  paddleRect = Rect.alignCenter(vpRect, paddleRect)
-
-  paddleRect = Rect.alignBottom(vpRect, paddleRect)
-  paddleRect = Rect.translate([0, -Rect.h(paddleRect)], paddleRect)
+  paddleRect = R.pipe(
+    Rect.alignCenter(vpRect),
+    Rect.alignBottom(vpRect),
+    Rect.translate([0, -Rect.h(paddleRect)]),
+  )(paddleRect)
 
   function update() {
     const newBR = Rect.mapCP(Vector.add(ballVel), ballRect)
