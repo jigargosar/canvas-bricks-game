@@ -405,6 +405,11 @@ function vec(x, y) {
     },
   }
 }
+
+function rectFromWH(w, h) {
+  return rectFromCS(vec(w / 2, h / 2), vec(w, h))
+}
+
 function rectFromCS(center, size) {
   const { x: cx, y: cy } = center
   const { x: w, y: h } = size
@@ -414,6 +419,12 @@ function rectFromCS(center, size) {
     },
     get y1() {
       return cy - h / 2
+    },
+    get x2() {
+      return cx + w / 2
+    },
+    get y2() {
+      return cy + h / 2
     },
     get cx() {
       return cx
@@ -437,20 +448,28 @@ function rectFromCS(center, size) {
 }
 
 function createPaddle(vp) {
-  const pad = rectFromCS(vec(0, 0), vec(200, 20))
-
+  const h = 15
+  const w = 150
+  let rect = rectFromCS(vec(vp.cx, vp.y2 - h * 2), vec(w, h))
+  const speed = 10
   return {
     render(ctx) {
       ctx.fillStyle = 'orange'
-      ctx.fillRect(pad.x1, pad.y1, pad.w, pad.h)
+      ctx.fillRect(rect.x1, rect.y1, rect.w, rect.h)
+    },
+    moveLeft() {
+      rect = rect.translate(vec(-speed, 0))
+    },
+    moveRight() {
+      rect = rect.translate(vec(speed, 0))
     },
   }
 }
 
 function startGame() {
   const ctx = initCanvas()
-  const vp = rectFromCS(vec(0, 0), vec(ctx.canvas.width, ctx.canvas.width))
-  const pad = createPaddle()
+  const vp = rectFromWH(ctx.canvas.width, ctx.canvas.width)
+  const pad = createPaddle(vp)
 
   function update() {}
 
