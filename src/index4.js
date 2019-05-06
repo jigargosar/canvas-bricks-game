@@ -406,6 +406,9 @@ function vec(x, y) {
     add(v2) {
       return vec(x + v2.x, y + v2.y)
     },
+    mapEach(xfn, yfn) {
+      return vec(xfn(x), yfn(y))
+    },
   }
 }
 
@@ -436,10 +439,10 @@ function rectFromCS(center, size) {
       return cy
     },
     get w() {
-      return size.x
+      return w
     },
     get h() {
-      return size.y
+      return h
     },
     get center() {
       return center
@@ -450,10 +453,35 @@ function rectFromCS(center, size) {
     mapCenter(cfn) {
       return rectFromCS(cfn(center), size)
     },
+    // mapSize(sfn) {
+    //   return rectFromCS(center, sfn(size))
+    // },
+    shrink(small) {
+      invariant(w > small.w)
+      invariant(h > small.h)
+      return rectFromCS(center, vec(w - small.w, h - small.h))
+    },
+    clampIn(big) {
+      invariant(w < big.w)
+      invariant(h < big.h)
+      if (
+        this.x1 > big.x1 &&
+        this.x2 < big.x2 &&
+        this.y1 > big.y1 &&
+        this.y2 < big.y2
+      ) {
+        return this
+      } else {
+        const shr = big.shrink(this)
+        return this.mapCenter(c =>
+          c.mapEach(R.clamp(shr.x1, shr.x2), R.clamp(shr.y1, shr.y2)),
+        )
+      }
+    },
   }
 }
 
-const key = (function initKeyboard() {
+const Key = (function initKeyboard() {
   const km = {}
   window.addEventListener('keydown', e => {
     km[e.key] = true
@@ -481,9 +509,9 @@ function createPaddle(vp) {
 
   return {
     update() {
-      const dx = key.left ? -speed : key.right ? speed : 0
+      const dx = Key.left ? -speed : Key.right ? speed : 0
       const vel = vec(dx, 0)
-      rect = rect.mapCenter(c => c.add(vel))
+      rect = rect.mapCenter(c => c.add(vel)).clampIn(vp)
     },
     render(ctx) {
       ctx.fillStyle = 'orange'
