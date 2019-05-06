@@ -358,17 +358,17 @@ function start() {
 
     const newBallRV = { rect: newBallRect, vel: ballRV.vel }
 
-    const crList = [
+    const collResThunks = [
       () => ballCollisionWithViewPort(newBallRV, vpRect),
       () => ballCollisionWithPaddle(ballRV, paddleRect),
       () => newBallRV,
     ]
 
-    const crr = R.reduce((cr, th) => (R.isNil(cr) ? th() : R.reduced(cr)))(
-      null,
-    )(crList)
+    const collRes = R.reduce((cr, th) =>
+      R.isNil(cr) ? th() : R.reduced(cr),
+    )(null)(collResThunks)
 
-    Object.assign(ballRV, R.pick(['rect', 'vel'])(crr))
+    Object.assign(ballRV, R.pick(['rect', 'vel'])(collRes))
   }
 
   function render() {
