@@ -5,7 +5,7 @@ const ScssConfigWebpackPlugin = require('scss-config-webpack-plugin')
 
 module.exports = {
   entry: './src/index3.js',
-  devtool: 'inline-source-map',
+  devtool: 'source-map',
   plugins: [
     // Cleans the dist folder before the build starts
     new CleanWebpackPlugin(),

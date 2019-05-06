@@ -9,25 +9,22 @@ function invariant(pred, msg = 'invariant failed') {
   }
 }
 
+//#region Basics
 /**
  * @template T
  * @param T
  * @returns T
  */
 const curryAll = R.mapObjIndexed(R.curry)
-
 function I(x) {
   return x
 }
-
 function degToRadians(degrees) {
   return (degrees * Math.PI) / 180
 }
-
 function absNeg(num) {
   return Math.abs(num) * -1
 }
-
 function absPos(num) {
   return Math.abs(num)
 }
@@ -41,6 +38,7 @@ function distanceBetweenPoints(p1, p2) {
   const [dx, dy] = [x2 - x1, y2 - y1]
   return Math.sqrt(dx * dx + dy * dy)
 }
+//#endregion
 
 // LINE SEGMENT INTERSECTION
 /**
@@ -117,7 +115,6 @@ let Vector = {
     return Vector.mapEach(I)(yf)(vec)
   },
 }
-
 Vector = curryAll(Vector)
 
 let Rect = {
@@ -284,7 +281,9 @@ function ballCollisionWithViewPort(ballRV, vpRect) {
   )
   const newRect = Rect.translate(offset, ballRect)
 
-  return { rect: newRect, vel: newVel }
+  const newBallRV = { rect: newRect, vel: newVel }
+
+  return R.equals(ballRV, newBallRV) ? null : newBallRV
 }
 
 function ballCollisionWithPaddle(ballRV, paddleRect) {
@@ -355,22 +354,21 @@ function start() {
   function update() {
     const newBallRect = Rect.mapCenter(Vector.add(ballRV.vel), ballRV.rect)
 
-    const beforeCollision = { rect: newBallRect, vel: ballRV.vel }
-    const afterCollision = ballCollisionWithViewPort(
-      beforeCollision,
-      vpRect,
-    )
+    const newBallRV = { rect: newBallRect, vel: ballRV.vel }
+    const collisionRes = ballCollisionWithViewPort(newBallRV, vpRect)
 
-    ballRV.rect = afterCollision.rect
-    ballRV.vel = afterCollision.vel
-
-    if (R.equals(beforeCollision, afterCollision)) {
+    if (collisionRes) {
+      ballRV.rect = collisionRes.rect
+      ballRV.vel = collisionRes.vel
+    } else {
       //TODO: check collision with paddle
       const afterCollision = ballCollisionWithPaddle(ballRV, paddleRect)
       ballRV.rect = afterCollision.rect
       ballRV.vel = afterCollision.vel
-      if (R.equals(beforeCollision, afterCollision)) {
+      if (R.equals(newBallRV, afterCollision)) {
         //TODO: check collision with bricks
+      } else {
+        Object.assign(ballRV, { rect: newBallRect })
       }
     }
   }
