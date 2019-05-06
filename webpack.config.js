@@ -6,6 +6,18 @@ const ScssConfigWebpackPlugin = require('scss-config-webpack-plugin')
 module.exports = {
   entry: './src/index4.js',
   devtool: 'source-map',
+  module: {
+    rules: [
+      {
+        test: /\.elm$/,
+        exclude: [/elm-stuff/, /node_modules/],
+        use: {
+          loader: 'elm-webpack-loader',
+          options: {},
+        },
+      },
+    ],
+  },
   plugins: [
     // Cleans the dist folder before the build starts
     new CleanWebpackPlugin(),

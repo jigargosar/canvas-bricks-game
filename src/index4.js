@@ -444,10 +444,10 @@ function rectFromCS(center, size) {
       const { x, y } = point
       const { minX, minY, maxX, maxY } = this.bounds
 
-      return [
+      return vec(
         x < minX ? minX - x : x > maxX ? maxX - x : 0,
         y < minY ? minY - y : y > maxY ? maxY - y : 0,
-      ]
+      )
     },
     restrictInOffset(big) {
       invariant(w < big.w)
@@ -576,10 +576,43 @@ function createBall(vp) {
   const w = r * 2
   const h = r * 2
   let rect = rectFromCS(vec(vp.cx, vp.cy), vec(w, h))
-  let vel = vecFromDegMag(99, 2)
+  let vel = vecFromDegMag(99, 10)
+
+  function vpCollision() {
+    const newRect = rect.translate(vel)
+
+    const offset = rect.translate(vel).restrictInOffset(vp)
+
+    if (R.equals(offset, vec(0, 0))) return false
+
+    const { x: xOffset, y: yOffset } = offset
+
+    vel = vel.mapEach(
+      dx =>
+        xOffset === 0
+          ? dx
+          : xOffset < 0
+          ? Math.abs(dx) * -1
+          : Math.abs(dx),
+      dy =>
+        yOffset === 0
+          ? dy
+          : yOffset < 0
+          ? Math.abs(dy) * -1
+          : Math.abs(dy),
+    )
+
+    rect = newRect.translate(offset)
+    return true
+  }
+
   return {
     update() {
-      const newRect = rect.translate(vel)
+      // const newRect = rect.translate(vel)
+      if (!vpCollision()) {
+        //TODO: check for other
+        rect = rect.translate(vel)
+      }
     },
     render(ctx) {
       const { cx, cy } = rect
