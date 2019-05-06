@@ -578,7 +578,7 @@ function createBall(vp) {
   let rect = rectFromCS(vec(vp.cx, vp.cy), vec(w, h))
   let vel = vecFromDegMag(99, 10)
 
-  function vpCollision() {
+  function viewportCollision() {
     const newRect = rect.translate(vel)
 
     const offset = rect.translate(vel).restrictInOffset(vp)
@@ -609,7 +609,7 @@ function createBall(vp) {
   return {
     update() {
       // const newRect = rect.translate(vel)
-      if (!vpCollision()) {
+      if (!viewportCollision()) {
         //TODO: check for other
         rect = rect.translate(vel)
       }
