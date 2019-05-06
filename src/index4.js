@@ -489,12 +489,6 @@ function createPaddle(vp) {
       ctx.fillStyle = 'orange'
       ctx.fillRect(rect.x1, rect.y1, rect.w, rect.h)
     },
-    moveLeft() {
-      // rect = rect.translate(vec(-speed, 0))
-    },
-    moveRight() {
-      // rect = rect.translate(vec(speed, 0))
-    },
   }
 }
 
@@ -503,16 +497,6 @@ function startGame() {
   const vp = rectFromWH(ctx.canvas.width, ctx.canvas.width)
   const pad = createPaddle(vp)
 
-  window.addEventListener('keydown', e => {
-    switch (e.key) {
-      case 'ArrowLeft':
-        pad.moveLeft()
-        break
-      case 'ArrowRight':
-        pad.moveRight()
-        break
-    }
-  })
   function update() {
     pad.update()
   }
