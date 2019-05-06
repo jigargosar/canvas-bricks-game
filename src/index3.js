@@ -357,23 +357,18 @@ function start() {
     const newBallRect = Rect.mapCenter(Vector.add(ballRV.vel), ballRV.rect)
 
     const newBallRV = { rect: newBallRect, vel: ballRV.vel }
-    const collRes = ballCollisionWithViewPort(newBallRV, vpRect)
 
-    if (collRes) {
-      ballRV.rect = collRes.rect
-      ballRV.vel = collRes.vel
-    } else {
-      //TODO: check collision with paddle
-      const collRes = ballCollisionWithPaddle(ballRV, paddleRect)
+    const crList = [
+      () => ballCollisionWithViewPort(newBallRV, vpRect),
+      () => ballCollisionWithPaddle(ballRV, paddleRect),
+      () => newBallRV,
+    ]
 
-      if (collRes) {
-        //TODO: check collision with bricks
-        ballRV.rect = collRes.rect
-        ballRV.vel = collRes.vel
-      } else {
-        Object.assign(ballRV, { rect: newBallRect })
-      }
-    }
+    const crr = R.reduce((cr, th) => (R.isNil(cr) ? th() : R.reduced(cr)))(
+      null,
+    )(crList)
+
+    Object.assign(ballRV, R.pick(['rect', 'vel'])(crr))
   }
 
   function render() {
