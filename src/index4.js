@@ -520,17 +520,39 @@ function createPaddle(vp) {
   }
 }
 
+function createBall(vp) {
+  const r = 10
+  const w = r * 2
+  const h = r * 2
+  let rect = rectFromCS(vec(vp.cx, vp.cy), vec(w, h))
+
+  return {
+    update() {},
+    render(ctx) {
+      const { cx, cy } = rect
+      const radius = r
+      ctx.beginPath()
+      ctx.arc(cx, cy, radius, 0, degToRadians(360), false)
+      ctx.fillStyle = 'blue'
+      ctx.fill()
+    },
+  }
+}
+
 function startGame() {
   const ctx = initCanvas()
   const vp = rectFromWH(ctx.canvas.width, ctx.canvas.width)
   const pad = createPaddle(vp)
+  const ball = createBall(vp)
 
   function update() {
     pad.update()
+    ball.update()
   }
 
   function render() {
     pad.render(ctx)
+    ball.render(ctx)
   }
 
   gameLoop(() => {
