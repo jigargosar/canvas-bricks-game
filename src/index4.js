@@ -395,6 +395,11 @@ function start() {
   })
 }
 
+function vecFromDegMag(deg, mag) {
+  const angle = degToRadians(deg)
+  return vec(Math.cos(angle) * mag, Math.sin(angle) * mag)
+}
+
 function vec(x, y) {
   return {
     get x() {
@@ -431,6 +436,15 @@ function rectFromCS(center, size) {
     },
     get y2() {
       return cy + h / 2
+    },
+    get edges() {
+      const [minX, minY, maxX, maxY] = [this.x1, this.y1, this.x2, this.y2]
+      return [
+        { p1: [minX, minY], p2: [maxX, minY], side: 'top' },
+        { p1: [maxX, minY], p2: [maxX, maxY], side: 'right' },
+        { p1: [maxX, maxY], p2: [minX, maxY], side: 'bottom' },
+        { p1: [minX, maxY], p2: [minX, minY], side: 'left' },
+      ]
     },
     get cx() {
       return cx
@@ -525,9 +539,11 @@ function createBall(vp) {
   const w = r * 2
   const h = r * 2
   let rect = rectFromCS(vec(vp.cx, vp.cy), vec(w, h))
-
+  let vel = vecFromDegMag(99, 2)
   return {
-    update() {},
+    update() {
+      rect = rect.translate(vel)
+    },
     render(ctx) {
       const { cx, cy } = rect
       const radius = r
