@@ -403,6 +403,9 @@ function vec(x, y) {
     get y() {
       return y
     },
+    add(v2) {
+      return vec(x + v2.x, y + v2.y)
+    },
   }
 }
 
@@ -441,8 +444,11 @@ function rectFromCS(center, size) {
     get center() {
       return center
     },
+    translate(v1) {
+      return rectFromCS(center.add(v1), size)
+    },
     mapCenter(cfn) {
-      return
+      return rectFromCS(cfn(center), size)
     },
   }
 }
@@ -452,6 +458,7 @@ function createPaddle(vp) {
   const w = 150
   let rect = rectFromCS(vec(vp.cx, vp.y2 - h * 2), vec(w, h))
   const speed = 10
+
   return {
     render(ctx) {
       ctx.fillStyle = 'orange'
@@ -471,6 +478,16 @@ function startGame() {
   const vp = rectFromWH(ctx.canvas.width, ctx.canvas.width)
   const pad = createPaddle(vp)
 
+  window.addEventListener('keydown', e => {
+    switch (e.key) {
+      case 'ArrowLeft':
+        pad.moveLeft()
+        break
+      case 'ArrowRight':
+        pad.moveRight()
+        break
+    }
+  })
   function update() {}
 
   function render() {
