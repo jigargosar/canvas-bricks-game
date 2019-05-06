@@ -321,12 +321,14 @@ function ballCollisionWithPaddle(ballRV, paddleRect) {
         break
     }
 
-    return {
+    const newBallRV = {
       rect: Rect.mapCenter(Vector.mapEach(xfn, yfn), ballRV.rect),
       vel: Vector.mapEach(dxfn, dyfn, ballRV.vel),
     }
+
+    return R.equals(ballRV, newBallRV) ? null : newBallRV
   }
-  return ballRV
+  return null
 }
 
 function start() {
@@ -355,18 +357,19 @@ function start() {
     const newBallRect = Rect.mapCenter(Vector.add(ballRV.vel), ballRV.rect)
 
     const newBallRV = { rect: newBallRect, vel: ballRV.vel }
-    const collisionRes = ballCollisionWithViewPort(newBallRV, vpRect)
+    const collRes = ballCollisionWithViewPort(newBallRV, vpRect)
 
-    if (collisionRes) {
-      ballRV.rect = collisionRes.rect
-      ballRV.vel = collisionRes.vel
+    if (collRes) {
+      ballRV.rect = collRes.rect
+      ballRV.vel = collRes.vel
     } else {
       //TODO: check collision with paddle
-      const afterCollision = ballCollisionWithPaddle(ballRV, paddleRect)
-      ballRV.rect = afterCollision.rect
-      ballRV.vel = afterCollision.vel
-      if (R.equals(newBallRV, afterCollision)) {
+      const collRes = ballCollisionWithPaddle(ballRV, paddleRect)
+
+      if (collRes) {
         //TODO: check collision with bricks
+        ballRV.rect = collRes.rect
+        ballRV.vel = collRes.vel
       } else {
         Object.assign(ballRV, { rect: newBallRect })
       }
