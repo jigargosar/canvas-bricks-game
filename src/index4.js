@@ -408,6 +408,9 @@ function vec(x, y) {
     get y() {
       return y
     },
+    get tuple() {
+      return [x, y]
+    },
     add(v2) {
       return vec(x + v2.x, y + v2.y)
     },
@@ -445,6 +448,22 @@ function rectFromCS(center, size) {
         { p1: [maxX, maxY], p2: [minX, maxY], side: 'bottom' },
         { p1: [minX, maxY], p2: [minX, minY], side: 'left' },
       ]
+    },
+    lineEdgeShortestIntersection(p1, p2) {
+      const llip = R.partial(lineLineIntersectionPoint, [p1, p2])
+      const distFromP2 = R.partial(distanceBetweenPoints, [p2])
+      return R.compose(
+        R.head,
+        R.sortWith([R.ascend(R.prop('len'))]),
+        R.map(ei => R.assoc('len', distFromP2(ei.ipt), ei)),
+        R.reject(
+          R.compose(
+            R.isNil,
+            R.prop('ipt'),
+          ),
+        ),
+        R.map(edge => ({ edge, ipt: llip(edge.p1, edge.p2) })),
+      )(this.edges)
     },
     get cx() {
       return cx
@@ -542,7 +561,7 @@ function createBall(vp) {
   let vel = vecFromDegMag(99, 2)
   return {
     update() {
-      rect = rect.translate(vel)
+      const newRect = rect.translate(vel)
     },
     render(ctx) {
       const { cx, cy } = rect
