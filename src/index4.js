@@ -417,6 +417,9 @@ function vec(x, y) {
     mapEach(xfn, yfn) {
       return vec(xfn(x), yfn(y))
     },
+    equals(v2) {
+      return x === v2.x && y === v2.y
+    },
   }
 }
 
@@ -512,6 +515,9 @@ function rectFromCS(center, size) {
       invariant(h > small.h)
       return rectFromCS(center, vec(w - small.w, h - small.h))
     },
+    grow(rect) {
+      return rectFromCS(center, vec(w + rect.w, h + rect.h))
+    },
     clampIn(big) {
       invariant(w < big.w)
       invariant(h < big.h)
@@ -559,6 +565,9 @@ function createPaddle(vp) {
   const speed = 10
 
   return {
+    get rect() {
+      return rect
+    },
     update() {
       const dx = Key.left ? -speed : Key.right ? speed : 0
       const vel = vec(dx, 0)
@@ -571,7 +580,7 @@ function createPaddle(vp) {
   }
 }
 
-function createBall(vp) {
+function createBall(vp, padRect) {
   const r = 10
   const w = r * 2
   const h = r * 2
@@ -583,7 +592,7 @@ function createBall(vp) {
 
     const offset = rect.translate(vel).restrictInOffset(vp)
 
-    if (R.equals(offset, vec(0, 0))) return false
+    if (offset.equals(vec(0, 0))) return false
 
     const { x: xOffset, y: yOffset } = offset
 
@@ -607,48 +616,43 @@ function createBall(vp) {
   }
 
   function paddleCollision() {
-    // const grownPaddleRect = Rect.mapSize(Vector.add(Rect.size(ballRV.rect)))(
-    //   paddleRect,
-    // )
+    const grownPaddleRect = padRect.grow(rect)
 
-    // const ballP1 = Rect.center(ballRV.rect)
-    // const ballP2 = Vector.add(ballP1, ballRV.vel)
+    const ballP1 = rect.center.tuple
+    const ballP2 = rect.center.add(vel).tuple
 
-    // const ei = lineRectEdgeIntersection(ballP1, ballP2, grownPaddleRect)
+    const ei = grownPaddleRect.lineEdgeShortestIntersection(ballP1, ballP2)
 
-    // if (ei) {
-    //   let xfn = I
-    //   let yfn = I
-    //   let dxfn = I
-    //   let dyfn = I
+    if (ei) {
+      let xfn = I
+      let yfn = I
+      let dxfn = I
+      let dyfn = I
 
-    //   switch (ei.edge.side) {
-    //     case 'top':
-    //       yfn = R.always(Vector.y(ei.edge.p1))
-    //       dyfn = absNeg
-    //       break
-    //     case 'bottom':
-    //       yfn = R.always(Vector.y(ei.edge.p1))
-    //       dyfn = Math.abs
-    //       break
-    //     case 'left':
-    //       xfn = R.always(Vector.x(ei.edge.p1))
-    //       dxfn = absNeg
-    //       break
-    //     case 'right':
-    //       xfn = R.always(Vector.x(ei.edge.p1))
-    //       dxfn = Math.abs
-    //       break
-    //   }
+      switch (ei.edge.side) {
+        case 'top':
+          yfn = R.always(Vector.y(ei.edge.p1))
+          dyfn = absNeg
+          break
+        case 'bottom':
+          yfn = R.always(Vector.y(ei.edge.p1))
+          dyfn = Math.abs
+          break
+        case 'left':
+          xfn = R.always(Vector.x(ei.edge.p1))
+          dxfn = absNeg
+          break
+        case 'right':
+          xfn = R.always(Vector.x(ei.edge.p1))
+          dxfn = Math.abs
+          break
+      }
 
-    //   const newBallRV = {
-    //     rect: Rect.mapCenter(Vector.mapEach(xfn, yfn), ballRV.rect),
-    //     vel: Vector.mapEach(dxfn, dyfn, ballRV.vel),
-    //   }
+      rect = rect.translate(vel).mapCenter(c => c.mapEach(xfn, yfn))
+      vel = vel.mapEach(dxfn, dyfn)
 
-    //   return R.equals(ballRV, newBallRV) ? null : newBallRV
-    // }
-    // return null
+      return true
+    }
     return false
   }
 
@@ -674,7 +678,7 @@ function startGame() {
   const ctx = initCanvas()
   const vp = rectFromWH(ctx.canvas.width, ctx.canvas.width)
   const pad = createPaddle(vp)
-  const ball = createBall(vp)
+  const ball = createBall(vp, pad.rect)
 
   function update() {
     pad.update()
