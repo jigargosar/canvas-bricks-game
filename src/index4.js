@@ -453,22 +453,47 @@ function rectFromCS(center, size) {
   }
 }
 
+const key = (function initKeyboard() {
+  const km = {}
+  window.addEventListener('keydown', e => {
+    km[e.key] = true
+  })
+  window.addEventListener('keyup', e => {
+    km[e.key] = false
+  })
+
+  return {
+    get left() {
+      return km['ArrowLeft']
+    },
+    get right() {
+      return km['ArrowRight']
+    },
+  }
+})()
+
 function createPaddle(vp) {
   const h = 15
   const w = 150
   let rect = rectFromCS(vec(vp.cx, vp.y2 - h * 2), vec(w, h))
+
   const speed = 10
 
   return {
+    update() {
+      const dx = key.left ? -speed : key.right ? speed : 0
+      const vel = vec(dx, 0)
+      rect = rect.mapCenter(c => c.add(vel))
+    },
     render(ctx) {
       ctx.fillStyle = 'orange'
       ctx.fillRect(rect.x1, rect.y1, rect.w, rect.h)
     },
     moveLeft() {
-      rect = rect.translate(vec(-speed, 0))
+      // rect = rect.translate(vec(-speed, 0))
     },
     moveRight() {
-      rect = rect.translate(vec(speed, 0))
+      // rect = rect.translate(vec(speed, 0))
     },
   }
 }
@@ -488,7 +513,9 @@ function startGame() {
         break
     }
   })
-  function update() {}
+  function update() {
+    pad.update()
+  }
 
   function render() {
     pad.render(ctx)
