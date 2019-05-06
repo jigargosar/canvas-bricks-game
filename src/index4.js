@@ -440,8 +440,26 @@ function rectFromCS(center, size) {
     get y2() {
       return cy + h / 2
     },
-    get edges() {
+    constrainPointOffset(point) {
+      const { x, y } = point
+      const { minX, minY, maxX, maxY } = this.bounds
+
+      return [
+        x < minX ? minX - x : x > maxX ? maxX - x : 0,
+        y < minY ? minY - y : y > maxY ? maxY - y : 0,
+      ]
+    },
+    restrictInOffset(big) {
+      invariant(w < big.w)
+      invariant(h < big.h)
+      return big.shrink(this).constrainPointOffset(center)
+    },
+    get bounds() {
       const [minX, minY, maxX, maxY] = [this.x1, this.y1, this.x2, this.y2]
+      return { minX, minY, maxX, maxY }
+    },
+    get edges() {
+      const { minX, minY, maxX, maxY } = this.bounds
       return [
         { p1: [minX, minY], p2: [maxX, minY], side: 'top' },
         { p1: [maxX, minY], p2: [maxX, maxY], side: 'right' },
