@@ -606,11 +606,56 @@ function createBall(vp) {
     return true
   }
 
+  function paddleCollision() {
+    // const grownPaddleRect = Rect.mapSize(Vector.add(Rect.size(ballRV.rect)))(
+    //   paddleRect,
+    // )
+
+    // const ballP1 = Rect.center(ballRV.rect)
+    // const ballP2 = Vector.add(ballP1, ballRV.vel)
+
+    // const ei = lineRectEdgeIntersection(ballP1, ballP2, grownPaddleRect)
+
+    // if (ei) {
+    //   let xfn = I
+    //   let yfn = I
+    //   let dxfn = I
+    //   let dyfn = I
+
+    //   switch (ei.edge.side) {
+    //     case 'top':
+    //       yfn = R.always(Vector.y(ei.edge.p1))
+    //       dyfn = absNeg
+    //       break
+    //     case 'bottom':
+    //       yfn = R.always(Vector.y(ei.edge.p1))
+    //       dyfn = Math.abs
+    //       break
+    //     case 'left':
+    //       xfn = R.always(Vector.x(ei.edge.p1))
+    //       dxfn = absNeg
+    //       break
+    //     case 'right':
+    //       xfn = R.always(Vector.x(ei.edge.p1))
+    //       dxfn = Math.abs
+    //       break
+    //   }
+
+    //   const newBallRV = {
+    //     rect: Rect.mapCenter(Vector.mapEach(xfn, yfn), ballRV.rect),
+    //     vel: Vector.mapEach(dxfn, dyfn, ballRV.vel),
+    //   }
+
+    //   return R.equals(ballRV, newBallRV) ? null : newBallRV
+    // }
+    // return null
+    return false
+  }
+
   return {
     update() {
-      // const newRect = rect.translate(vel)
-      if (!viewportCollision()) {
-        //TODO: check for other
+      const collisionHandled = viewportCollision() || paddleCollision()
+      if (!collisionHandled) {
         rect = rect.translate(vel)
       }
     },
