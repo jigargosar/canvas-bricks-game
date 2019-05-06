@@ -430,16 +430,25 @@ function rectFromWH(w, h) {
   }
 }
 
+function createPaddle(vp) {
+  const pad = rectFromWH(200, 20)
+  return {
+    render(ctx) {
+      ctx.fillStyle = 'orange'
+      ctx.fillRect(pad.x1, pad.y1, pad.w, pad.h)
+    },
+  }
+}
+
 function startGame() {
   const ctx = initCanvas()
   const vp = rectFromWH(ctx.canvas.width, ctx.canvas.width)
-  const pad = rectFromWH(200, 20)
+  const pad = createPaddle()
 
   function update() {}
 
   function render() {
-    ctx.fillStyle = 'orange'
-    ctx.fillRect(pad.x1, pad.y1, pad.w, pad.h)
+    pad.render(ctx)
   }
 
   gameLoop(() => {
