@@ -1,29 +1,31 @@
 import * as R from 'ramda'
 
-type Point = {
-  x: number
-  y: number
+export class Point {
+  private constructor(private x: number, private y: number) {}
+
+  static fromXY(x: number, y: number): Point {
+    return new Point(x, y)
+  }
+
+  static xy = Point.fromXY
+
+  get tuple(): Vec2 {
+    return Point.toTuple(this)
+  }
+
+  static toTuple(a: Point): Vec2 {
+    return [a.x, a.y]
+  }
+
+  static len(a: Point, b: Point): number {
+    return distanceBetweenPoints(a.tuple, b.tuple)
+  }
 }
 
-type ReducerNum2 = (a: number, b: number) => number
+type Vec2 = [number, number]
 
-function map2Both(fn: ReducerNum2, a: Point, b: Point): Point {
-  return { x: fn(a.x, b.x), y: fn(a.y, b.y) }
-}
-
-function subtract(a: Point, b: Point): Point {
-  return map2Both(R.subtract, a, b)
-}
-
-function square(a: number): number {
-  return a * a
-}
-
-export function len(a: Point, b: Point) {
-  const c = subtract(a, b)
-  return Math.sqrt(square(c.x) + square(c.y))
-}
-
-export function xy(x: number, y: number): Point {
-  return { x, y }
+function distanceBetweenPoints(p1: Vec2, p2: Vec2): number {
+  const [[x1, y1], [x2, y2]] = [p1, p2]
+  const [dx, dy] = [x2 - x1, y2 - y1]
+  return Math.sqrt(dx * dx + dy * dy)
 }
