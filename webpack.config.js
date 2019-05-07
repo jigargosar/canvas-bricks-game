@@ -1,10 +1,11 @@
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const JsConfigWebpackPlugin = require('js-config-webpack-plugin')
+const TsConfigWebpackPlugin = require('ts-config-webpack-plugin')
 const ScssConfigWebpackPlugin = require('scss-config-webpack-plugin')
 
 module.exports = {
-  entry: './src/index4.js',
+  entry: './src/index5.ts',
   devtool: 'source-map',
   module: {
     rules: [
@@ -25,7 +26,8 @@ module.exports = {
     new HtmlWebpackPlugin({ template: 'src/index.html' }),
     // Multi threading babel loader configuration with caching for .js and .jsx files
     // see https://github.com/namics/webpack-config-plugins/tree/master/packages/js-config-webpack-plugin/config
-    new JsConfigWebpackPlugin(),
+    // new JsConfigWebpackPlugin(),
+    new TsConfigWebpackPlugin(),
     // SCSS Configuration for .css .module.css and .scss .module.scss files
     // see https://github.com/namics/webpack-config-plugins/tree/master/packages/scss-config-webpack-plugin/config
     new ScssConfigWebpackPlugin(),
