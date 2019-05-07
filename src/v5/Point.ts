@@ -1,10 +1,18 @@
 import * as R from 'ramda'
 
 export class Point {
-  private constructor(private x: number, private y: number) {}
+  private constructor(private _x: number, private _y: number) {}
 
   static fromXY(x: number, y: number): Point {
     return new Point(x, y)
+  }
+
+  get x() {
+    return this._x
+  }
+
+  get y() {
+    return this._y
   }
 
   static xy = Point.fromXY

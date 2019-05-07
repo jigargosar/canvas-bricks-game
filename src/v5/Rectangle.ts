@@ -6,6 +6,10 @@ import { Size } from './Size'
 export class Rectangle {
   private constructor(private center: Point, private size: Size) {}
 
+  get x1() {
+    return this.center
+  }
+
   static fromWidthHeight(width: number, height: number): Rectangle {
     return new Rectangle(
       Point.fromXY(width / 2, height / 2),
