@@ -3,6 +3,7 @@ import 'tachyons'
 import './index.css'
 import * as R from 'ramda'
 import { Rectangle } from './v5/Rectangle'
+import { Paddle } from './Paddle'
 
 function invariant(pred, msg = 'invariant failed') {
   if (!pred) {
@@ -679,16 +680,16 @@ function startGame() {
   const ctx = initCanvas()
   const { width, height } = ctx.canvas
   const viewport = Rectangle.fromWH(width, height)
-  // const pad = createPaddle(vp)
+  const pad = Paddle.init(viewport)
   // const ball = createBall(vp, pad.rect)
 
   function update() {
-    // pad.update()
+    pad.update()
     // ball.update()
   }
 
   function render() {
-    // pad.render(ctx)
+    pad.render(ctx)
     // ball.render(ctx)
   }
 

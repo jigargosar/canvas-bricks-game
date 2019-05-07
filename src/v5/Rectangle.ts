@@ -17,7 +17,8 @@ export class Rectangle {
 
   get topLeft(): Point {
     const { width, height } = this.size
-    return this.center.translateBy(Vector.fromParts(width / 2, height / 2))
+    const halfDiagVector = Vector.fromParts(width / 2, height / 2)
+    return this.center.translateBy(halfDiagVector.scale(-1))
   }
 
   get tl(): Point {
