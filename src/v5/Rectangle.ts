@@ -8,28 +8,16 @@ import { NumberTuple } from './types'
 export class Rectangle {
   private constructor(public center: Point, public size: Size) {}
 
-  static fromWidthHeight(width: number, height: number): Rectangle {
-    return new Rectangle(
-      Point.fromXY(width / 2, height / 2),
-      Size.fromWidthHeight(width, height),
-    )
-  }
-
-  static fromCenterWH(
-    center: Point,
-    width: number,
-    height: number,
-  ): Rectangle {
-    return new Rectangle(center, Size.fromWidthHeight(width, height))
-  }
-
-  static fromWH = Rectangle.fromWidthHeight
-
-  static fromCenterSize(c: Point, s: Size): Rectangle {
+  static fromCS(c: Point, s: Size): Rectangle {
     return new Rectangle(c, s)
   }
 
-  static fromCS = Rectangle.fromCenterSize
+  static fromWH(width: number, height: number): Rectangle {
+    return Rectangle.fromCS(
+      Point.fromXY(width / 2, height / 2),
+      Size.fromWH(width, height),
+    )
+  }
 
   get extrema() {
     const tl = this.topLeft
@@ -37,11 +25,10 @@ export class Rectangle {
     return { minX: tl.x, minY: tl.y, maxX: br.x, maxY: br.y }
   }
 
-  shrink(bySize: Size): Rectangle {
-    const { w, h } = this.size
-    return new Rectangle(
-      this.center,
-      Size.fromWH(w - bySize.w, h - bySize.h),
+  shrink(b: Size): Rectangle {
+    return mapS(
+      a => Size.fromWH(a.width - b.width, a.height - b.height),
+      this,
     )
   }
 
@@ -81,9 +68,14 @@ function translateCenterByScaledSizeVector(
 }
 
 type PointF = (a: Point) => Point
+type SizeF = (a: Size) => Size
 
-const rec = Rectangle.fromCenterSize
+const rec = Rectangle.fromCS
 
 function mapC(fn: PointF, r: Rectangle): Rectangle {
   return rec(fn(r.center), r.size)
+}
+
+function mapS(fn: SizeF, r: Rectangle): Rectangle {
+  return rec(r.center, fn(r.size))
 }

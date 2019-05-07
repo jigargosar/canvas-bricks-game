@@ -9,19 +9,19 @@ export class Vector {
   }
 
   get tuple(): NumberTuple {
-    return Vector.toTuple(this)
+    return toTuple(this)
   }
 
   scale(factor: number): Vector {
-    return Vector.scale(factor, this)
-  }
-  static scale(factor: number, v: Vector) {
-    return Vector.fromParts(v.x * factor, v.y * factor)
-  }
-
-  static toTuple({ x, y }: Vector): NumberTuple {
-    return [x, y]
+    return scale(factor, this)
   }
 }
-
 export const vec = Vector.fromParts
+
+function scale(s: number, { x, y }: Vector) {
+  return vec(x * s, y * s)
+}
+
+function toTuple({ x, y }: Vector): NumberTuple {
+  return [x, y]
+}

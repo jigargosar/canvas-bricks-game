@@ -23,9 +23,7 @@ export class Size {
     return Vector.fromParts(this.w, this.h)
   }
 
-  static fromWidthHeight(width: number, height: number): Size {
+  static fromWH(width: number, height: number): Size {
     return new Size(width, height)
   }
-
-  static fromWH = Size.fromWidthHeight
 }

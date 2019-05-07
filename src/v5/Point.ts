@@ -17,8 +17,8 @@ export class Point {
     return translateBy(v, this)
   }
 
-  static len(a: Point, b: Point): number {
-    return distanceBetweenPoints(a.tuple, b.tuple)
+  distanceFrom(a: Point) {
+    return distanceBetweenPoints(a.tuple, this.tuple)
   }
 }
 

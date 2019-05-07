@@ -1,22 +1,24 @@
 import { Rectangle } from './v5/Rectangle'
 import { Point } from './v5/Point'
 import { Vector, vec } from './v5/Vector'
+import { Size } from './v5/Size'
 
 type Key = {
   left: boolean
   right: boolean
 }
 export class Paddle {
-  static readonly w = 150
-  static readonly h = 15
+  static readonly width = 150
+  static readonly height = 15
+  static readonly size = Size.fromWH(Paddle.width, Paddle.height)
+
   private rect: Rectangle
 
   private constructor(private viewport: Rectangle) {
     const { center, size } = viewport
-    this.rect = Rectangle.fromCenterWH(
-      Point.fromXY(center.x, size.height - Paddle.h * 1.5),
-      Paddle.w,
-      Paddle.h,
+    this.rect = Rectangle.fromCS(
+      Point.fromXY(center.x, size.height - Paddle.height * 1.5),
+      Paddle.size,
     )
   }
 
