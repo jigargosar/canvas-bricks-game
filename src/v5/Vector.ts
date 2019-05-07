@@ -23,3 +23,5 @@ export class Vector {
     return [x, y]
   }
 }
+
+export const vec = Vector.fromParts

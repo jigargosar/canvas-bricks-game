@@ -684,7 +684,7 @@ function startGame() {
   // const ball = createBall(vp, pad.rect)
 
   function update() {
-    pad.update()
+    pad.update(Key)
     // ball.update()
   }
 

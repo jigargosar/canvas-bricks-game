@@ -1,26 +1,32 @@
 import { Rectangle } from './v5/Rectangle'
 import { Point } from './v5/Point'
-import { Vector } from './v5/Vector'
+import { Vector, vec } from './v5/Vector'
 
+type Key = {
+  left: boolean
+  right: boolean
+}
 export class Paddle {
   static readonly w = 150
   static readonly h = 15
   private rect: Rectangle
-  private vel: Vector
 
-  private constructor({ center, size }: Rectangle) {
+  private constructor(private viewport: Rectangle) {
+    const { center, size } = viewport
     this.rect = Rectangle.fromCenterWH(
       Point.xy(center.x, size.height - Paddle.h * 1.5),
       Paddle.w,
       Paddle.h,
     )
-    this.vel = Vector.fromParts(2, 2)
   }
 
-  update() {
-    // const dx = Key.left ? -speed : Key.right ? speed : 0
-    // const vel = vec(dx, 0)
-    // rect = rect.mapCenter(c => c.add(vel)).clampIn(vp)
+  update(key: Key) {
+    const speed = 10
+    const dx = key.left ? -speed : key.right ? speed : 0
+    const vel = vec(dx, 0)
+    this.rect = this.rect
+      .mapCenter(c => c.translateBy(vel))
+      .clampIn(this.viewport)
   }
 
   render(ctx: CanvasRenderingContext2D) {
@@ -30,6 +36,7 @@ export class Paddle {
       size: { w, h },
     } = this.rect
     ctx.fillRect(x, y, w, h)
+    debugger
   }
   static init(viewport: Rectangle) {
     return new Paddle(viewport)

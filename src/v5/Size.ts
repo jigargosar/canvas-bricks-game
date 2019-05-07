@@ -4,7 +4,7 @@ import * as P from './Point'
 import { NumberTuple } from './types'
 
 export class Size {
-  constructor(public width: number, public height: number) {}
+  private constructor(public width: number, public height: number) {}
 
   get w() {
     return this.width
@@ -22,5 +22,5 @@ export class Size {
     return new Size(width, height)
   }
 
-  static fromWH = Size.fromWH
+  static fromWH = Size.fromWidthHeight
 }
