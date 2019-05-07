@@ -25,13 +25,6 @@ export class Rectangle {
     return { minX, minY, maxX, maxY }
   }
 
-  shrink(b: Size): Rectangle {
-    return mapS(
-      a => Size.fromWH(a.width - b.width, a.height - b.height),
-      this,
-    )
-  }
-
   clampIn(big: Rectangle): Rectangle {
     const { minX, maxX, minY, maxY } = mapS(
       bigSize => bigSize.shrinkBy(this.size),
