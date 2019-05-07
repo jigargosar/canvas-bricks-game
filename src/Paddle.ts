@@ -15,9 +15,11 @@ export class Paddle {
   private rect: Rectangle
 
   private constructor(private viewport: Rectangle) {
-    const { center, size } = viewport
     this.rect = Rectangle.fromCS(
-      Point.fromXY(center.x, size.height - Paddle.height * 1.5),
+      Point.fromXY(
+        viewport.center.x,
+        viewport.extrema.maxY - Paddle.height * 1.5,
+      ),
       Paddle.size,
     )
   }
