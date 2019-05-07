@@ -9,6 +9,8 @@ export class Point {
     return new Point(x, y)
   }
 
+  static readonly origin = Point.fromXY(0, 0)
+
   get tuple(): NumberTuple {
     return toTuple(this)
   }

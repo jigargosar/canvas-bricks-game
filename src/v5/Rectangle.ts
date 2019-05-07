@@ -20,9 +20,9 @@ export class Rectangle {
   }
 
   get extrema() {
-    const tl = this.topLeft
-    const br = this.bottomRight
-    return { minX: tl.x, minY: tl.y, maxX: br.x, maxY: br.y }
+    const { x: minX, y: minY } = this.topLeft
+    const { x: maxX, y: maxY } = this.bottomRight
+    return { minX, minY, maxX, maxY }
   }
 
   shrink(b: Size): Rectangle {
@@ -33,7 +33,10 @@ export class Rectangle {
   }
 
   clampIn(big: Rectangle): Rectangle {
-    const { minX, maxX, minY, maxY } = big.shrink(this.size).extrema
+    const { minX, maxX, minY, maxY } = mapS(
+      bigSize => bigSize.shrinkBy(this.size),
+      big,
+    ).extrema
     const fn = (c: Point) =>
       Point.fromXY(R.clamp(minX, maxX, c.x), R.clamp(minY, maxY, c.y))
     return mapC(fn, this)
