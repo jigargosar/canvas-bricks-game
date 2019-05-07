@@ -7,7 +7,35 @@ export class Rectangle {
   private constructor(private center: Point, private size: Size) {}
 
   get x1() {
-    return this.center
+    const {
+      center: { x, y },
+      size: { w, h },
+    } = this
+    return x - w / 2
+  }
+
+  get y1() {
+    const {
+      center: { x, y },
+      size: { w, h },
+    } = this
+    return y - h / 2
+  }
+
+  get x2() {
+    const {
+      center: { x, y },
+      size: { w, h },
+    } = this
+    return x + w / 2
+  }
+
+  get y2() {
+    const {
+      center: { x, y },
+      size: { w, h },
+    } = this
+    return y + h / 2
   }
 
   static fromWidthHeight(width: number, height: number): Rectangle {
