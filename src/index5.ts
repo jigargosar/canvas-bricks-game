@@ -2,6 +2,8 @@
 import 'tachyons'
 import './index.css'
 import * as R from 'ramda'
+import * as Pt from './v5/Point'
+import { xy } from './v5/Point'
 
 function invariant(pred, msg = 'invariant failed') {
   if (!pred) {
@@ -698,3 +700,6 @@ function startGame() {
 }
 
 startGame()
+
+console.log(Pt.len(Pt.xy(0, 0), Pt.xy(1, 1)))
+console.log(distanceBetweenPoints([0, 0], [1, 1]))

@@ -19,7 +19,11 @@ function square(a: number): number {
   return a * a
 }
 
-function len(a: Point, b: Point) {
+export function len(a: Point, b: Point) {
   const c = subtract(a, b)
   return Math.sqrt(square(c.x) + square(c.y))
+}
+
+export function xy(x: number, y: number): Point {
+  return { x, y }
 }
