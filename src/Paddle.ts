@@ -31,11 +31,8 @@ export class Paddle {
 
   render(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = 'orange'
-    const {
-      topLeft: { x, y },
-      size: { w, h },
-    } = this.rect
-    ctx.fillRect(x, y, w, h)
+    const { topLeft: p, size: s } = this.rect
+    ctx.fillRect(p.x, p.y, s.width, s.height)
   }
   static init(viewport: Rectangle) {
     return new Paddle(viewport)

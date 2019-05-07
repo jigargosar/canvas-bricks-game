@@ -20,8 +20,14 @@ export class Rectangle {
   }
 
   get extrema() {
-    const { x: minX, y: minY } = this.topLeft
-    const { x: maxX, y: maxY } = this.bottomRight
+    const { x: minX, y: minY } = translateCenterByScaledSizeVector(
+      -0.5,
+      this,
+    )
+    const { x: maxX, y: maxY } = translateCenterByScaledSizeVector(
+      0.5,
+      this,
+    )
     return { minX, minY, maxX, maxY }
   }
 
@@ -39,16 +45,20 @@ export class Rectangle {
     return mapC(c => c.translateBy(v), this)
   }
 
+  get vertices() {
+    const { minX, minY, maxX, maxY } = this.extrema
+    return {
+      topLeft: Point.fromXY(minX, minY),
+      bottomRight: Point.fromXY(maxX, maxY),
+    }
+  }
+
   get topLeft(): Point {
-    return translateCenterByScaledSizeVector(-0.5, this)
+    return this.vertices.topLeft
   }
 
   get bottomRight(): Point {
-    return translateCenterByScaledSizeVector(0.5, this)
-  }
-
-  get tl(): Point {
-    return this.topLeft
+    return this.vertices.bottomRight
   }
 
   get dimension(): NumberTuple {
@@ -58,9 +68,9 @@ export class Rectangle {
 
 function translateCenterByScaledSizeVector(
   factor: number,
-  rect: Rectangle,
+  r: Rectangle,
 ): Point {
-  return rect.center.translateBy(rect.size.vector.scale(factor))
+  return r.center.translateBy(r.size.vector.scale(factor))
 }
 
 type PointF = (a: Point) => Point
