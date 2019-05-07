@@ -8,8 +8,12 @@ export class Paddle {
   private rect: Rectangle
   private vel: Vector
 
-  private constructor(center: Point) {
-    this.rect = Rectangle.fromWH(Paddle.w, Paddle.h)
+  private constructor({ center, size }: Rectangle) {
+    this.rect = Rectangle.fromCenterWH(
+      Point.xy(center.x, size.height - Paddle.h * 1.5),
+      Paddle.w,
+      Paddle.h,
+    )
     this.vel = Vector.fromParts(2, 2)
   }
 
@@ -20,7 +24,6 @@ export class Paddle {
   }
 
   render(ctx: CanvasRenderingContext2D) {
-    debugger
     ctx.fillStyle = 'orange'
     const {
       topLeft: { x, y },
@@ -29,6 +32,6 @@ export class Paddle {
     ctx.fillRect(x, y, w, h)
   }
   static init(viewport: Rectangle) {
-    return new Paddle(viewport.center)
+    return new Paddle(viewport)
   }
 }

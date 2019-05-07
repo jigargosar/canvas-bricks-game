@@ -15,10 +15,21 @@ export class Rectangle {
     )
   }
 
+  static fromCenterWH(
+    center: Point,
+    width: number,
+    height: number,
+  ): Rectangle {
+    return new Rectangle(center, Size.fromWidthHeight(width, height))
+  }
+
   get topLeft(): Point {
-    const { width, height } = this.size
+    const {
+      center,
+      size: { width, height },
+    } = this
     const halfDiagVector = Vector.fromParts(width / 2, height / 2)
-    return this.center.translateBy(halfDiagVector.scale(-1))
+    return center.translateBy(halfDiagVector.scale(-1))
   }
 
   get tl(): Point {
