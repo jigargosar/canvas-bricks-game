@@ -3,15 +3,8 @@ import { Point } from './Point'
 import * as P from './Point'
 
 export class Size {
-  constructor(private _width: number, private _height: number) {}
+  constructor(public width: number, public height: number) {}
 
-  get width() {
-    return this._width
-  }
-
-  get height() {
-    return this._height
-  }
   get w() {
     return this.width
   }

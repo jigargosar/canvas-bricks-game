@@ -4,39 +4,7 @@ import { Point } from './Point'
 import { Size } from './Size'
 
 export class Rectangle {
-  private constructor(private center: Point, private size: Size) {}
-
-  get x1() {
-    const {
-      center: { x, y },
-      size: { w, h },
-    } = this
-    return x - w / 2
-  }
-
-  get y1() {
-    const {
-      center: { x, y },
-      size: { w, h },
-    } = this
-    return y - h / 2
-  }
-
-  get x2() {
-    const {
-      center: { x, y },
-      size: { w, h },
-    } = this
-    return x + w / 2
-  }
-
-  get y2() {
-    const {
-      center: { x, y },
-      size: { w, h },
-    } = this
-    return y + h / 2
-  }
+  private constructor(public center: Point, public size: Size) {}
 
   static fromWidthHeight(width: number, height: number): Rectangle {
     return new Rectangle(
