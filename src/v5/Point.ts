@@ -9,27 +9,25 @@ export class Point {
     return new Point(x, y)
   }
 
-  static xy = Point.fromXY
-
   get tuple(): NumberTuple {
-    return Point.toTuple(this)
+    return toTuple(this)
   }
 
   translateBy(v: Vector): Point {
-    return Point.translateBy(v, this)
-  }
-
-  static toTuple({ x, y }: Point): NumberTuple {
-    return [x, y]
+    return translateBy(v, this)
   }
 
   static len(a: Point, b: Point): number {
     return distanceBetweenPoints(a.tuple, b.tuple)
   }
+}
 
-  static translateBy(v: Vector, p: Point): Point {
-    return Point.xy(p.x + v.x, p.y + v.y)
-  }
+function toTuple(p: Point): NumberTuple {
+  return [p.x, p.y]
+}
+
+function translateBy(v: Vector, p: Point): Point {
+  return Point.fromXY(p.x + v.x, p.y + v.y)
 }
 
 function distanceBetweenPoints(p1: NumberTuple, p2: NumberTuple): number {

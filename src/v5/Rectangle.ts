@@ -47,8 +47,8 @@ export class Rectangle {
 
   clampIn(big: Rectangle): Rectangle {
     const { minX, maxX, minY, maxY } = big.shrink(this.size).extrema
-    const fn = c =>
-      Point.xy(R.clamp(minX, maxX, c.x), R.clamp(minY, maxY, c.y))
+    const fn = (c: Point) =>
+      Point.fromXY(R.clamp(minX, maxX, c.x), R.clamp(minY, maxY, c.y))
     return mapC(fn, this)
   }
 
