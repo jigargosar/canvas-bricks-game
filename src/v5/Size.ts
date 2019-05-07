@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 import { Point } from './Point'
 import * as P from './Point'
+import { NumberTuple } from './types'
 
 export class Size {
   constructor(public width: number, public height: number) {}
@@ -11,6 +12,10 @@ export class Size {
 
   get h() {
     return this.height
+  }
+
+  get tuple(): NumberTuple {
+    return [this.w, this.h]
   }
 
   static fromWidthHeight(width: number, height: number): Size {

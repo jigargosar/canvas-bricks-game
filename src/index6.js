@@ -2,7 +2,7 @@
 import 'tachyons'
 import './index.css'
 import * as R from 'ramda'
-import { Point } from './v5/Point'
+import { Rectangle } from './v5/Rectangle'
 
 function invariant(pred, msg = 'invariant failed') {
   if (!pred) {
@@ -677,28 +677,28 @@ function createBall(vp, padRect) {
 
 function startGame() {
   const ctx = initCanvas()
-  const vp = rectFromWH(ctx.canvas.width, ctx.canvas.width)
-  const pad = createPaddle(vp)
-  const ball = createBall(vp, pad.rect)
+  const { width, height } = ctx.canvas
+  const viewport = Rectangle.fromWH(width, height)
+  // const pad = createPaddle(vp)
+  // const ball = createBall(vp, pad.rect)
 
   function update() {
-    pad.update()
-    ball.update()
+    // pad.update()
+    // ball.update()
   }
 
   function render() {
-    pad.render(ctx)
-    ball.render(ctx)
+    // pad.render(ctx)
+    // ball.render(ctx)
   }
 
   gameLoop(() => {
     update()
-    ctx.clearRect(vp.x1, vp.y1, vp.w, vp.h)
+    const { x, y } = viewport.topLeft
+    const { width, height } = viewport.size
+    ctx.clearRect(x, y, width, height)
     render()
   })
 }
 
 startGame()
-
-console.log(Point.len(Point.xy(0, 0), Point.xy(1, 1)))
-console.log(distanceBetweenPoints([0, 0], [1, 1]))

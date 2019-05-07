@@ -2,6 +2,8 @@ import * as R from 'ramda'
 import { Point } from './Point'
 
 import { Size } from './Size'
+import { Vector } from './Vector'
+import { NumberTuple } from './types'
 
 export class Rectangle {
   private constructor(public center: Point, public size: Size) {}
@@ -11,6 +13,19 @@ export class Rectangle {
       Point.fromXY(width / 2, height / 2),
       Size.fromWidthHeight(width, height),
     )
+  }
+
+  get topLeft(): Point {
+    const { width, height } = this.size
+    return this.center.translateBy(Vector.fromParts(width / 2, height / 2))
+  }
+
+  get tl(): Point {
+    return this.topLeft
+  }
+
+  get dimension(): NumberTuple {
+    return this.size.tuple
   }
 
   static fromWH = Rectangle.fromWidthHeight
