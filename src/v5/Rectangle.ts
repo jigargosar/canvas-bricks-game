@@ -20,14 +20,11 @@ export class Rectangle {
   }
 
   get extrema() {
-    const { x: minX, y: minY } = translateCenterByScaledSizeVector(
-      -0.5,
-      this,
-    )
-    const { x: maxX, y: maxY } = translateCenterByScaledSizeVector(
-      0.5,
-      this,
-    )
+    const translateBySize = (scale: number) =>
+      this.center.translateBy(this.size.vector.scale(scale))
+
+    const { x: minX, y: minY } = translateBySize(-0.5)
+    const { x: maxX, y: maxY } = translateBySize(0.5)
     return { minX, minY, maxX, maxY }
   }
 
