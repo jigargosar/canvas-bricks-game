@@ -15,7 +15,7 @@ export class Point {
     return Point.toTuple(this)
   }
 
-  translateBy(v: Vector) {
+  translateBy(v: Vector): Point {
     return Point.translateBy(v, this)
   }
 

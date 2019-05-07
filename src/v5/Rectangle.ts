@@ -23,14 +23,20 @@ export class Rectangle {
     return new Rectangle(center, Size.fromWidthHeight(width, height))
   }
 
-  mapCenter(cfn: (a: Point) => Point): Rectangle {
-    return new Rectangle(cfn(this.center), this.size)
+  static fromWH = Rectangle.fromWidthHeight
+
+  static fromCenterSize(c: Point, s: Size): Rectangle {
+    return new Rectangle(c, s)
   }
+
+  static fromCS = Rectangle.fromCenterSize
+
   get extrema() {
     const tl = this.topLeft
     const br = this.bottomRight
     return { minX: tl.x, minY: tl.y, maxX: br.x, maxY: br.y }
   }
+
   shrink(bySize: Size): Rectangle {
     const { w, h } = this.size
     return new Rectangle(
@@ -41,13 +47,17 @@ export class Rectangle {
 
   clampIn(big: Rectangle): Rectangle {
     const { minX, maxX, minY, maxY } = big.shrink(this.size).extrema
-    return this.mapCenter(c =>
-      Point.xy(R.clamp(minX, maxX, c.x), R.clamp(minY, maxY, c.y)),
-    )
+    const fn = c =>
+      Point.xy(R.clamp(minX, maxX, c.x), R.clamp(minY, maxY, c.y))
+    return mapC(fn, this)
+  }
+
+  translateBy(v: Vector) {
+    return mapC(c => c.translateBy(v), this)
   }
 
   get topLeft(): Point {
-    return translateCenterByScaledSizeVector(0.5, this)
+    return translateCenterByScaledSizeVector(-0.5, this)
   }
 
   get bottomRight(): Point {
@@ -61,8 +71,6 @@ export class Rectangle {
   get dimension(): NumberTuple {
     return this.size.tuple
   }
-
-  static fromWH = Rectangle.fromWidthHeight
 }
 
 function translateCenterByScaledSizeVector(
@@ -70,4 +78,12 @@ function translateCenterByScaledSizeVector(
   rect: Rectangle,
 ): Point {
   return rect.center.translateBy(rect.size.vector.scale(factor))
+}
+
+type PointF = (a: Point) => Point
+
+const rec = Rectangle.fromCenterSize
+
+function mapC(fn: PointF, r: Rectangle): Rectangle {
+  return rec(fn(r.center), r.size)
 }

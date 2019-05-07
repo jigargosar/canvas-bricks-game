@@ -24,9 +24,7 @@ export class Paddle {
     const speed = 10
     const dx = key.left ? -speed : key.right ? speed : 0
     const vel = vec(dx, 0)
-    this.rect = this.rect
-      .mapCenter(c => c.translateBy(vel))
-      .clampIn(this.viewport)
+    this.rect = this.rect.translateBy(vel).clampIn(this.viewport)
   }
 
   render(ctx: CanvasRenderingContext2D) {
