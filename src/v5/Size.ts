@@ -6,24 +6,15 @@ import { Vector } from './Vector'
 
 export class Size {
   private constructor(public width: number, public height: number) {}
-
-  get w() {
-    return this.width
-  }
-
-  get h() {
-    return this.height
+  static fromWH(width: number, height: number): Size {
+    return new Size(width, height)
   }
 
   get tuple(): NumberTuple {
-    return [this.w, this.h]
+    return [this.width, this.height]
   }
 
   get vector(): Vector {
-    return Vector.fromParts(this.w, this.h)
-  }
-
-  static fromWH(width: number, height: number): Size {
-    return new Size(width, height)
+    return Vector.fromParts(this.width, this.height)
   }
 }
