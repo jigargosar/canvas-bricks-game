@@ -47,21 +47,11 @@ export class Rectangle {
   }
 
   get topLeft(): Point {
-    const {
-      center,
-      size: { width, height },
-    } = this
-    const halfDiagVector = Vector.fromParts(width / 2, height / 2)
-    return center.translateBy(halfDiagVector.scale(-1))
+    return translateCenterByScaledSizeVector(0.5, this)
   }
 
   get bottomRight(): Point {
-    const {
-      center,
-      size: { width, height },
-    } = this
-    const halfDiagVector = Vector.fromParts(width / 2, height / 2)
-    return center.translateBy(halfDiagVector.scale(-1))
+    return translateCenterByScaledSizeVector(0.5, this)
   }
 
   get tl(): Point {
@@ -73,4 +63,11 @@ export class Rectangle {
   }
 
   static fromWH = Rectangle.fromWidthHeight
+}
+
+function translateCenterByScaledSizeVector(
+  factor: number,
+  rect: Rectangle,
+): Point {
+  return rect.center.translateBy(rect.size.vector.scale(factor))
 }

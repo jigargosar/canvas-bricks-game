@@ -36,7 +36,6 @@ export class Paddle {
       size: { w, h },
     } = this.rect
     ctx.fillRect(x, y, w, h)
-    debugger
   }
   static init(viewport: Rectangle) {
     return new Paddle(viewport)
