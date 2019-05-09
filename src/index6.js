@@ -5,6 +5,7 @@ import * as R from 'ramda'
 import { Rectangle } from './v6/Rectangle'
 import { Paddle } from './Paddle'
 import { Ball } from './Ball'
+import { Bricks } from './Bricks'
 
 function invariant(pred, msg = 'invariant failed') {
   if (!pred) {
@@ -683,6 +684,7 @@ function startGame() {
   const viewport = Rectangle.fromWH(width, height)
   let pad = Paddle.init(viewport)
   let ball = Ball.init(viewport)
+  let bricks = Bricks.init()
 
   function update() {
     pad = pad.update(Key, viewport)
@@ -692,6 +694,7 @@ function startGame() {
   function render() {
     pad.render(ctx)
     ball.render(ctx)
+    bricks.render(ctx)
   }
 
   gameLoop(() => {
