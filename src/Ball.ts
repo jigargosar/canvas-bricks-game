@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import { Rectangle, line, LineSegment } from './v6/Rectangle'
 import { Point } from './v6/Point'
-import { Vector, vec, absNeg } from './v6/Vector'
+import { Vector, vec, absNeg, NumF } from './v6/Vector'
 import { Size } from './v6/Size'
 
 export class Ball {
@@ -41,7 +41,7 @@ export class Ball {
     const eis = collisionRect.edgeIntersections(
       LineSegment.fromPoints(p1, p2),
     )
-    const updateY = (velYFn, cy) =>
+    const updateY = (velYFn: NumF, cy: number) =>
       new Ball(this.rect.setCY(cy), this.vel.mapY(velYFn))
     if (eis.top) {
       return updateY(absNeg, ext.minY - 1)
@@ -49,7 +49,7 @@ export class Ball {
       return updateY(Math.abs, ext.maxY + 1)
     }
 
-    const updateX = (velXFn, cx) =>
+    const updateX = (velXFn: NumF, cx: number) =>
       new Ball(this.rect.setCX(cx), this.vel.mapX(velXFn))
     if (eis.left) {
       return updateX(absNeg, ext.minX - 1)
