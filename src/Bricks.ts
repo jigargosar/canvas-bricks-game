@@ -10,10 +10,17 @@ export class Bricks {
   static init() {
     const xScale = Brick.width + 10
     const xTranslate = Brick.width
-    const brickAt = (x: number, y: number) =>
-      Brick.init(x * xScale + xTranslate, y * Brick.offsetHeight)
 
-    const bricks = R.times(y => R.times(x => brickAt(x, y), 5), 5)
+    const yScale = Brick.height + 10
+    const yTranslate = 20
+
+    const rowCt = 5
+    const colCt = 5
+
+    const brickAt = (x: number, y: number) =>
+      Brick.init(x * xScale + xTranslate, y * yScale + yTranslate)
+
+    const bricks = R.times(y => R.times(x => brickAt(x, y), rowCt), colCt)
     return new Bricks((R.flatten(bricks) as any) as Brick[])
   }
 
@@ -24,7 +31,6 @@ export class Bricks {
 
 export class Brick {
   static readonly width = 50
-  static readonly offsetWidth = Brick.width + 10
   static readonly height = 10
   static readonly offsetHeight = Brick.height + 10
   static readonly size = Size.fromWH(Brick.width, Brick.height)
