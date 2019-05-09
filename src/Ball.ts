@@ -13,15 +13,18 @@ export class Ball {
   private rect: Rectangle
   private vel: Vector = Vector.fromDegMag(99, 5)
 
-  private constructor(private viewport: Rectangle) {
+  private constructor(
+    private viewport: Rectangle,
+    private paddleRect: Rectangle,
+  ) {
     this.rect = Rectangle.fromCS(
       Point.fromXY(viewport.center.x, viewport.center.y),
       Ball.size,
     )
   }
 
-  static init(viewport: Rectangle) {
-    return new Ball(viewport)
+  static init(viewport: Rectangle, paddleRect: Rectangle): Ball {
+    return new Ball(viewport, paddleRect)
   }
 
   updateViewportCollision() {
@@ -38,6 +41,9 @@ export class Ball {
   }
 
   updatePaddleCollision() {
+    const edgeIntersections = this.paddleRect.grow(this.rect)
+      .edgeIntersections
+
     return false
   }
 

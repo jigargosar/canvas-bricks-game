@@ -5,6 +5,7 @@ import { Size } from './Size'
 import { Vector, vec } from './Vector'
 import { NumberTuple } from './types'
 import { max } from 'date-fns'
+import leftPad = require('../../node_modules/left-pad/index')
 
 export type XYWH = {
   x: number
@@ -37,6 +38,10 @@ export class Rectangle {
 
   mapSize(fn: SizeF): Rectangle {
     return mapS(fn, this)
+  }
+
+  grow(b: Rectangle) {
+    return mapS(s => s.add(b.size), this)
   }
 
   clampOffsetIn(big: Rectangle): Vector {
@@ -81,6 +86,12 @@ export class Rectangle {
     }
   }
 
+  edgeIntersections(a: LineSegment): EdgeIntersections {
+    return R.mapObjIndexed((b: LineSegment) =>
+      a.intersectionPoint(b),
+    ) as EdgeIntersections
+  }
+
   get topLeftXYWH(): XYWH {
     const { minX: x, minY: y } = this.extrema
     const { width: w, height: h } = this.size
@@ -92,15 +103,26 @@ export class Rectangle {
   }
 }
 
-class LineSegment {
+type EdgeIntersections = {
+  top?: Point
+  bottom?: Point
+  left?: Point
+  right?: Point
+}
+
+export class LineSegment {
   private constructor(public p1: Point, public p2: Point) {}
 
   static fromPoints(p1: Point, p2: Point): LineSegment {
     return new LineSegment(p1, p2)
   }
+
+  intersectionPoint(b: LineSegment): Point | undefined {
+    return this.p1
+  }
 }
 
-function line(p1: Point, p2: Point): LineSegment {
+export function line(p1: Point, p2: Point): LineSegment {
   return LineSegment.fromPoints(p1, p2)
 }
 
