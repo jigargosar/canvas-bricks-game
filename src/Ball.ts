@@ -10,16 +10,14 @@ export class Ball {
 
   static readonly size = Size.fromWH(Ball.radius * 2, Ball.radius * 2)
 
-  private vel: Vector = Vector.fromDegMag(99, 20)
-
-  private constructor(private rect: Rectangle) {}
+  private constructor(private rect: Rectangle, private vel: Vector) {}
 
   static init(viewport: Rectangle): Ball {
     const rect = Rectangle.fromCS(
       Point.fromXY(viewport.center.x, viewport.center.y),
       Ball.size,
     )
-    return new Ball(rect)
+    return new Ball(rect, Vector.fromDegMag(99, 20))
   }
 
   updateViewportCollision(viewport: Rectangle) {
