@@ -1,8 +1,8 @@
 import * as R from 'ramda'
 
-import { Rectangle } from './v6/Rectangle'
+import { Rectangle, line, LineSegment } from './v6/Rectangle'
 import { Point } from './v6/Point'
-import { Vector, vec } from './v6/Vector'
+import { Vector, vec, absNeg } from './v6/Vector'
 import { Size } from './v6/Size'
 
 export class Ball {
@@ -11,7 +11,7 @@ export class Ball {
   static readonly size = Size.fromWH(Ball.radius * 2, Ball.radius * 2)
 
   private rect: Rectangle
-  private vel: Vector = Vector.fromDegMag(99, 5)
+  private vel: Vector = Vector.fromDegMag(99, 2)
 
   private constructor(
     private viewport: Rectangle,
@@ -41,8 +41,21 @@ export class Ball {
   }
 
   updatePaddleCollision() {
-    const edgeIntersections = this.paddleRect.grow(this.rect)
-      .edgeIntersections
+    const p1 = this.rect.center
+    const p2 = p1.translateBy(this.vel)
+    const collisionRect = this.paddleRect.grow(this.rect)
+    const cex = collisionRect.extrema
+    const eis = collisionRect.edgeIntersections(
+      LineSegment.fromPoints(p1, p2),
+    )
+
+    if (eis.top) {
+      this.vel = this.vel.mapY(absNeg)
+      this.rect = this.rect.mapCenter(({ x, y }) =>
+        Point.fromXY(x, cex.minY - 1),
+      )
+      return true
+    }
 
     return false
   }

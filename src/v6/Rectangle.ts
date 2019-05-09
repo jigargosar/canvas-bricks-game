@@ -4,8 +4,6 @@ import { Point } from './Point'
 import { Size } from './Size'
 import { Vector, vec } from './Vector'
 import { NumberTuple } from './types'
-import { max } from 'date-fns'
-import leftPad = require('../../node_modules/left-pad/index')
 
 export type XYWH = {
   x: number
@@ -38,6 +36,10 @@ export class Rectangle {
 
   mapSize(fn: SizeF): Rectangle {
     return mapS(fn, this)
+  }
+
+  mapCenter(fn: PointF): Rectangle {
+    return mapC(fn, this)
   }
 
   grow(b: Rectangle) {
@@ -87,9 +89,7 @@ export class Rectangle {
   }
 
   edgeIntersections(a: LineSegment): EdgeIntersections {
-    return R.mapObjIndexed((b: LineSegment) =>
-      a.intersectionPoint(b),
-    ) as EdgeIntersections
+    return R.mapObjIndexed(b => a.intersectionPoint(b), this.edges)
   }
 
   get topLeftXYWH(): XYWH {
@@ -103,7 +103,7 @@ export class Rectangle {
   }
 }
 
-type EdgeIntersections = {
+export type EdgeIntersections = {
   top?: Point
   bottom?: Point
   left?: Point
@@ -118,8 +118,19 @@ export class LineSegment {
   }
 
   intersectionPoint(b: LineSegment): Point | undefined {
-    return this.p1
+    const a = this
+    const pointTuple = lineLineIntersectionPoint(
+      a.p1.tuple,
+      a.p2.tuple,
+      b.p1.tuple,
+      b.p2.tuple,
+    )
+    return whenNotNil(Point.fromTuple, pointTuple)
   }
+}
+
+function whenNotNil<A, B>(fn: (a: A) => B, a?: A): B | undefined {
+  return a ? fn(a) : undefined
 }
 
 export function line(p1: Point, p2: Point): LineSegment {
@@ -141,4 +152,37 @@ function mapS(fn: SizeF, r: Rectangle): Rectangle {
 
 function clampOffset(min: number, max: number, val: number): number {
   return val < min ? min - val : val > max ? max - val : 0
+}
+
+// LINE SEGMENT INTERSECTION
+/**
+ * @param {Point} p1
+ * @param {Point} p2
+ * @param {Point} p3
+ * @param {Point} p4
+ * @returns {Point | null}
+ * @tutorial http://www-cs.ccny.cuny.edu/~wolberg/capstone/intersection/Intersection%20point%20of%20two%20lines.html
+ */
+function lineLineIntersectionPoint(
+  p1: NumberTuple,
+  p2: NumberTuple,
+  p3: NumberTuple,
+  p4: NumberTuple,
+): NumberTuple | undefined {
+  const [[x1, y1], [x2, y2], [x3, y3], [x4, y4]] = [p1, p2, p3, p4]
+  const denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1)
+
+  if (denominator === 0) return undefined
+
+  const uaNumerator = (x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)
+  const ubNumerator = (x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)
+
+  if (uaNumerator === 0 && ubNumerator === 0) return undefined
+
+  const ua = uaNumerator / denominator
+  const ub = ubNumerator / denominator
+
+  if (ua < 0 || ua > 1 || ub < 0 || ub > 1) return undefined
+
+  return [x1 + ua * (x2 - x1), y1 + ub * (y2 - y1)]
 }
