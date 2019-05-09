@@ -10,7 +10,7 @@ export class Bricks {
   static init() {
     const xScale = Brick.width + 10
     const xTranslate = Brick.width
-    const brickAt = (x, y) =>
+    const brickAt = (x: number, y: number) =>
       Brick.init(x * xScale + xTranslate, y * Brick.offsetHeight)
 
     const bricks = R.times(y => R.times(x => brickAt(x, y), 5), 5)
