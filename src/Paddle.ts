@@ -17,8 +17,8 @@ export class Paddle {
     const rect = Rectangle.fromCS(
       Point.fromXY(
         viewport.center.x,
-        viewport.center.y,
-        // viewport.extrema.maxY - Paddle.height * 1.5,
+        // viewport.center.y,
+        viewport.extrema.maxY - Paddle.height * 1.5,
       ),
       Paddle.size,
     )
