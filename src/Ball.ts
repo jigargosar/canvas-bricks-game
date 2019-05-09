@@ -41,6 +41,7 @@ export class Ball {
     const eis = collisionRect.edgeIntersections(
       LineSegment.fromPoints(p1, p2),
     )
+
     const updateY = (velYFn: NumF, cy: number) =>
       new Ball(this.rect.setCY(cy), this.vel.mapY(velYFn))
     if (eis.top) {
