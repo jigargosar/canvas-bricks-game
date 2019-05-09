@@ -59,12 +59,3 @@ export class Ball {
     ctx.fill()
   }
 }
-
-function applySign(of: number, to: number) {
-  const absNeg = R.compose(
-    R.negate,
-    Math.abs,
-  )
-  const fn = of < 0 ? absNeg : of > 0 ? Math.abs : R.identity
-  return fn(to)
-}
