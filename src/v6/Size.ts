@@ -18,11 +18,19 @@ export class Size {
     return Vector.fromParts(this.width, this.height)
   }
 
-  shrinkBy(b: Size) {
+  substract(b: Size) {
     return substractParts(this, b)
+  }
+
+  add(b: Size) {
+    return addParts(this, b)
   }
 }
 
 function substractParts(a: Size, b: Size) {
   return Size.fromWH(a.width - b.width, a.height - b.height)
+}
+
+function addParts(a: Size, b: Size) {
+  return Size.fromWH(a.width + b.width, a.height + b.height)
 }

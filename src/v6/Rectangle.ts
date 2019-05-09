@@ -36,14 +36,17 @@ export class Rectangle {
   }
 
   clampOffsetIn(big: Rectangle): Vector {
-    const enclosingRect = mapS(bigSize => bigSize.shrinkBy(this.size), big)
+    const enclosingRect = mapS(
+      bigSize => bigSize.substract(this.size),
+      big,
+    )
     const { minX, maxX, minY, maxY } = enclosingRect.extrema
     const { x, y } = this.center
     return vec(clampOffset(minX, maxX, x), clampOffset(minY, maxY, y))
   }
 
   clampIn(big: Rectangle): Rectangle {
-    const shrinkedRect = mapS(bigSize => bigSize.shrinkBy(this.size), big)
+    const shrinkedRect = mapS(bigSize => bigSize.substract(this.size), big)
     const { minX, maxX, minY, maxY } = shrinkedRect.extrema
     const fn = (c: Point) =>
       Point.fromXY(R.clamp(minX, maxX, c.x), R.clamp(minY, maxY, c.y))
