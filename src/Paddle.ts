@@ -12,24 +12,15 @@ export class Paddle {
   static readonly height = 15
   static readonly size = Size.fromWH(Paddle.width, Paddle.height)
 
-  private rect: Rectangle
+  private constructor(private readonly rect: Rectangle) {}
 
-  private constructor(private viewport: Rectangle) {
-    this.rect = Rectangle.fromCS(
-      Point.fromXY(
-        viewport.center.x,
-        viewport.center.y,
-        // viewport.extrema.maxY - Paddle.height * 1.5,
-      ),
-      Paddle.size,
-    )
-  }
-
-  update(key: Key) {
+  update(key: Key, viewport: Rectangle): Paddle {
     const speed = 10
     const dx = key.left ? -speed : key.right ? speed : 0
     const vel = vec(dx, 0)
-    this.rect = this.rect.translateBy(vel).clampIn(this.viewport)
+    const rect = this.rect.translateBy(vel).clampIn(viewport)
+
+    return new Paddle(rect)
   }
 
   render(ctx: CanvasRenderingContext2D) {
@@ -38,6 +29,14 @@ export class Paddle {
     ctx.fillRect(x, y, w, h)
   }
   static init(viewport: Rectangle) {
-    return new Paddle(viewport)
+    const rect = Rectangle.fromCS(
+      Point.fromXY(
+        viewport.center.x,
+        viewport.center.y,
+        // viewport.extrema.maxY - Paddle.height * 1.5,
+      ),
+      Paddle.size,
+    )
+    return new Paddle(rect)
   }
 }

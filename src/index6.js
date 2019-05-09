@@ -681,11 +681,11 @@ function startGame() {
   const ctx = initCanvas()
   const { width, height } = ctx.canvas
   const viewport = Rectangle.fromWH(width, height)
-  const pad = Paddle.init(viewport)
-  const ball = Ball.init(viewport)
+  let pad = Paddle.init(viewport)
+  let ball = Ball.init(viewport)
 
   function update() {
-    pad.update(Key)
+    pad = pad.update(Key, viewport)
     ball.update(pad.rect)
   }
 
