@@ -72,13 +72,6 @@ export class Rectangle {
   }
 }
 
-function translateCenterByScaledSizeVector(
-  factor: number,
-  r: Rectangle,
-): Point {
-  return r.center.translateBy(r.size.vector.scale(factor))
-}
-
 type PointF = (a: Point) => Point
 type SizeF = (a: Size) => Size
 
