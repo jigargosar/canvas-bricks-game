@@ -51,9 +51,7 @@ export class Ball {
     }
     if (eis.bottom) {
       const vel = this.vel.mapY(Math.abs)
-      const rect = this.rect.mapCenter(({ x, y }) =>
-        Point.fromXY(x, cex.maxY + 1),
-      )
+      const rect = this.rect.setCY(cex.maxY + 1)
       return new Ball(rect, vel)
     }
   }

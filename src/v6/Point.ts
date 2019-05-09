@@ -26,6 +26,14 @@ export class Point {
   distanceFrom(a: Point) {
     return distanceBetweenPoints(a.tuple, this.tuple)
   }
+
+  setX(x: number) {
+    return Point.fromXY(x, this.y)
+  }
+
+  setY(y: number) {
+    return Point.fromXY(this.x, y)
+  }
 }
 
 function toTuple(p: Point): NumberTuple {

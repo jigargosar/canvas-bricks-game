@@ -42,6 +42,14 @@ export class Rectangle {
     return mapC(fn, this)
   }
 
+  setCX(cx: number) {
+    return this.mapCenter(c => c.setX(cx))
+  }
+
+  setCY(cy: number) {
+    return this.mapCenter(c => c.setY(cy))
+  }
+
   grow(b: Rectangle) {
     return mapS(s => s.add(b.size), this)
   }
