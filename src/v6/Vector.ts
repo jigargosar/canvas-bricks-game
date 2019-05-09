@@ -23,6 +23,10 @@ export class Vector {
   scale(factor: number): Vector {
     return scale(factor, this)
   }
+
+  get isZero() {
+    return this.x === 0 && this.y === 0
+  }
 }
 export const vec = Vector.fromParts
 

@@ -93,5 +93,5 @@ function mapS(fn: SizeF, r: Rectangle): Rectangle {
 }
 
 function clampOffset(min: number, max: number, val: number): number {
-  return val < min ? val - min : val > max ? max - val : 0
+  return val < min ? min - val : val > max ? max - val : 0
 }

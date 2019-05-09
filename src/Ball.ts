@@ -29,15 +29,8 @@ export class Ball {
       .translateBy(this.vel)
       .clampInOffset(this.viewport)
     const { x, y } = offset
-    if (x !== 0 || y !== 0) {
-      // const r = R
-      const absNeg = R.compose(
-        R.negate,
-        Math.abs,
-      )
-      const dxfn = x < 0 ? absNeg : x > 0 ? Math.abs : R.identity
-      const dyfn = y < 0 ? absNeg : y > 0 ? Math.abs : R.identity
-      this.vel = vec(dxfn(this.vel.x), dyfn(this.vel.y))
+    if (!offset.isZero) {
+      this.vel = vec(applySign(x, this.vel.x), applySign(y, this.vel.y))
       this.rect = this.rect.translateBy(this.vel).translateBy(offset)
     } else {
       this.rect = this.rect.translateBy(this.vel).clampIn(this.viewport)
@@ -51,4 +44,13 @@ export class Ball {
     ctx.arc(x, y, Ball.radius, 0, 2 * Math.PI, false)
     ctx.fill()
   }
+}
+
+function applySign(of: number, to: number) {
+  const absNeg = R.compose(
+    R.negate,
+    Math.abs,
+  )
+  const fn = of < 0 ? absNeg : of > 0 ? Math.abs : R.identity
+  return fn(to)
 }
