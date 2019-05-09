@@ -13,6 +13,17 @@ export class Paddle {
   static readonly size = Size.fromWH(Paddle.width, Paddle.height)
 
   private constructor(private readonly rect: Rectangle) {}
+  static init(viewport: Rectangle) {
+    const rect = Rectangle.fromCS(
+      Point.fromXY(
+        viewport.center.x,
+        viewport.center.y,
+        // viewport.extrema.maxY - Paddle.height * 1.5,
+      ),
+      Paddle.size,
+    )
+    return new Paddle(rect)
+  }
 
   update(key: Key, viewport: Rectangle): Paddle {
     const speed = 10
@@ -27,16 +38,5 @@ export class Paddle {
     ctx.fillStyle = 'orange'
     const { x, y, w, h } = this.rect.topLeftXYWH
     ctx.fillRect(x, y, w, h)
-  }
-  static init(viewport: Rectangle) {
-    const rect = Rectangle.fromCS(
-      Point.fromXY(
-        viewport.center.x,
-        viewport.center.y,
-        // viewport.extrema.maxY - Paddle.height * 1.5,
-      ),
-      Paddle.size,
-    )
-    return new Paddle(rect)
   }
 }
