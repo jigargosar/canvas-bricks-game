@@ -10,7 +10,10 @@ export class Ball {
 
   static readonly size = Size.fromWH(Ball.radius * 2, Ball.radius * 2)
 
-  private constructor(private rect: Rectangle, private vel: Vector) {}
+  private constructor(
+    private readonly rect: Rectangle,
+    private readonly vel: Vector,
+  ) {}
 
   static init(viewport: Rectangle): Ball {
     const rect = Rectangle.fromCS(
@@ -24,11 +27,10 @@ export class Ball {
     const offset = this.rect.translateBy(this.vel).clampOffsetIn(viewport)
 
     if (!offset.isZero) {
-      this.vel = this.vel.applySignOf(offset)
-      this.rect = this.rect.translateBy(this.vel).translateBy(offset)
-      return true
+      const vel = this.vel.applySignOf(offset)
+      const rect = this.rect.translateBy(this.vel).translateBy(offset)
+      return new Ball(rect, vel)
     }
-    return false
   }
 
   updatePaddleCollision(paddleRect: Rectangle) {
@@ -41,32 +43,28 @@ export class Ball {
     )
 
     if (eis.top) {
-      this.vel = this.vel.mapY(absNeg)
-      this.rect = this.rect.mapCenter(({ x, y }) =>
+      const vel = this.vel.mapY(absNeg)
+      const rect = this.rect.mapCenter(({ x, y }) =>
         Point.fromXY(x, cex.minY - 1),
       )
-      return true
+      return new Ball(rect, vel)
     }
     if (eis.bottom) {
-      this.vel = this.vel.mapY(Math.abs)
-      this.rect = this.rect.mapCenter(({ x, y }) =>
+      const vel = this.vel.mapY(Math.abs)
+      const rect = this.rect.mapCenter(({ x, y }) =>
         Point.fromXY(x, cex.maxY + 1),
       )
-      return true
+      return new Ball(rect, vel)
     }
-
-    return false
   }
 
   update(viewport: Rectangle, paddleRect: Rectangle) {
-    const updated =
+    const move = () => new Ball(this.rect.translateBy(this.vel), this.vel)
+    return (
       this.updateViewportCollision(viewport) ||
-      this.updatePaddleCollision(paddleRect)
-
-    if (!updated) {
-      this.rect = this.rect.translateBy(this.vel)
-      //.clampIn(this.viewport)
-    }
+      this.updatePaddleCollision(paddleRect) ||
+      move()
+    )
   }
 
   render(ctx: CanvasRenderingContext2D) {
