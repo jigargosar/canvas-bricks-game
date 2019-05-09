@@ -10,7 +10,7 @@ export class Point {
   }
 
   static fromTuple([x, y]: NumberTuple) {
-    return Point.fromXY(x, y)
+    return fromXY(x, y)
   }
 
   static readonly origin = Point.fromXY(0, 0)
@@ -28,13 +28,15 @@ export class Point {
   }
 
   setX(x: number) {
-    return Point.fromXY(x, this.y)
+    return fromXY(x, this.y)
   }
 
   setY(y: number) {
-    return Point.fromXY(this.x, y)
+    return fromXY(this.x, y)
   }
 }
+
+const fromXY = Point.fromXY
 
 function toTuple(p: Point): NumberTuple {
   return [p.x, p.y]
