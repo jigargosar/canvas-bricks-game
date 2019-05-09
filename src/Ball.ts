@@ -37,8 +37,14 @@ export class Ball {
     return false
   }
 
+  updatePaddleCollision() {
+    return false
+  }
+
   update() {
-    const updated = this.updateViewportCollision()
+    const updated =
+      this.updateViewportCollision() || this.updatePaddleCollision()
+
     if (!updated) {
       this.rect = this.rect.translateBy(this.vel)
       //.clampIn(this.viewport)
