@@ -27,10 +27,13 @@ export class Ball {
   update() {
     const offset = this.rect
       .translateBy(this.vel)
-      .clampInOffset(this.viewport)
-    const { x, y } = offset
+      .clampOffsetIn(this.viewport)
+
     if (!offset.isZero) {
-      this.vel = vec(applySign(x, this.vel.x), applySign(y, this.vel.y))
+      this.vel = vec(
+        applySign(offset.x, this.vel.x),
+        applySign(offset.y, this.vel.y),
+      )
       this.rect = this.rect.translateBy(this.vel).translateBy(offset)
     } else {
       this.rect = this.rect.translateBy(this.vel).clampIn(this.viewport)
