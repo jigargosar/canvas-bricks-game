@@ -35,6 +35,10 @@ export class Rectangle {
     return { minX, minY, maxX, maxY }
   }
 
+  mapSize(fn: SizeF): Rectangle {
+    return mapS(fn, this)
+  }
+
   clampOffsetIn(big: Rectangle): Vector {
     const enclosingRect = mapS(
       bigSize => bigSize.substract(this.size),
