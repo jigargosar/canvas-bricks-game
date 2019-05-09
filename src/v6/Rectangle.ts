@@ -96,7 +96,11 @@ export class Rectangle {
     }
   }
 
-  edgeIntersections(a: LineSegment): EdgeIntersections {
+  edgeIntersectionsWithPointVector(
+    p: Point,
+    v: Vector,
+  ): EdgeIntersections {
+    const a = LineSegment.fromPointVector(p, v)
     return R.mapObjIndexed(b => a.intersectionPoint(b), this.edges)
   }
 
@@ -123,6 +127,10 @@ export class LineSegment {
 
   static fromPoints(p1: Point, p2: Point): LineSegment {
     return new LineSegment(p1, p2)
+  }
+
+  static fromPointVector(p: Point, v: Vector) {
+    return line(p, p.translateBy(v))
   }
 
   intersectionPoint(b: LineSegment): Point | undefined {

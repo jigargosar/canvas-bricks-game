@@ -34,12 +34,11 @@ export class Ball {
   }
 
   updatePaddleCollision(paddleRect: Rectangle) {
-    const p1 = this.rect.center
-    const p2 = p1.translateBy(this.vel)
     const collisionRect = paddleRect.grow(this.rect)
     const ext = collisionRect.extrema
-    const eis = collisionRect.edgeIntersections(
-      LineSegment.fromPoints(p1, p2),
+    const eis = collisionRect.edgeIntersectionsWithPointVector(
+      this.rect.center,
+      this.vel,
     )
 
     const updateY = (velYFn: NumF, cy: number) =>
