@@ -11,20 +11,17 @@ export class Ball {
   static readonly size = Size.fromWH(Ball.radius * 2, Ball.radius * 2)
 
   private rect: Rectangle
-  private vel: Vector = Vector.fromDegMag(99, 2)
+  private vel: Vector = Vector.fromDegMag(99, 20)
 
-  private constructor(
-    private viewport: Rectangle,
-    private paddleRect: Rectangle,
-  ) {
+  private constructor(private viewport: Rectangle) {
     this.rect = Rectangle.fromCS(
       Point.fromXY(viewport.center.x, viewport.center.y),
       Ball.size,
     )
   }
 
-  static init(viewport: Rectangle, paddleRect: Rectangle): Ball {
-    return new Ball(viewport, paddleRect)
+  static init(viewport: Rectangle): Ball {
+    return new Ball(viewport)
   }
 
   updateViewportCollision() {
@@ -40,10 +37,10 @@ export class Ball {
     return false
   }
 
-  updatePaddleCollision() {
+  updatePaddleCollision(paddleRect: Rectangle) {
     const p1 = this.rect.center
     const p2 = p1.translateBy(this.vel)
-    const collisionRect = this.paddleRect.grow(this.rect)
+    const collisionRect = paddleRect.grow(this.rect)
     const cex = collisionRect.extrema
     const eis = collisionRect.edgeIntersections(
       LineSegment.fromPoints(p1, p2),
@@ -56,13 +53,21 @@ export class Ball {
       )
       return true
     }
+    if (eis.bottom) {
+      this.vel = this.vel.mapY(Math.abs)
+      this.rect = this.rect.mapCenter(({ x, y }) =>
+        Point.fromXY(x, cex.maxY + 1),
+      )
+      return true
+    }
 
     return false
   }
 
-  update() {
+  update(paddleRect: Rectangle) {
     const updated =
-      this.updateViewportCollision() || this.updatePaddleCollision()
+      this.updateViewportCollision() ||
+      this.updatePaddleCollision(paddleRect)
 
     if (!updated) {
       this.rect = this.rect.translateBy(this.vel)
