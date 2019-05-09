@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 import { NumberTuple } from './types'
-import { Vector } from './Vector'
+import { Vector, NumF } from './Vector'
 
 export class Point {
   private constructor(public x: number, public y: number) {}
@@ -27,12 +27,21 @@ export class Point {
     return distanceBetweenPoints(a.tuple, this.tuple)
   }
 
+  map(xf: NumF, yf: NumF) {
+    const { x, y } = this
+    return fromXY(xf(x), yf(y))
+  }
+
+  set(x: number, y: number) {
+    return this.map(() => x, () => y)
+  }
+
   setX(x: number) {
-    return fromXY(x, this.y)
+    return this.map(() => x, R.identity)
   }
 
   setY(y: number) {
-    return fromXY(this.x, y)
+    return this.map(R.identity, () => y)
   }
 }
 

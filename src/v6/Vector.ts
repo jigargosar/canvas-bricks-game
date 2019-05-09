@@ -20,10 +20,10 @@ export class Vector {
     return toTuple(this)
   }
 
-  mapX(fn: NumberF) {
+  mapX(fn: NumF) {
     return mapEach(fn, R.identity, this)
   }
-  mapY(fn: NumberF) {
+  mapY(fn: NumF) {
     return mapEach(R.identity, fn, this)
   }
 
@@ -50,9 +50,9 @@ function toTuple({ x, y }: Vector): NumberTuple {
   return [x, y]
 }
 
-type NumberF = (a: number) => number
+export type NumF = (a: number) => number
 
-function mapEach(xf: NumberF, yf: NumberF, { x, y }: Vector) {
+function mapEach(xf: NumF, yf: NumF, { x, y }: Vector) {
   return vec(xf(x), yf(y))
 }
 
