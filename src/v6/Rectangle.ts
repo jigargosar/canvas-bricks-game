@@ -4,6 +4,7 @@ import { Point } from './Point'
 import { Size } from './Size'
 import { Vector, vec } from './Vector'
 import { NumberTuple } from './types'
+import { max } from 'date-fns'
 
 export type XYWH = {
   x: number
@@ -57,7 +58,19 @@ export class Rectangle {
     const { minX, minY, maxX, maxY } = this.extrema
     return {
       topLeft: Point.fromXY(minX, minY),
+      topRight: Point.fromXY(maxX, minY),
       bottomRight: Point.fromXY(maxX, maxY),
+      bottomLeft: Point.fromXY(minX, maxY),
+    }
+  }
+
+  get edges() {
+    const { topLeft, topRight, bottomRight, bottomLeft } = this.vertices
+    return {
+      top: line(topLeft, topRight),
+      right: line(topRight, bottomRight),
+      bottom: line(bottomRight, bottomLeft),
+      left: line(bottomLeft, topLeft),
     }
   }
 
@@ -70,6 +83,18 @@ export class Rectangle {
   get dimension(): NumberTuple {
     return this.size.tuple
   }
+}
+
+class LineSegment {
+  private constructor(public p1: Point, public p2: Point) {}
+
+  static fromPoints(p1: Point, p2: Point): LineSegment {
+    return new LineSegment(p1, p2)
+  }
+}
+
+function line(p1: Point, p2: Point): LineSegment {
+  return LineSegment.fromPoints(p1, p2)
 }
 
 type PointF = (a: Point) => Point
