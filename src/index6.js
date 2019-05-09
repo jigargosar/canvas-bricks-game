@@ -684,7 +684,7 @@ function startGame() {
   const viewport = Rectangle.fromWH(width, height)
   let pad = Paddle.init(viewport)
   let ball = Ball.init(viewport)
-  let bricks = Bricks.init()
+  let bricks = Bricks.init(viewport)
 
   function update() {
     pad = pad.update(Key, viewport)
