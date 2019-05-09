@@ -37,29 +37,24 @@ export class Ball {
     const p1 = this.rect.center
     const p2 = p1.translateBy(this.vel)
     const collisionRect = paddleRect.grow(this.rect)
-    const cex = collisionRect.extrema
+    const ext = collisionRect.extrema
     const eis = collisionRect.edgeIntersections(
       LineSegment.fromPoints(p1, p2),
     )
-
+    const updateY = (velYFn, cy) =>
+      new Ball(this.rect.setCY(cy), this.vel.mapY(velYFn))
     if (eis.top) {
-      const vel = this.vel.mapY(absNeg)
-      const rect = this.rect.setCY(cex.minY - 1)
-      return new Ball(rect, vel)
+      return updateY(absNeg, ext.minY - 1)
     } else if (eis.bottom) {
-      const vel = this.vel.mapY(Math.abs)
-      const rect = this.rect.setCY(cex.maxY + 1)
-      return new Ball(rect, vel)
+      return updateY(Math.abs, ext.maxY + 1)
     }
 
+    const updateX = (velXFn, cx) =>
+      new Ball(this.rect.setCX(cx), this.vel.mapX(velXFn))
     if (eis.left) {
-      const vel = this.vel.mapX(absNeg)
-      const rect = this.rect.setCX(cex.minX - 1)
-      return new Ball(rect, vel)
+      return updateX(absNeg, ext.minX - 1)
     } else if (eis.right) {
-      const vel = this.vel.mapX(Math.abs)
-      const rect = this.rect.setCX(cex.maxX + 1)
-      return new Ball(rect, vel)
+      return updateX(Math.abs, ext.maxX + 1)
     }
   }
 

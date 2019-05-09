@@ -20,10 +20,10 @@ export class Vector {
     return toTuple(this)
   }
 
-  mapX(fn: NumF) {
+  mapX(fn: NumF): Vector {
     return mapEach(fn, R.identity, this)
   }
-  mapY(fn: NumF) {
+  mapY(fn: NumF): Vector {
     return mapEach(R.identity, fn, this)
   }
 
