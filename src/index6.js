@@ -4,6 +4,7 @@ import './index.css'
 import * as R from 'ramda'
 import { Rectangle } from './v6/Rectangle'
 import { Paddle } from './Paddle'
+import { Ball } from './Ball'
 
 function invariant(pred, msg = 'invariant failed') {
   if (!pred) {
@@ -681,21 +682,21 @@ function startGame() {
   const { width, height } = ctx.canvas
   const viewport = Rectangle.fromWH(width, height)
   const pad = Paddle.init(viewport)
-  // const ball = createBall(vp, pad.rect)
+  const ball = Ball.init(viewport)
 
   function update() {
     pad.update(Key)
-    // ball.update()
+    ball.update()
   }
 
   function render() {
     pad.render(ctx)
-    // ball.render(ctx)
+    ball.render(ctx)
   }
 
   gameLoop(() => {
     update()
-    const { x, y, w, h } = viewport.xywh
+    const { x, y, w, h } = viewport.topLeftXYWH
     ctx.clearRect(x, y, w, h)
     render()
   })

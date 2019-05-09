@@ -1,4 +1,4 @@
-import * as R from './ramda'
+import * as R from 'ramda'
 import { Point } from './Point'
 import * as P from './Point'
 import { NumberTuple } from './types'

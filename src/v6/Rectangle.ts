@@ -1,8 +1,8 @@
-import * as R from './ramda'
+import * as R from 'ramda'
 import { Point } from './Point'
 
 import { Size } from './Size'
-import { Vector } from './Vector'
+import { Vector, vec } from './Vector'
 import { NumberTuple } from './types'
 
 export type XYWH = {
@@ -34,6 +34,13 @@ export class Rectangle {
     return { minX, minY, maxX, maxY }
   }
 
+  clampInOffset(big: Rectangle): Vector {
+    const enclosingRect = mapS(bigSize => bigSize.shrinkBy(this.size), big)
+    const { minX, maxX, minY, maxY } = enclosingRect.extrema
+    const { x, y } = this.center
+    return vec(clampOffset(minX, maxX, x), clampOffset(minY, maxY, y))
+  }
+
   clampIn(big: Rectangle): Rectangle {
     const shrinkedRect = mapS(bigSize => bigSize.shrinkBy(this.size), big)
     const { minX, maxX, minY, maxY } = shrinkedRect.extrema
@@ -54,7 +61,7 @@ export class Rectangle {
     }
   }
 
-  get xywh(): XYWH {
+  get topLeftXYWH(): XYWH {
     const { minX: x, minY: y } = this.extrema
     const { width: w, height: h } = this.size
     return { x, y, w, h }
@@ -83,4 +90,8 @@ function mapC(fn: PointF, r: Rectangle): Rectangle {
 
 function mapS(fn: SizeF, r: Rectangle): Rectangle {
   return rec(r.center, fn(r.size))
+}
+
+function clampOffset(min: number, max: number, val: number): number {
+  return val < min ? val - min : val > max ? max - val : 0
 }

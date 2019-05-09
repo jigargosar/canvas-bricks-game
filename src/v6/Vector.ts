@@ -1,11 +1,19 @@
-import * as R from './ramda'
+import * as R from 'ramda'
 import { NumberTuple } from './types'
+
+function degToRadians(degrees) {
+  return (degrees * Math.PI) / 180
+}
 
 export class Vector {
   private constructor(public x: number, public y: number) {}
 
   static fromParts(x: number, y: number): Vector {
     return new Vector(x, y)
+  }
+  static fromDegMag(deg: number, mag: number): Vector {
+    const angle = degToRadians(deg)
+    return Vector.fromParts(Math.cos(angle) * mag, Math.sin(angle) * mag)
   }
 
   get tuple(): NumberTuple {
