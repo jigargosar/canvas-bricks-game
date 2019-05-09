@@ -5,6 +5,11 @@ import { Point } from './v6/Point'
 import { Vector, vec, absNeg, NumF } from './v6/Vector'
 import { Size } from './v6/Size'
 
+type FAA<A> = (a: A) => A
+
+type RectF = FAA<Rectangle>
+type VecF = FAA<Vector>
+
 export class Ball {
   static readonly radius = 10
 
@@ -33,10 +38,25 @@ export class Ball {
     }
   }
 
+  map(rfn: RectF, vfn: VecF): Ball {
+    return new Ball(rfn(this.rect), vfn(this.vel))
+  }
+
+  mapRect(rfn): Ball {
+    return this.map(rfn, R.identity)
+  }
+  mapVel(vfn) {
+    return this.map(R.identity, vfn)
+  }
+
+  setCY(cy) {
+    return this.mapRect(r => r.setCY(cy))
+  }
+
   updatePaddleCollision(paddleRect: Rectangle) {
-    const collisionRect = paddleRect.grow(this.rect)
-    const ext = collisionRect.extrema
-    const eis = collisionRect.edgeIntersectionsWithPointVector(
+    const rect2 = paddleRect.grow(this.rect)
+    const ext = rect2.extrema
+    const eis = rect2.edgeIntersectionsWithPointVector(
       this.rect.center,
       this.vel,
     )
