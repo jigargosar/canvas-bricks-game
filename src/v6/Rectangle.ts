@@ -60,10 +60,6 @@ export class Rectangle {
     return { x, y, w, h }
   }
 
-  get topLeft(): Point {
-    return this.vertices.topLeft
-  }
-
   get dimension(): NumberTuple {
     return this.size.tuple
   }
