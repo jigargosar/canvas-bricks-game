@@ -42,15 +42,23 @@ export class Ball {
     return new Ball(rfn(this.rect), vfn(this.vel))
   }
 
-  mapRect(rfn): Ball {
+  mapRect(rfn: RectF): Ball {
     return this.map(rfn, R.identity)
   }
-  mapVel(vfn) {
+  mapVel(vfn: VecF) {
     return this.map(R.identity, vfn)
   }
-
-  setCY(cy) {
+  mapVelY(fn: NumF) {
+    return this.mapVel(v => v.mapY(fn))
+  }
+  mapVelX(fn: NumF) {
+    return this.mapVel(v => v.mapX(fn))
+  }
+  setCY(cy: number) {
     return this.mapRect(r => r.setCY(cy))
+  }
+  setCX(cy: number) {
+    return this.mapRect(r => r.setCX(cy))
   }
 
   updatePaddleCollision(paddleRect: Rectangle) {
@@ -61,20 +69,16 @@ export class Ball {
       this.vel,
     )
 
-    const updateY = (velYFn: NumF, cy: number) =>
-      new Ball(this.rect.setCY(cy), this.vel.mapY(velYFn))
     if (eis.top) {
-      return updateY(absNeg, ext.minY - 1)
+      return this.setCY(ext.minY - 1).mapVelY(absNeg)
     } else if (eis.bottom) {
-      return updateY(Math.abs, ext.maxY + 1)
+      return this.setCY(ext.maxY + 1).mapVelY(Math.abs)
     }
 
-    const updateX = (velXFn: NumF, cx: number) =>
-      new Ball(this.rect.setCX(cx), this.vel.mapX(velXFn))
     if (eis.left) {
-      return updateX(absNeg, ext.minX - 1)
+      return this.setCX(ext.minX - 1).mapVelX(absNeg)
     } else if (eis.right) {
-      return updateX(Math.abs, ext.maxX + 1)
+      return this.setCX(ext.maxX + 1).mapVelX(Math.abs)
     }
   }
 
