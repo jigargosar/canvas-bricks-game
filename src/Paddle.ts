@@ -1,7 +1,7 @@
-import { Rectangle } from './v5/Rectangle'
-import { Point } from './v5/Point'
-import { Vector, vec } from './v5/Vector'
-import { Size } from './v5/Size'
+import { Rectangle } from './v6/Rectangle'
+import { Point } from './v6/Point'
+import { Vector, vec } from './v6/Vector'
+import { Size } from './v6/Size'
 
 type Key = {
   left: boolean
@@ -33,8 +33,8 @@ export class Paddle {
 
   render(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = 'orange'
-    const { topLeft: p, size: s } = this.rect
-    ctx.fillRect(p.x, p.y, s.width, s.height)
+    const { x, y, w, h } = this.rect.xywh
+    ctx.fillRect(x, y, w, h)
   }
   static init(viewport: Rectangle) {
     return new Paddle(viewport)

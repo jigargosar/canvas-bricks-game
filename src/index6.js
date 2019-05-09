@@ -2,7 +2,7 @@
 import 'tachyons'
 import './index.css'
 import * as R from 'ramda'
-import { Rectangle } from './v5/Rectangle'
+import { Rectangle } from './v6/Rectangle'
 import { Paddle } from './Paddle'
 
 function invariant(pred, msg = 'invariant failed') {
@@ -695,9 +695,8 @@ function startGame() {
 
   gameLoop(() => {
     update()
-    const { x, y } = viewport.topLeft
-    const { width, height } = viewport.size
-    ctx.clearRect(x, y, width, height)
+    const { x, y, w, h } = viewport.xywh
+    ctx.clearRect(x, y, w, h)
     render()
   })
 }

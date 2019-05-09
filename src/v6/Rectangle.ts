@@ -1,10 +1,16 @@
-import * as R from 'ramda'
+import * as R from './ramda'
 import { Point } from './Point'
 
 import { Size } from './Size'
 import { Vector } from './Vector'
 import { NumberTuple } from './types'
 
+export type XYWH = {
+  x: number
+  y: number
+  w: number
+  h: number
+}
 export class Rectangle {
   private constructor(public center: Point, public size: Size) {}
 
@@ -48,12 +54,14 @@ export class Rectangle {
     }
   }
 
-  get topLeft(): Point {
-    return this.vertices.topLeft
+  get xywh(): XYWH {
+    const { minX: x, minY: y } = this.extrema
+    const { width: w, height: h } = this.size
+    return { x, y, w, h }
   }
 
-  get bottomRight(): Point {
-    return this.vertices.bottomRight
+  get topLeft(): Point {
+    return this.vertices.topLeft
   }
 
   get dimension(): NumberTuple {

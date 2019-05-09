@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "clean": "rm -fr .cache dist",
-    "start": "parcel src/index.html --open"
+    "start_": "parcel src/index.html --open",
+    "start": "npx nodemon -w webpack.config.js -w yarn.lock -x webpack-dev-server --open"
   },
   "devDependencies": {
     "@babel/core": "^7.4.4",
