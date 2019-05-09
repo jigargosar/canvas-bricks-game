@@ -10,24 +10,20 @@ export class Ball {
 
   static readonly size = Size.fromWH(Ball.radius * 2, Ball.radius * 2)
 
-  private rect: Rectangle
   private vel: Vector = Vector.fromDegMag(99, 20)
 
-  private constructor(private viewport: Rectangle) {
-    this.rect = Rectangle.fromCS(
+  private constructor(private rect: Rectangle) {}
+
+  static init(viewport: Rectangle): Ball {
+    const rect = Rectangle.fromCS(
       Point.fromXY(viewport.center.x, viewport.center.y),
       Ball.size,
     )
+    return new Ball(rect)
   }
 
-  static init(viewport: Rectangle): Ball {
-    return new Ball(viewport)
-  }
-
-  updateViewportCollision() {
-    const offset = this.rect
-      .translateBy(this.vel)
-      .clampOffsetIn(this.viewport)
+  updateViewportCollision(viewport: Rectangle) {
+    const offset = this.rect.translateBy(this.vel).clampOffsetIn(viewport)
 
     if (!offset.isZero) {
       this.vel = this.vel.applySignOf(offset)
@@ -64,9 +60,9 @@ export class Ball {
     return false
   }
 
-  update(paddleRect: Rectangle) {
+  update(viewport: Rectangle, paddleRect: Rectangle) {
     const updated =
-      this.updateViewportCollision() ||
+      this.updateViewportCollision(viewport) ||
       this.updatePaddleCollision(paddleRect)
 
     if (!updated) {

@@ -686,7 +686,7 @@ function startGame() {
 
   function update() {
     pad = pad.update(Key, viewport)
-    ball.update(pad.rect)
+    ball.update(viewport, pad.rect)
   }
 
   function render() {
