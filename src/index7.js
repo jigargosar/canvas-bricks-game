@@ -1,6 +1,7 @@
 /* eslint-disable no-debugger */
 import 'tachyons'
 import './index.css'
+import { Draw } from './main7'
 
 function initCanvas() {
   const canvas = document.getElementById('gameScreen')
@@ -96,6 +97,8 @@ const Mouse = function initMouse(canvas) {
 
 function startGame() {
   const ctx = initCanvas()
+  const draw = Draw.fromCtx(ctx)
+
   const { width, height } = ctx.canvas
   const viewportRectangle = Rectangle.fromXYWidthHeight(
     0,
