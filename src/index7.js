@@ -3,6 +3,7 @@ import 'tachyons'
 import './index.css'
 import { Rectangle } from './v6/Rectangle'
 import { Point } from './v6/Point'
+import { Size } from './v6/Size'
 
 function initCanvas() {
   const canvas = document.getElementById('gameScreen')
@@ -72,7 +73,9 @@ function startGame() {
   function update() {}
 
   function render() {
-    ctx.fillRect(mouse.x, mouse.y, 10, 10)
+    const rect = Rectangle.fromCS(mouse.at, Size.fromWH(100, 100))
+    const { x, y, w, h } = rect.topLeftXYWH
+    ctx.fillRect(x, y, w, h)
   }
 
   gameLoop(() => {
