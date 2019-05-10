@@ -31,7 +31,7 @@ export class Rectangle {
 
   containsPoint({ x, y }: Point): boolean {
     const { minX, minY, maxX, maxY } = this.extrema
-    return x >= minX && x <= maxX && y >= minY && y <= maxY
+    return x > minX && x < maxX && y > minY && y < maxY
   }
 
   get extrema() {

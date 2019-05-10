@@ -70,8 +70,9 @@ export class Ball {
       this.rect.center,
       this.vel,
     )
-
-    rect2.containsPoint(this.rect.center)
+    if (eis.bottom) {
+      rect2.containsPoint(this.rect.center)
+    }
 
     if (eis.top) {
       return this.setCY(ext.minY - 1).mapVelY(absNeg)

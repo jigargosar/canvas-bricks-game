@@ -694,7 +694,7 @@ function startGame() {
       const newBall = ball.updateBrickCollision(bricks, brickIdx)
       if (newBall) {
         ball = newBall
-        bricks = bricks.killAt(brickIdx)
+        // bricks = bricks.killAt(brickIdx)
       } else {
         ball = ball.update(viewport, pad.rect, bricks)
       }
