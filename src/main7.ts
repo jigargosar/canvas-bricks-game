@@ -80,8 +80,10 @@ export class Rect {
   }
 
   get topLeftXYWH() {
-    const { x, y } = this.center.translateBy(this.size.halfVec.scale(-1))
-    const { width: w, height: h } = this.size
+    const center = this.center
+    const size = this.size
+    const { x, y } = center.translateBy(size.halfVec.scale(-1))
+    const { width: w, height: h } = size
     return { x, y, w, h }
   }
 }
