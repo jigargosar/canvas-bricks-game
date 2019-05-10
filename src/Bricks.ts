@@ -5,7 +5,7 @@ import { Size } from './v6/Size'
 import * as R from 'ramda'
 
 export class Bricks {
-  private constructor(private readonly bricks: Brick[]) {}
+  private constructor(readonly bricks: Brick[]) {}
 
   static init(viewport: Rectangle) {
     const rowCt = 5

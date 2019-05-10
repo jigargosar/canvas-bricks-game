@@ -27,7 +27,7 @@ export class Ball {
       Point.fromXY(viewport.center.x, viewport.center.y),
       Ball.size,
     )
-    return new Ball(rect, Vector.fromDegMag(91, 1))
+    return new Ball(rect, Vector.fromDegMag(99, 10))
   }
 
   updateViewportCollision(viewport: Rectangle) {
@@ -63,33 +63,17 @@ export class Ball {
     return this.mapRect(r => r.setCX(cy))
   }
 
-  updateBrickCollision(bricks: Bricks, brickIdx: number) {
-    const rect2 = bricks.rectAtIdx(brickIdx).grow(this.rect)
-    const ext = rect2.extrema
-    const eis = rect2.edgeIntersectionsWithPointVector(
-      this.rect.center,
-      this.vel,
-    )
-
-    if (eis.bottom) {
-      rect2.containsPoint(this.rect.center)
-    }
-
-    if (eis.top) {
-      return this.setCY(ext.minY - 1).mapVelY(absNeg)
-    } else if (eis.bottom) {
-      return this.setCY(ext.maxY + 1).mapVelY(Math.abs)
-    }
-
-    if (eis.left) {
-      return this.setCX(ext.minX - 1).mapVelX(absNeg)
-    } else if (eis.right) {
-      return this.setCX(ext.maxX + 1).mapVelX(Math.abs)
-    }
+  updateBricksCollision(bricks: Bricks) {
+    return bricks.bricks.reduce((acc, brick, idx) => {
+      if (acc) return acc
+      if (!brick.alive) return
+      const newBall = this.updateRectCollision(brick.rect)
+      return newBall ? { ball: newBall, brickIdx: idx } : null
+    }, null)
   }
 
-  updatePaddleCollision(paddleRect: Rectangle) {
-    const rect2 = paddleRect.grow(this.rect)
+  updateRectCollision(rect: Rectangle) {
+    const rect2 = rect.grow(this.rect)
     const ext = rect2.extrema
     const eis = rect2.edgeIntersectionsWithPointVector(
       this.rect.center,
@@ -109,11 +93,11 @@ export class Ball {
     }
   }
 
-  update(viewport: Rectangle, paddleRect: Rectangle) {
+  update(viewport: Rectangle, paddleRect: Rectangle, bricks: Bricks) {
     const move = () => new Ball(this.rect.translateBy(this.vel), this.vel)
     return (
       this.updateViewportCollision(viewport) ||
-      this.updatePaddleCollision(paddleRect) ||
+      this.updateRectCollision(paddleRect) ||
       move()
     )
   }
