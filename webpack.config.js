@@ -5,7 +5,7 @@ const TsConfigWebpackPlugin = require('ts-config-webpack-plugin')
 const ScssConfigWebpackPlugin = require('scss-config-webpack-plugin')
 
 module.exports = {
-  entry: './src/v6/index.js',
+  entry: './src/index7.js',
   devtool: 'source-map',
   module: {
     rules: [
