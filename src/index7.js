@@ -2,6 +2,7 @@
 import 'tachyons'
 import './index.css'
 import { Rectangle } from './v6/Rectangle'
+import { Point } from './v6/Point'
 
 function initCanvas() {
   const canvas = document.getElementById('gameScreen')
@@ -41,14 +42,38 @@ const Key = (function initKeyboard() {
   }
 })()
 
+const Mouse = function initMouse(canvas) {
+  let point = Point.origin
+  window.addEventListener('mousemove', e => {
+    point = Point.fromXY(
+      e.pageX - canvas.offsetLeft,
+      e.pageY - canvas.offsetTop,
+    )
+  })
+  return {
+    get at() {
+      return point
+    },
+    get x() {
+      return point.x
+    },
+    get y() {
+      return point.y
+    },
+  }
+}
+
 function startGame() {
   const ctx = initCanvas()
   const { width, height } = ctx.canvas
   const viewport = Rectangle.fromWH(width, height)
+  const mouse = Mouse(ctx.canvas)
 
   function update() {}
 
-  function render() {}
+  function render() {
+    ctx.fillRect(mouse.x, mouse.y, 10, 10)
+  }
 
   gameLoop(() => {
     update()
