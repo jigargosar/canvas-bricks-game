@@ -4,6 +4,8 @@ import { Rectangle, line, LineSegment } from './v6/Rectangle'
 import { Point } from './v6/Point'
 import { Vector, vec, absNeg, NumF } from './v6/Vector'
 import { Size } from './v6/Size'
+import { Bricks } from './Bricks'
+import { Brick } from './index'
 
 type FAA<A> = (a: A) => A
 
@@ -25,7 +27,7 @@ export class Ball {
       Point.fromXY(viewport.center.x, viewport.center.y),
       Ball.size,
     )
-    return new Ball(rect, Vector.fromDegMag(99, 20))
+    return new Ball(rect, Vector.fromDegMag(99, 5))
   }
 
   updateViewportCollision(viewport: Rectangle) {
@@ -61,6 +63,29 @@ export class Ball {
     return this.mapRect(r => r.setCX(cy))
   }
 
+  updateBrickCollision(bricks: Bricks, brickIdx: number) {
+    const rect2 = bricks.rectAtIdx(brickIdx).grow(this.rect)
+    const ext = rect2.extrema
+    const eis = rect2.edgeIntersectionsWithPointVector(
+      this.rect.center,
+      this.vel,
+    )
+
+    rect2.containsPoint(this.rect.center)
+
+    if (eis.top) {
+      return this.setCY(ext.minY - 1).mapVelY(absNeg)
+    } else if (eis.bottom) {
+      return this.setCY(ext.maxY + 1).mapVelY(Math.abs)
+    }
+
+    if (eis.left) {
+      return this.setCX(ext.minX - 1).mapVelX(absNeg)
+    } else if (eis.right) {
+      return this.setCX(ext.maxX + 1).mapVelX(Math.abs)
+    }
+  }
+
   updatePaddleCollision(paddleRect: Rectangle) {
     const rect2 = paddleRect.grow(this.rect)
     const ext = rect2.extrema
@@ -89,6 +114,10 @@ export class Ball {
       this.updatePaddleCollision(paddleRect) ||
       move()
     )
+  }
+
+  findCollidingBrickIdx(bricks: Bricks): number {
+    return bricks.findCollidingIdx(this.rect)
   }
 
   render(ctx: CanvasRenderingContext2D) {
