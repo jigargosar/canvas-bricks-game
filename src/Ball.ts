@@ -27,7 +27,7 @@ export class Ball {
       Point.fromXY(viewport.center.x, viewport.center.y),
       Ball.size,
     )
-    return new Ball(rect, Vector.fromDegMag(99, 5))
+    return new Ball(rect, Vector.fromDegMag(91, 1))
   }
 
   updateViewportCollision(viewport: Rectangle) {
