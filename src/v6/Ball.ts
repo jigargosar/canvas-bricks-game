@@ -1,11 +1,11 @@
 import * as R from 'ramda'
 
-import { Rectangle, line, LineSegment } from './v6/Rectangle'
-import { Point } from './v6/Point'
-import { Vector, vec, absNeg, NumF } from './v6/Vector'
-import { Size } from './v6/Size'
+import { Rectangle, line, LineSegment } from './Rectangle'
+import { Point } from './Point'
+import { Vector, vec, absNeg, NumF } from './Vector'
+import { Size } from './Size'
 import { Bricks } from './Bricks'
-import { Brick } from './index'
+import { Brick } from '../index'
 
 type FAA<A> = (a: A) => A
 

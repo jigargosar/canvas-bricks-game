@@ -1,7 +1,7 @@
-import { Rectangle } from './v6/Rectangle'
-import { Point } from './v6/Point'
-import { Vector, vec } from './v6/Vector'
-import { Size } from './v6/Size'
+import { Rectangle } from './Rectangle'
+import { Point } from './Point'
+import { Vector, vec } from './Vector'
+import { Size } from './Size'
 
 type Key = {
   left: boolean
