@@ -79,12 +79,8 @@ export class Rect {
     return Rect.fromCS(center, size)
   }
 
-  get topLeftXYWH() {
-    const center = this.center
-    const size = this.size
-    const { x, y } = center.translateBy(size.halfVec.scale(-1))
-    const { width: w, height: h } = size
-    return { x, y, w, h }
+  get topLeft() {
+    return this.center.translateBy(this.size.halfVec.scale(-1))
   }
 }
 
@@ -97,7 +93,8 @@ export class Draw {
   }
 
   clearRect(rect: Rect) {
-    const { x, y, w, h } = rect.topLeftXYWH
+    const { x, y } = rect.topLeft
+    const { width: w, height: h } = rect.size
     this.ctx.clearRect(x, y, w, h)
   }
 }
