@@ -1,6 +1,6 @@
 /* eslint-disable no-debugger */
 import 'tachyons'
-import './index.css'
+import '../index.css'
 import { Rectangle } from './Rectangle'
 import { Paddle } from './Paddle'
 import { Ball } from './Ball'
