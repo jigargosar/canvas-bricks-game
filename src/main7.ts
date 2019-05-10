@@ -24,6 +24,11 @@ export class Vec {
     return this.tuple[1]
   }
 
+  scale(s: number) {
+    const newTuple = this.tuple.map(n => n * s) as NumTuple
+    return Vec.fromTuple(newTuple)
+  }
+
   static fromDegMag(deg: number, mag: number) {
     const angle = degToRadians(deg)
     return Vec.fromComponents(Math.cos(angle) * mag, Math.sin(angle) * mag)
@@ -49,8 +54,13 @@ export class Size {
     public readonly width: number,
     public readonly height: number,
   ) {}
+
   static fromWH(width: number, height: number) {
     return new Size(width, height)
+  }
+
+  get halfVec() {
+    return Vec.fromComponents(this.width / 2, this.height / 2)
   }
 }
 
@@ -67,6 +77,12 @@ export class Rect {
     const center = Point.fromXY(width / 2, height / 2)
     const size = Size.fromWH(width, height)
     return Rect.fromCS(center, size)
+  }
+
+  get topLeftXYWH() {
+    const { x, y } = this.center.translateBy(this.size.halfVec.scale(-1))
+    const { width: w, height: h } = this.size
+    return { x, y, w, h }
   }
 }
 

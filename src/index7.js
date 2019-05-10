@@ -1,7 +1,7 @@
 /* eslint-disable no-debugger */
 import 'tachyons'
 import './index.css'
-import { Draw } from './main7'
+import { Draw, Rect } from './main7'
 
 function initCanvas() {
   const canvas = document.getElementById('gameScreen')
@@ -100,12 +100,7 @@ function startGame() {
   const draw = Draw.fromCtx(ctx)
 
   const { width, height } = ctx.canvas
-  const viewportRectangle = Rectangle.fromXYWidthHeight(
-    0,
-    0,
-    width,
-    height,
-  )
+  const viewportRect = Rect.fromWH(width, height)
   const mouse = Mouse(ctx.canvas)
 
   function update() {}
@@ -118,7 +113,7 @@ function startGame() {
 
   gameLoop(() => {
     update()
-    const { x, y, w, h } = Rectangle.toXYWHObj(viewportRectangle)
+    const { x, y, w, h } = viewportRect.topLeftXYWH
     ctx.clearRect(x, y, w, h)
     render()
   })
