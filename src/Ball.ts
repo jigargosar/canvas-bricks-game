@@ -70,6 +70,7 @@ export class Ball {
       this.rect.center,
       this.vel,
     )
+
     if (eis.bottom) {
       rect2.containsPoint(this.rect.center)
     }
