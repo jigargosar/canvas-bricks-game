@@ -1,9 +1,6 @@
 /* eslint-disable no-debugger */
 import 'tachyons'
 import './index.css'
-import { Rectangle } from './v6/Rectangle'
-import { Point } from './v6/Point'
-import { Size } from './v6/Size'
 
 function initCanvas() {
   const canvas = document.getElementById('gameScreen')
@@ -43,6 +40,38 @@ const Key = (function initKeyboard() {
   }
 })()
 
+const Point = (function() {
+  function fromXY(x, y) {
+    return { x, y }
+  }
+  return {
+    fromXY,
+    origin: fromXY(0, 0),
+  }
+})()
+
+const Rectangle = (function() {
+  function fromXYWidthHeight(x, y, w, h) {
+    return { x, y, w, h }
+  }
+  function fromWidthHeight(w, h) {
+    return fromXYWidthHeight(0, 0, w, h)
+  }
+
+  function fromCenterXYWidthHeight(cx, cy, w, h) {
+    return fromXYWidthHeight(cx - w / 2, cy - h / 2, w, h)
+  }
+
+  function toXYWHObj({ x, y, w, h }) {
+    return { x, y, w, h }
+  }
+  return {
+    fromWidthHeight,
+    fromCenterXYWidthHeight,
+    toXYWHObj,
+  }
+})()
+
 const Mouse = function initMouse(canvas) {
   let point = Point.origin
   window.addEventListener('mousemove', e => {
@@ -67,20 +96,21 @@ const Mouse = function initMouse(canvas) {
 function startGame() {
   const ctx = initCanvas()
   const { width, height } = ctx.canvas
-  const viewport = Rectangle.fromWH(width, height)
+  const viewportRectangle = Rectangle.fromWidthHeight(width, height)
   const mouse = Mouse(ctx.canvas)
 
   function update() {}
 
   function render() {
-    const rect = Rectangle.fromCS(mouse.at, Size.fromWH(100, 100))
-    const { x, y, w, h } = rect.topLeftXYWH
+    const mp = mouse.at
+    const rect = Rectangle.fromCenterXYWidthHeight(mp.x, mp.y, 100, 100)
+    const { x, y, w, h } = Rectangle.toXYWHObj(rect)
     ctx.fillRect(x, y, w, h)
   }
 
   gameLoop(() => {
     update()
-    const { x, y, w, h } = viewport.topLeftXYWH
+    const { x, y, w, h } = Rectangle.toXYWHObj(viewportRectangle)
     ctx.clearRect(x, y, w, h)
     render()
   })
