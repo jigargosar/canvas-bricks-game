@@ -54,20 +54,21 @@ const Rectangle = (function() {
   function fromXYWidthHeight(x, y, w, h) {
     return { x, y, w, h }
   }
-  function fromWidthHeight(w, h) {
-    return fromXYWidthHeight(0, 0, w, h)
-  }
-
   function fromCenterXYWidthHeight(cx, cy, w, h) {
     return fromXYWidthHeight(cx - w / 2, cy - h / 2, w, h)
+  }
+
+  function fromCenterPointWidthHeight(centerPoint, w, h) {
+    return fromCenterXYWidthHeight(centerPoint.x, centerPoint.y, w, h)
   }
 
   function toXYWHObj({ x, y, w, h }) {
     return { x, y, w, h }
   }
   return {
-    fromWidthHeight,
+    fromXYWidthHeight,
     fromCenterXYWidthHeight,
+    fromCenterPointWidthHeight,
     toXYWHObj,
   }
 })()
@@ -96,14 +97,18 @@ const Mouse = function initMouse(canvas) {
 function startGame() {
   const ctx = initCanvas()
   const { width, height } = ctx.canvas
-  const viewportRectangle = Rectangle.fromWidthHeight(width, height)
+  const viewportRectangle = Rectangle.fromXYWidthHeight(
+    0,
+    0,
+    width,
+    height,
+  )
   const mouse = Mouse(ctx.canvas)
 
   function update() {}
 
   function render() {
-    const mp = mouse.at
-    const rect = Rectangle.fromCenterXYWidthHeight(mp.x, mp.y, 100, 100)
+    const rect = Rectangle.fromCenterPointWidthHeight(mouse.at, 100, 100)
     const { x, y, w, h } = Rectangle.toXYWHObj(rect)
     ctx.fillRect(x, y, w, h)
   }
