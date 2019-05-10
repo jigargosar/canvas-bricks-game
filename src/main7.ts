@@ -47,6 +47,7 @@ export class Point {
   translateBy(vec: Vec): Point {
     return Point.fromXY(this.x + vec.xComponent, this.y + vec.yComponent)
   }
+  static origin = Point.fromXY(0, 0)
 }
 
 export class Size {

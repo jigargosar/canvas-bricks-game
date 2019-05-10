@@ -1,7 +1,7 @@
 /* eslint-disable no-debugger */
 import 'tachyons'
 import './index.css'
-import { Draw, Rect } from './main7'
+import { Draw, Rect, Point, Size } from './main7'
 
 function initCanvas() {
   const canvas = document.getElementById('gameScreen')
@@ -38,16 +38,6 @@ const Key = (function initKeyboard() {
     get right() {
       return km['ArrowRight']
     },
-  }
-})()
-
-const Point = (function() {
-  function fromXY(x, y) {
-    return { x, y }
-  }
-  return {
-    fromXY,
-    origin: fromXY(0, 0),
   }
 })()
 
@@ -106,8 +96,9 @@ function startGame() {
   function update() {}
 
   function render() {
-    const rect = Rectangle.fromCenterPointWidthHeight(mouse.at, 100, 100)
-    const { x, y, w, h } = Rectangle.toXYWHObj(rect)
+    const rect = Rect.fromCS(mouse.at, Size.fromWH(100, 100))
+    const { x, y } = rect.topLeft
+    const { width: w, height: h } = rect.size
     ctx.fillRect(x, y, w, h)
   }
 
