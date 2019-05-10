@@ -93,6 +93,11 @@ export class Draw {
   static fromCtx(ctx: CanvasRenderingContext2D) {
     return new Draw(ctx)
   }
+
+  clearRect(rect: Rect) {
+    const { x, y, w, h } = rect.topLeftXYWH
+    this.ctx.clearRect(x, y, w, h)
+  }
 }
 
 // Game

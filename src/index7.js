@@ -113,8 +113,7 @@ function startGame() {
 
   gameLoop(() => {
     update()
-    const { x, y, w, h } = viewportRect.topLeftXYWH
-    ctx.clearRect(x, y, w, h)
+    draw.clearRect(viewportRect)
     render()
   })
 }
