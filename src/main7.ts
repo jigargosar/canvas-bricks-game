@@ -236,16 +236,20 @@ export class Follower2 {
     return { rect, vel }
   }
 
+  static fromRV(rect: Rect, vel: Vec): FollowerModel {
+    return { rect, vel }
+  }
+
   static update(
     mouse: Mouse,
     { rect, vel }: FollowerModel,
   ): FollowerModel {
     return rect.center.equalsWithin(1, mouse.at)
-      ? { rect: rect.mapCenter(mouse.at), vel: Vec.zero }
-      : {
-          rect: rect.translateBy(vel),
-          vel: Vec.fromPolar(2, rect.center.angleTo(mouse.at)),
-        }
+      ? Follower2.fromRV(rect.mapCenter(mouse.at), Vec.zero)
+      : Follower2.fromRV(
+          v7rect.translateBy(vel),
+          v7Vec.fromPolar(2, rect.center.angleTo(mouse.at)),
+        )
   }
   static render(draw: Draw, { rect }: FollowerModel) {
     draw.fillEllipse(rect, 'white')
