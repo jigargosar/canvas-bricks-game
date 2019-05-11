@@ -145,7 +145,10 @@ startGame({
   update({ mouse }, state) {
     function updateFollower(follower) {
       const { rect, vel } = follower
-      return { ...follower, rect: rect.translateBy(vel) }
+      const newRV = rect.center.equalsWithin(1, mouse.at)
+        ? { rect: rect.mapCenter(mouse.at), vel: vec2(0, 0) }
+        : { rect: rect.translateBy(vel), vel: vec2(0, 0) }
+      return { ...follower, ...newRV }
     }
     return { ...state, follower: updateFollower(state.follower) }
   },

@@ -46,6 +46,16 @@ export class Point {
   translateBy(vec: Vec): Point {
     return Point.fromXY(this.x + vec.dx, this.y + vec.dy)
   }
+  equals(p2: Point) {
+    return this.equalsWithin(0, p2)
+  }
+  equalsWithin(threshold: number, p2: Point) {
+    const p1 = this
+    return (
+      Math.abs(p1.x - p2.x) <= threshold &&
+      Math.abs(p1.y - p2.y) <= threshold
+    )
+  }
   static origin = Point.fromXY(0, 0)
 }
 
