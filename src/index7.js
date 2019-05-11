@@ -1,16 +1,7 @@
 /* eslint-disable no-debugger */
 import 'tachyons'
 import './index.css'
-import {
-  Draw,
-  Rect,
-  Point,
-  Size,
-  canvasToRect,
-  vec2,
-  Follower,
-  Follower2,
-} from './main7'
+import { Draw, Point, canvasToRect, Follower, Follower2 } from './main7'
 import * as R from 'ramda'
 
 function initCanvas() {
@@ -51,29 +42,6 @@ const Key = function initKeyboard() {
   }
 }
 
-const Rectangle = (function() {
-  function fromXYWidthHeight(x, y, w, h) {
-    return { x, y, w, h }
-  }
-  function fromCenterXYWidthHeight(cx, cy, w, h) {
-    return fromXYWidthHeight(cx - w / 2, cy - h / 2, w, h)
-  }
-
-  function fromCenterPointWidthHeight(centerPoint, w, h) {
-    return fromCenterXYWidthHeight(centerPoint.x, centerPoint.y, w, h)
-  }
-
-  function toXYWHObj({ x, y, w, h }) {
-    return { x, y, w, h }
-  }
-  return {
-    fromXYWidthHeight,
-    fromCenterXYWidthHeight,
-    fromCenterPointWidthHeight,
-    toXYWHObj,
-  }
-})()
-
 const Mouse = function initMouse(canvas) {
   const canvasRect = canvasToRect(canvas)
   let point = canvasRect.center
@@ -111,15 +79,6 @@ function useState(initial) {
   }
 }
 
-const overProp = R.curry(function overProp(name, fn, obj) {
-  return R.over(R.lensProp(name), fn, obj)
-})
-
-function renderFollower(draw, follower) {
-  const rect = follower.rect
-  draw.fillEllipse(rect, 'dodgerblue')
-}
-
 function startGame(cbs) {
   const { init, update, render } = cbs
 
@@ -150,14 +109,10 @@ startGame({
     }
   },
   update({ mouse }, state) {
-    return R.compose(updateFollowers)(state)
-
-    function updateFollowers(state) {
-      return {
-        ...state,
-        follower: state.follower.update(mouse),
-        follower2: Follower2.update(mouse, state.follower2),
-      }
+    return {
+      ...state,
+      follower: state.follower.update(mouse),
+      follower2: Follower2.update(mouse, state.follower2),
     }
   },
   render(draw, { follower, follower2 }) {
