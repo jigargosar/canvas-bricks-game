@@ -9,7 +9,7 @@ function degToRadians(degrees: number) {
 export class Vec {
   private constructor(readonly dx: number, readonly dy: number) {}
 
-  static fromComponents(x: number, y: number) {
+  static fromParts(x: number, y: number) {
     return new Vec(x, y)
   }
   static fromTuple(tuple: NumTuple) {
@@ -20,14 +20,16 @@ export class Vec {
     return [this.dx, this.dy]
   }
   scale(s: number) {
-    const newTuple = this.tuple.map(n => n * s) as NumTuple
-    return Vec.fromTuple(newTuple)
+    const { dx, dy } = this
+    return vec2(dx * s, dy * s)
   }
   static fromDegMag(deg: number, mag: number) {
     const angle = degToRadians(deg)
-    return Vec.fromComponents(Math.cos(angle) * mag, Math.sin(angle) * mag)
+    return vec2(Math.cos(angle) * mag, Math.sin(angle) * mag)
   }
 }
+
+export const vec2 = Vec.fromParts
 
 export class Point {
   private constructor(
@@ -52,7 +54,7 @@ export class Size {
     return new Size(width, height)
   }
   get halfVec() {
-    return Vec.fromComponents(this.width / 2, this.height / 2)
+    return vec2(this.width / 2, this.height / 2)
   }
 }
 
