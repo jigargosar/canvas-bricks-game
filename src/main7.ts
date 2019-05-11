@@ -115,4 +115,8 @@ export class Draw {
   }
 }
 
+export function canvasToRect(canvas: HTMLCanvasElement) {
+  return Rect.fromWH(canvas.width, canvas.height)
+}
+
 // Game

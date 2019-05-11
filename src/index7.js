@@ -1,7 +1,7 @@
 /* eslint-disable no-debugger */
 import 'tachyons'
 import './index.css'
-import { Draw, Rect, Point, Size } from './main7'
+import { Draw, Rect, Point, Size, canvasToRect } from './main7'
 
 function initCanvas() {
   const canvas = document.getElementById('gameScreen')
@@ -65,7 +65,8 @@ const Rectangle = (function() {
 })()
 
 const Mouse = function initMouse(canvas) {
-  let point = Point.origin
+  const canvasRect = canvasToRect(canvas)
+  let point = canvasRect.center
   window.addEventListener('mousemove', e => {
     point = Point.fromXY(
       e.pageX - canvas.offsetLeft,
