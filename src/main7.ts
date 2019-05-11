@@ -1,3 +1,25 @@
+import * as R from 'ramda'
+// BASICS
+
+// https://github.com/elm/core/blob/1.0.2/src/Basics.elm
+
+const mul = R.multiply
+const add = R.add
+const cos = Math.cos
+const sin = Math.sin
+const sqrt = Math.sqrt
+const atan2 = Math.atan2
+
+function fromPolar(radius: number, theta: number) {
+  return [mul(radius, cos(theta)), mul(radius, sin(theta))]
+}
+
+function toPolar(x: number, y: number) {
+  return [sqrt(add(mul(x, x), mul(y, y))), atan2(y, x)]
+}
+
+// BASICS END
+
 type MapF<T> = (a: T) => T
 
 type MapFOrValue<T> = MapF<T> | T
@@ -6,8 +28,8 @@ type MapFOrValue<T> = MapF<T> | T
 
 export type NumTuple = [number, number]
 
-function degToRadians(degrees: number) {
-  return (degrees * Math.PI) / 180
+function degrees(angle: number) {
+  return (angle * Math.PI) / 180
 }
 
 export class Vec {
@@ -28,7 +50,7 @@ export class Vec {
     return vec2(dx * s, dy * s)
   }
   static fromDegMag(deg: number, mag: number) {
-    const angle = degToRadians(deg)
+    const angle = degrees(deg)
     return vec2(Math.cos(angle) * mag, Math.sin(angle) * mag)
   }
 }
