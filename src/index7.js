@@ -114,7 +114,7 @@ function renderBall(ctx, { x, y, r }) {
 
 function initPaddle(vp) {
   const pad = { x: 0, y: 0, w: 100, h: 15, vx: 0, vy: 0 }
-  const x = (vp.w + pad.w) / 2
+  const x = (vp.w - pad.w) / 2
   const y = vp.h - pad.h - 20
   return { ...pad, x, y }
 }
@@ -153,7 +153,7 @@ function renderBricks(ctx, bricks) {
 
 startGame({
   init({ mouse, viewport }) {
-    const vp = [viewport.size.width, viewport.size.height]
+    const vp = { w: viewport.size.width, h: viewport.size.height }
     return {
       follower: Follower.init(mouse.at),
       follower2: Follower2.init(mouse.at),
@@ -169,8 +169,12 @@ startGame({
       follower2: Follower2.update(mouse, state.follower2),
     }
   },
-  render(draw, { follower, follower2 }) {
+  render(draw, { follower, follower2, ball, pad, bricks }) {
     follower.render(draw)
     Follower2.render(draw, follower2)
+    const ctx = draw.ctx
+    renderBall(ctx, ball)
+    renderPaddle(ctx, pad)
+    renderBricks(ctx, bricks)
   },
 })
