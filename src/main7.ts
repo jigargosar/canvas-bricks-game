@@ -121,9 +121,9 @@ export class Draw {
   }
 
   static rectToTopLeftXYWHTuple(rect: Rect) {
-    const { x, y } = rect.topLeft
-    const { width, height } = rect.size
-    return [x, y, width, height]
+    const { center, size } = rect
+    const { x, y } = center.translateBy(size.halfVec.scale(-1))
+    return [x, y, size.width, size.height]
   }
 
   static rectToCenterXYWHTuple(rect: Rect) {
