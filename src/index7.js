@@ -162,9 +162,11 @@ function renderBricks(ctx, bricks) {
     .forEach(({ x, y, w, h }) => ctx.fillRect(x, y, w, h))
 }
 
-function update({ mouse, viewport: vp }, state) {
-  const { ball, pad, bricks } = state
-  return { ...state, ball, pad, bricks }
+function updateBallPaddleBricks(
+  { mouse, viewport: vp },
+  { ball, pad, bricks },
+) {
+  return { ball, pad, bricks }
 }
 
 startGame({
@@ -178,11 +180,13 @@ startGame({
       bricks: initBricks(vp),
     }
   },
-  update({ mouse }, state) {
+  update(deps, state) {
+    const { mouse } = deps
     return {
       ...state,
       follower: state.follower.update(mouse),
       follower2: Follower2.update(mouse, state.follower2),
+      ...updateBallPaddleBricks(deps, state),
     }
   },
   render(draw, { follower, follower2, ball, pad, bricks }) {
