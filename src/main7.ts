@@ -53,6 +53,9 @@ export class Vec {
   get polar() {
     return toPolar(this.dx, this.dy)
   }
+  get angle() {
+    return this.polar[1]
+  }
   mapLength(fn: MapFOrValue<number>) {
     const [length, angle] = this.polar
     const newLength = typeof fn === 'number' ? fn : fn(length)
@@ -94,6 +97,9 @@ export class Point {
   vectorTo(to: Point) {
     const from = this
     return Vec.fromParts(to.x - from.x, to.y - from.y)
+  }
+  angleTo(to: Point) {
+    return this.vectorTo(to).angle
   }
   static origin = Point.fromXY(0, 0)
 }
@@ -205,10 +211,10 @@ export class Follower {
   update(mouse: Mouse) {
     const { rect, vel } = this
     const newRV = rect.center.equalsWithin(1, mouse.at)
-      ? { rect: rect.mapCenter(mouse.at), vel: vec2(0, 0) }
+      ? { rect: rect.mapCenter(mouse.at), vel: Vec.zero }
       : {
           rect: rect.translateBy(vel),
-          vel: rect.center.vectorTo(mouse.at).mapLength(2),
+          vel: Vec.fromPolar(2, rect.center.angleTo(mouse.at)),
         }
 
     return new Follower(newRV.rect, newRV.vel)
