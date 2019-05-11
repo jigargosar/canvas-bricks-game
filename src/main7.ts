@@ -35,15 +35,27 @@ function degrees(angle: number) {
 export class Vec {
   private constructor(readonly dx: number, readonly dy: number) {}
 
-  static fromParts(x: number, y: number) {
-    return new Vec(x, y)
+  static fromParts(dx: number, dy: number) {
+    return new Vec(dx, dy)
+  }
+  static fromPolar(radius: number, theta: number) {
+    const [dx, dy] = fromPolar(radius, theta)
+    return new Vec(dx, dy)
   }
   static fromTuple(tuple: NumTuple) {
-    const [x, y] = tuple
-    return new Vec(x, y)
+    const [dx, dy] = tuple
+    return new Vec(dx, dy)
   }
   get tuple() {
     return [this.dx, this.dy]
+  }
+  get polar() {
+    return toPolar(this.dx, this.dy)
+  }
+  mapLength(fn: MapFOrValue<number>) {
+    const [length, angle] = this.polar
+    const newLength = typeof fn === 'number' ? fn : fn(length)
+    return Vec.fromPolar(newLength, angle)
   }
   scale(s: number) {
     const { dx, dy } = this
@@ -77,6 +89,10 @@ export class Point {
       Math.abs(p1.x - p2.x) <= threshold &&
       Math.abs(p1.y - p2.y) <= threshold
     )
+  }
+  vectorTo(to: Point) {
+    const from = this
+    return Vec.fromParts(to.x - from.x, to.y - from.y)
   }
   static origin = Point.fromXY(0, 0)
 }
