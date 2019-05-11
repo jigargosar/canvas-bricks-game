@@ -2,7 +2,7 @@
 import 'tachyons'
 import './index.css'
 import { Draw, Rect, Point, Size, canvasToRect } from './main7'
-import * as R from 'R'
+import * as R from 'ramda'
 
 function initCanvas() {
   const canvas = document.getElementById('gameScreen')
@@ -108,11 +108,14 @@ function useState(initial) {
   }
 }
 
-const overProp = prop => R.over(R.lensProp(prop))
+const overProp = R.curry(function overProp(name, fn, obj) {
+  return R.over(R.lensProp(name), fn, obj)
+})
 
 function updateFollower({ mouse }, follower) {
-  return follower.mapCenter(mouse.at)
+  return overProp('rect')(r => r.mapCenter(mouse.at))(follower)
 }
+
 function renderFollower(draw, follower) {
   const rect = follower.rect
   draw.fillEllipse(rect, 'dodgerblue')
@@ -125,9 +128,8 @@ function startGame() {
     )(state)
   }
 
-  function render(draw, state) {
-    const follower = stateBox.state
-    renderFollower(follower, draw)
+  function render(draw, { follower }) {
+    renderFollower(draw, follower)
   }
 
   const ctx = initCanvas()
