@@ -124,7 +124,7 @@ function renderPaddle(ctx, { x, y, w, h }) {
   ctx.fillRect(x, y, w, h)
 }
 
-function initBricks() {
+function initBricks(vp) {
   const rowCt = 5
   const colCt = 5
   const brickWidth = 50
@@ -132,7 +132,8 @@ function initBricks() {
   const colGap = 20
   const rowGap = 20
   const topOffset = 30
-  const leftOffset = 20
+  const gridWidth = colCt * (brickWidth + colGap) - colGap
+  const leftOffset = (vp.w - gridWidth) / 2
 
   const bricksRows = R.times(
     row => R.times(col => initBrick(row, col), colCt),
