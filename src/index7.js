@@ -23,7 +23,7 @@ function gameLoop(step) {
   requestAnimationFrame(callback)
 }
 
-const Key = (function initKeyboard() {
+const Key = function initKeyboard() {
   const km = {}
   window.addEventListener('keydown', e => {
     km[e.key] = true
@@ -40,7 +40,7 @@ const Key = (function initKeyboard() {
       return km['ArrowRight']
     },
   }
-})()
+}
 
 const Rectangle = (function() {
   function fromXYWidthHeight(x, y, w, h) {
@@ -110,26 +110,35 @@ function useState(initial) {
 
 const overProp = prop => R.over(R.lensProp(prop))
 
+function updateFollower({ mouse }, follower) {
+  return follower.mapCenter(mouse.at)
+}
+function renderFollower(draw, follower) {
+  const rect = follower.rect
+  draw.fillEllipse(rect, 'dodgerblue')
+}
+
 function startGame() {
   const ctx = initCanvas()
   const draw = Draw.fromCtx(ctx)
 
   const viewportRect = draw.rect
   const mouse = Mouse(ctx.canvas)
-  const deps = { mouse }
+  const key = Key()
 
-  let stateBox = useState(initialState(deps))
+  const updateDeps = { mouse, viewportRect, key }
+
+  let stateBox = useState(initialState(updateDeps))
 
   function update() {
     stateBox.mapState(
-      overProp('follower')(follower => follower.mapCenter(mouse.at)),
+      overProp('follower')(R.partial(updateFollower, [updateDeps])),
     )
   }
 
   function render() {
     const follower = stateBox.state
-    const rect = follower.rect
-    draw.fillEllipse(rect, 'dodgerblue')
+    renderFollower(follower, draw)
   }
 
   gameLoop(() => {
