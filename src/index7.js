@@ -1,7 +1,15 @@
 /* eslint-disable no-debugger */
 import 'tachyons'
 import './index.css'
-import { Draw, Rect, Point, Size, canvasToRect, vec2 } from './main7'
+import {
+  Draw,
+  Rect,
+  Point,
+  Size,
+  canvasToRect,
+  vec2,
+  Follower,
+} from './main7'
 import * as R from 'ramda'
 
 function initCanvas() {
@@ -136,26 +144,13 @@ function startGame(cbs) {
 startGame({
   init({ mouse }) {
     return {
-      follower: {
-        rect: Rect.fromCS(mouse.at, Size.fromWH(100, 100)),
-        vel: vec2(0, 0),
-      },
+      follower: Follower.init(mouse.at),
     }
   },
   update({ mouse }, state) {
-    function updateFollower(follower) {
-      const { rect, vel } = follower
-      const newRV = rect.center.equalsWithin(1, mouse.at)
-        ? { rect: rect.mapCenter(mouse.at), vel: vec2(0, 0) }
-        : {
-            rect: rect.translateBy(vel),
-            vel: rect.center.vectorTo(mouse.at).mapLength(2),
-          }
-      return { ...follower, ...newRV }
-    }
-    return { ...state, follower: updateFollower(state.follower) }
+    return { ...state, follower: state.follower.update(mouse) }
   },
   render(draw, { follower }) {
-    renderFollower(draw, follower)
+    follower.render(draw)
   },
 })

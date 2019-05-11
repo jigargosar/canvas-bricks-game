@@ -190,11 +190,32 @@ export function canvasToRect(canvas: HTMLCanvasElement) {
 
 // Game
 
-class Follower {
+type Mouse = {
+  at: Point
+}
+
+export class Follower {
   private constructor(readonly rect: Rect, readonly vel: Vec) {}
-  init(c: Point) {
+  static init(c: Point) {
     const rect = Rect.fromCS(c, Size.fromWH(100, 100))
     const vel = Vec.zero
     return new Follower(rect, vel)
+  }
+
+  update(mouse: Mouse) {
+    const { rect, vel } = this
+    const newRV = rect.center.equalsWithin(1, mouse.at)
+      ? { rect: rect.mapCenter(mouse.at), vel: vec2(0, 0) }
+      : {
+          rect: rect.translateBy(vel),
+          vel: rect.center.vectorTo(mouse.at).mapLength(2),
+        }
+
+    return new Follower(newRV.rect, newRV.vel)
+  }
+
+  render(draw: Draw) {
+    const rect = this.rect
+    draw.fillEllipse(rect, 'dodgerblue')
   }
 }
