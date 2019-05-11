@@ -94,9 +94,14 @@ export class Draw {
   }
 
   clearRect(rect: Rect) {
-    const { x, y } = rect.topLeft
-    const { width: w, height: h } = rect.size
+    const [x, y, w, h] = Draw.rectToXYWHTuple(rect)
     this.ctx.clearRect(x, y, w, h)
+  }
+
+  static rectToXYWHTuple(rect: Rect) {
+    const { x, y } = rect.topLeft
+    const { width, height } = rect.size
+    return [x, y, width, height]
   }
 }
 
