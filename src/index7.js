@@ -162,6 +162,11 @@ function renderBricks(ctx, bricks) {
     .forEach(({ x, y, w, h }) => ctx.fillRect(x, y, w, h))
 }
 
+function update({ mouse, viewport: vp }, state) {
+  const { ball, pad, bricks } = state
+  return { ...state, ball, pad, bricks }
+}
+
 startGame({
   init({ mouse, viewport }) {
     const vp = { w: viewport.size.width, h: viewport.size.height }
