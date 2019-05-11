@@ -11,6 +11,11 @@ export class Vec {
     private readonly x: number,
     private readonly y: number,
   ) {}
+
+  static fromComponents(x: number, y: number) {
+    return new Vec(x, y)
+  }
+
   static fromTuple(tuple: NumTuple) {
     const [x, y] = tuple
     return new Vec(x, y)
@@ -18,10 +23,6 @@ export class Vec {
 
   get tuple() {
     return [this.x, this.y]
-  }
-
-  static fromComponents(a: number, b: number) {
-    return Vec.fromTuple([a, b])
   }
 
   get xComponent() {
