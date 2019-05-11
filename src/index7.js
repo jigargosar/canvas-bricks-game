@@ -2,6 +2,7 @@
 import 'tachyons'
 import './index.css'
 import { Draw, Rect, Point, Size, canvasToRect } from './main7'
+import * as R from 'R'
 
 function initCanvas() {
   const canvas = document.getElementById('gameScreen')
@@ -86,18 +87,48 @@ const Mouse = function initMouse(canvas) {
   }
 }
 
+function initialState({ mouse }) {
+  return {
+    follower: { rect: Rect.fromCS(mouse.at, Size.fromWH(100, 100)) },
+  }
+}
+
+function useState(initial) {
+  let state = initial
+  return {
+    get state() {
+      return state
+    },
+    mapState(fn) {
+      state = fn(state)
+    },
+    mergeState(partialState) {
+      Object.assign(state, partialState)
+    },
+  }
+}
+
+const overProp = prop => R.over(R.lensProp(prop))
+
 function startGame() {
   const ctx = initCanvas()
   const draw = Draw.fromCtx(ctx)
 
-  const { width, height } = ctx.canvas
-  const viewportRect = Rect.fromWH(width, height)
+  const viewportRect = draw.rect
   const mouse = Mouse(ctx.canvas)
+  const deps = { mouse }
 
-  function update() {}
+  let stateBox = useState(initialState(deps))
+
+  function update() {
+    stateBox.mapState(
+      overProp('follower')(follower => follower.mapCenter(mouse.at)),
+    )
+  }
 
   function render() {
-    const rect = Rect.fromCS(mouse.at, Size.fromWH(100, 100))
+    const follower = stateBox.state
+    const rect = follower.rect
     draw.fillEllipse(rect, 'dodgerblue')
   }
 

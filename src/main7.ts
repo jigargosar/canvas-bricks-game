@@ -1,3 +1,7 @@
+type MapF<T> = (a: T) => T
+
+type MapFOrValue<T> = MapF<T> | T
+
 // GEOMETRY
 
 export type NumTuple = [number, number]
@@ -71,6 +75,10 @@ export class Rect {
     const size = Size.fromWH(width, height)
     return Rect.fromCS(center, size)
   }
+  mapCenter(pointF: MapFOrValue<Point>) {
+    const nc = pointF instanceof Point ? pointF : pointF(this.center)
+    return Rect.fromCS(nc, this.size)
+  }
 }
 
 // Canvas
@@ -79,6 +87,12 @@ export class Draw {
   private constructor(public readonly ctx: CanvasRenderingContext2D) {}
   static fromCtx(ctx: CanvasRenderingContext2D) {
     return new Draw(ctx)
+  }
+  get canvas() {
+    return this.ctx.canvas
+  }
+  get rect() {
+    return canvasToRect(this.canvas)
   }
   clearRect(rect: Rect) {
     const [x, y, w, h] = Draw.rectToTopLeftXYWHTuple(rect)
