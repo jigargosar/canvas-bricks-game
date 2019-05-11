@@ -79,6 +79,9 @@ export class Rect {
     const nc = pointF instanceof Point ? pointF : pointF(this.center)
     return Rect.fromCS(nc, this.size)
   }
+  translateBy(v: Vec) {
+    return this.mapCenter(c => c.translateBy(v))
+  }
 }
 
 // Canvas

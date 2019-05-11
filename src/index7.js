@@ -1,7 +1,7 @@
 /* eslint-disable no-debugger */
 import 'tachyons'
 import './index.css'
-import { Draw, Rect, Point, Size, canvasToRect } from './main7'
+import { Draw, Rect, Point, Size, canvasToRect, vec2 } from './main7'
 import * as R from 'ramda'
 
 function initCanvas() {
@@ -106,19 +106,14 @@ const overProp = R.curry(function overProp(name, fn, obj) {
   return R.over(R.lensProp(name), fn, obj)
 })
 
-const updateFollower = R.curry(function updateFollower(
-  { mouse },
-  follower,
-) {
-  return overProp('rect')(r => r.mapCenter(mouse.at))(follower)
-})
-
 function renderFollower(draw, follower) {
   const rect = follower.rect
   draw.fillEllipse(rect, 'dodgerblue')
 }
 
-function startGame({ init, update, render }) {
+function startGame(cbs) {
+  const { init, update, render } = cbs
+
   const ctx = initCanvas()
   const draw = Draw.fromCtx(ctx)
 
@@ -141,13 +136,19 @@ function startGame({ init, update, render }) {
 startGame({
   init({ mouse }) {
     return {
-      follower: { rect: Rect.fromCS(mouse.at, Size.fromWH(100, 100)) },
+      follower: {
+        rect: Rect.fromCS(mouse.at, Size.fromWH(100, 100)),
+        vel: vec2(0, 0),
+      },
     }
   },
-  update(deps, state) {
-    return R.compose(overProp('follower')(updateFollower(deps)))(state)
+  update({ mouse }, state) {
+    function updateFollower(follower) {
+      const { rect, vel } = follower
+      return { ...follower, rect: rect.translateBy(vel) }
+    }
+    return { ...state, follower: updateFollower(state.follower) }
   },
-
   render(draw, { follower }) {
     renderFollower(draw, follower)
   },
