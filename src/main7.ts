@@ -225,3 +225,29 @@ export class Follower {
     draw.fillEllipse(rect, 'dodgerblue')
   }
 }
+
+export type FollowerModel = { rect: Rect; vel: Vec }
+
+export class Follower2 {
+  private constructor() {}
+  static init(c: Point): FollowerModel {
+    const rect = Rect.fromCS(c, Size.fromWH(50, 50))
+    const vel = Vec.zero
+    return { rect, vel }
+  }
+
+  static update(
+    mouse: Mouse,
+    { rect, vel }: FollowerModel,
+  ): FollowerModel {
+    return rect.center.equalsWithin(1, mouse.at)
+      ? { rect: rect.mapCenter(mouse.at), vel: Vec.zero }
+      : {
+          rect: rect.translateBy(vel),
+          vel: Vec.fromPolar(2, rect.center.angleTo(mouse.at)),
+        }
+  }
+  static render(draw: Draw, { rect }: FollowerModel) {
+    draw.fillEllipse(rect, 'white')
+  }
+}

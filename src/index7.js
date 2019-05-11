@@ -9,6 +9,7 @@ import {
   canvasToRect,
   vec2,
   Follower,
+  Follower2,
 } from './main7'
 import * as R from 'ramda'
 
@@ -145,12 +146,18 @@ startGame({
   init({ mouse }) {
     return {
       follower: Follower.init(mouse.at),
+      follower2: Follower2.init(mouse.at),
     }
   },
   update({ mouse }, state) {
-    return { ...state, follower: state.follower.update(mouse) }
+    return {
+      ...state,
+      follower: state.follower.update(mouse),
+      follower2: Follower2.update(mouse, state.follower2),
+    }
   },
-  render(draw, { follower }) {
+  render(draw, { follower, follower2 }) {
     follower.render(draw)
+    Follower2.render(draw, follower2)
   },
 })
