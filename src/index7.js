@@ -119,32 +119,32 @@ function renderFollower(draw, follower) {
 }
 
 function startGame() {
-  const ctx = initCanvas()
-  const draw = Draw.fromCtx(ctx)
-
-  const viewportRect = draw.rect
-  const mouse = Mouse(ctx.canvas)
-  const key = Key()
-
-  const updateDeps = { mouse, viewportRect, key }
-
-  let stateBox = useState(initialState(updateDeps))
-
-  function update() {
-    stateBox.mapState(
+  function update(state) {
+    return R.compose(
       overProp('follower')(R.partial(updateFollower, [updateDeps])),
-    )
+    )(state)
   }
 
-  function render() {
+  function render(draw, state) {
     const follower = stateBox.state
     renderFollower(follower, draw)
   }
 
+  const ctx = initCanvas()
+  const draw = Draw.fromCtx(ctx)
+
+  const updateDeps = {
+    mouse: Mouse(ctx.canvas),
+    viewport: draw.rect,
+    key: Key(),
+  }
+  let stateBox = useState(initialState(updateDeps))
+
   gameLoop(() => {
-    update()
-    draw.clearRect(viewportRect)
-    render()
+    stateBox.mapState(update)
+    draw.clear()
+
+    render(draw, stateBox.state)
   })
 }
 

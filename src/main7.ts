@@ -94,6 +94,9 @@ export class Draw {
   get rect() {
     return canvasToRect(this.canvas)
   }
+  clear() {
+    this.clearRect(this.rect)
+  }
   clearRect(rect: Rect) {
     const [x, y, w, h] = Draw.rectToTopLeftXYWHTuple(rect)
     this.ctx.clearRect(x, y, w, h)
