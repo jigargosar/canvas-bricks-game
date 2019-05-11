@@ -7,37 +7,22 @@ function degToRadians(degrees: number) {
 }
 
 export class Vec {
-  private constructor(
-    private readonly x: number,
-    private readonly y: number,
-  ) {}
+  private constructor(readonly dx: number, readonly dy: number) {}
 
   static fromComponents(x: number, y: number) {
     return new Vec(x, y)
   }
-
   static fromTuple(tuple: NumTuple) {
     const [x, y] = tuple
     return new Vec(x, y)
   }
-
   get tuple() {
-    return [this.x, this.y]
+    return [this.dx, this.dy]
   }
-
-  get xComponent() {
-    return this.tuple[0]
-  }
-
-  get yComponent() {
-    return this.tuple[1]
-  }
-
   scale(s: number) {
     const newTuple = this.tuple.map(n => n * s) as NumTuple
     return Vec.fromTuple(newTuple)
   }
-
   static fromDegMag(deg: number, mag: number) {
     const angle = degToRadians(deg)
     return Vec.fromComponents(Math.cos(angle) * mag, Math.sin(angle) * mag)
@@ -52,9 +37,8 @@ export class Point {
   static fromXY(x: number, y: number) {
     return new Point(x, y)
   }
-
   translateBy(vec: Vec): Point {
-    return Point.fromXY(this.x + vec.xComponent, this.y + vec.yComponent)
+    return Point.fromXY(this.x + vec.dx, this.y + vec.dy)
   }
   static origin = Point.fromXY(0, 0)
 }
@@ -64,11 +48,9 @@ export class Size {
     public readonly width: number,
     public readonly height: number,
   ) {}
-
   static fromWH(width: number, height: number) {
     return new Size(width, height)
   }
-
   get halfVec() {
     return Vec.fromComponents(this.width / 2, this.height / 2)
   }
@@ -79,19 +61,13 @@ export class Rect {
     public readonly center: Point,
     public readonly size: Size,
   ) {}
-
   static fromCS(center: Point, size: Size) {
     return new Rect(center, size)
   }
-
   static fromWH(width: number, height: number) {
     const center = Point.fromXY(width / 2, height / 2)
     const size = Size.fromWH(width, height)
     return Rect.fromCS(center, size)
-  }
-
-  get topLeft() {
-    return this.center.translateBy(this.size.halfVec.scale(-1))
   }
 }
 
@@ -102,12 +78,10 @@ export class Draw {
   static fromCtx(ctx: CanvasRenderingContext2D) {
     return new Draw(ctx)
   }
-
   clearRect(rect: Rect) {
     const [x, y, w, h] = Draw.rectToTopLeftXYWHTuple(rect)
     this.ctx.clearRect(x, y, w, h)
   }
-
   fillRect(
     rect: Rect,
     fillStyle: string | CanvasGradient | CanvasPattern,
@@ -116,7 +90,6 @@ export class Draw {
     const [x, y, w, h] = Draw.rectToTopLeftXYWHTuple(rect)
     this.ctx.fillRect(x, y, w, h)
   }
-
   fillEllipse(
     rect: Rect,
     fillStyle: string | CanvasGradient | CanvasPattern,
@@ -128,13 +101,11 @@ export class Draw {
     ctx.ellipse(x, y, w, h, 0, 0, 2 * Math.PI, false)
     ctx.fill()
   }
-
   static rectToTopLeftXYWHTuple(rect: Rect) {
     const { center, size } = rect
     const { x, y } = center.translateBy(size.halfVec.scale(-1))
     return [x, y, size.width, size.height]
   }
-
   static rectToCenterXYWHTuple(rect: Rect) {
     const { x, y } = rect.center
     const { width, height } = rect.size
