@@ -105,11 +105,23 @@ function initBall(vp) {
   return { x: vp.w / 2, y: vp.h / 2, r: 10, vx: 0, vy: 0 }
 }
 
+function renderBall(ctx, { x, y, r }) {
+  ctx.beginPath()
+  ctx.arc(x, y, r, 0, 2 * Math.PI, false)
+  ctx.fillStyle = 'green'
+  ctx.fill()
+}
+
 function initPaddle(vp) {
   const pad = { x: 0, y: 0, w: 100, h: 15, vx: 0, vy: 0 }
   const x = (vp.w + pad.w) / 2
   const y = vp.h - pad.h - 20
   return { ...pad, x, y }
+}
+
+function renderPaddle(ctx, { x, y, w, h }) {
+  ctx.fillStyle = 'orange'
+  ctx.fillRect(x, y, w, h)
 }
 
 function initBrick(row, col) {
@@ -132,11 +144,22 @@ function initBricks() {
   return R.times(row => R.times(col => initBrick(row, col), colCt), rowCt)
 }
 
+function renderBricks(ctx, bricks) {
+  ctx.fillStyle = 'dodgerblue'
+  bricks
+    .filter(b => b.alive)
+    .forEach(({ x, y, w, h }) => ctx.fillRect(x, y, w, h))
+}
+
 startGame({
-  init({ mouse }) {
+  init({ mouse, viewport }) {
+    const vp = [viewport.size.width, viewport.size.height]
     return {
       follower: Follower.init(mouse.at),
       follower2: Follower2.init(mouse.at),
+      ball: initBall(vp),
+      pad: initPaddle(vp),
+      bricks: initBricks(vp),
     }
   },
   update({ mouse }, state) {
