@@ -97,9 +97,8 @@ function startGame() {
 
   function render() {
     const rect = Rect.fromCS(mouse.at, Size.fromWH(100, 100))
-    const { x, y } = rect.topLeft
-    const { width: w, height: h } = rect.size
-    ctx.fillRect(x, y, w, h)
+
+    draw.fillEllipse(rect, 'dodgerblue')
   }
 
   gameLoop(() => {

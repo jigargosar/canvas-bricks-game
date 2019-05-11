@@ -95,12 +95,39 @@ export class Draw {
   }
 
   clearRect(rect: Rect) {
-    const [x, y, w, h] = Draw.rectToXYWHTuple(rect)
+    const [x, y, w, h] = Draw.rectToTopLeftXYWHTuple(rect)
     this.ctx.clearRect(x, y, w, h)
   }
 
-  static rectToXYWHTuple(rect: Rect) {
+  fillRect(
+    rect: Rect,
+    fillStyle: string | CanvasGradient | CanvasPattern,
+  ) {
+    this.ctx.fillStyle = fillStyle
+    const [x, y, w, h] = Draw.rectToTopLeftXYWHTuple(rect)
+    this.ctx.fillRect(x, y, w, h)
+  }
+
+  fillEllipse(
+    rect: Rect,
+    fillStyle: string | CanvasGradient | CanvasPattern,
+  ) {
+    const ctx = this.ctx
+    ctx.beginPath()
+    ctx.fillStyle = fillStyle
+    const [x, y, w, h] = Draw.rectToCenterXYWHTuple(rect)
+    ctx.ellipse(x, y, w, h, 0, 0, 2 * Math.PI, false)
+    ctx.fill()
+  }
+
+  static rectToTopLeftXYWHTuple(rect: Rect) {
     const { x, y } = rect.topLeft
+    const { width, height } = rect.size
+    return [x, y, width, height]
+  }
+
+  static rectToCenterXYWHTuple(rect: Rect) {
+    const { x, y } = rect.center
     const { width, height } = rect.size
     return [x, y, width, height]
   }
