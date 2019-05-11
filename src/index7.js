@@ -150,10 +150,14 @@ startGame({
     }
   },
   update({ mouse }, state) {
-    return {
-      ...state,
-      follower: state.follower.update(mouse),
-      follower2: Follower2.update(mouse, state.follower2),
+    return R.compose(updateFollowers)(state)
+
+    function updateFollowers(state) {
+      return {
+        ...state,
+        follower: state.follower.update(mouse),
+        follower2: Follower2.update(mouse, state.follower2),
+      }
     }
   },
   render(draw, { follower, follower2 }) {
