@@ -70,6 +70,7 @@ export class Rect {
     public readonly center: Point,
     public readonly size: Size,
   ) {}
+
   static fromCS(center: Point, size: Size) {
     return new Rect(center, size)
   }
