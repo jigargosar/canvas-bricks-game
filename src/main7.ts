@@ -7,9 +7,17 @@ function degToRadians(degrees: number) {
 }
 
 export class Vec {
-  private constructor(private readonly tuple: NumTuple) {}
+  private constructor(
+    private readonly x: number,
+    private readonly y: number,
+  ) {}
   static fromTuple(tuple: NumTuple) {
-    return new Vec(tuple)
+    const [x, y] = tuple
+    return new Vec(x, y)
+  }
+
+  get tuple() {
+    return [this.x, this.y]
   }
 
   static fromComponents(a: number, b: number) {
