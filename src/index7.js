@@ -129,7 +129,7 @@ function initBrick(row, col) {
 
   const colGap = 20
   const rowGap = 20
-  const topOffset = 100
+  const topOffset = 30
   const leftOffset = 20
 
   const x = leftOffset + col * (brick.w + colGap)
@@ -141,7 +141,11 @@ function initBricks() {
   const rowCt = 5
   const colCt = 5
 
-  return R.times(row => R.times(col => initBrick(row, col), colCt), rowCt)
+  const bricksRows = R.times(
+    row => R.times(col => initBrick(row, col), colCt),
+    rowCt,
+  )
+  return R.flatten(bricksRows)
 }
 
 function renderBricks(ctx, bricks) {
@@ -170,8 +174,8 @@ startGame({
     }
   },
   render(draw, { follower, follower2, ball, pad, bricks }) {
-    follower.render(draw)
-    Follower2.render(draw, follower2)
+    // follower.render(draw)
+    // Follower2.render(draw, follower2)
     const ctx = draw.ctx
     renderBall(ctx, ball)
     renderPaddle(ctx, pad)
