@@ -87,12 +87,6 @@ const Mouse = function initMouse(canvas) {
   }
 }
 
-function initialState({ mouse }) {
-  return {
-    follower: { rect: Rect.fromCS(mouse.at, Size.fromWH(100, 100)) },
-  }
-}
-
 function useState(initial) {
   let state = initial
   return {
@@ -112,26 +106,19 @@ const overProp = R.curry(function overProp(name, fn, obj) {
   return R.over(R.lensProp(name), fn, obj)
 })
 
-function updateFollower({ mouse }, follower) {
+const updateFollower = R.curry(function updateFollower(
+  { mouse },
+  follower,
+) {
   return overProp('rect')(r => r.mapCenter(mouse.at))(follower)
-}
+})
 
 function renderFollower(draw, follower) {
   const rect = follower.rect
   draw.fillEllipse(rect, 'dodgerblue')
 }
 
-function startGame() {
-  function update(state) {
-    return R.compose(
-      overProp('follower')(R.partial(updateFollower, [updateDeps])),
-    )(state)
-  }
-
-  function render(draw, { follower }) {
-    renderFollower(draw, follower)
-  }
-
+function startGame({ init, update, render }) {
   const ctx = initCanvas()
   const draw = Draw.fromCtx(ctx)
 
@@ -140,14 +127,28 @@ function startGame() {
     viewport: draw.rect,
     key: Key(),
   }
-  let stateBox = useState(initialState(updateDeps))
+
+  const box = useState(init(updateDeps))
 
   gameLoop(() => {
-    stateBox.mapState(update)
+    box.mapState(s => update(updateDeps, s))
     draw.clear()
 
-    render(draw, stateBox.state)
+    render(draw, box.state)
   })
 }
 
-startGame()
+startGame({
+  init({ mouse }) {
+    return {
+      follower: { rect: Rect.fromCS(mouse.at, Size.fromWH(100, 100)) },
+    }
+  },
+  update(deps, state) {
+    return R.compose(overProp('follower')(updateFollower(deps)))(state)
+  },
+
+  render(draw, { follower }) {
+    renderFollower(draw, follower)
+  },
+})
