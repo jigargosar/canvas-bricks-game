@@ -46,6 +46,7 @@ export class Vec {
     const [dx, dy] = tuple
     return new Vec(dx, dy)
   }
+  static zero = Vec.fromParts(0, 0)
   get tuple() {
     return [this.dx, this.dy]
   }
@@ -188,3 +189,12 @@ export function canvasToRect(canvas: HTMLCanvasElement) {
 }
 
 // Game
+
+class Follower {
+  private constructor(readonly rect: Rect, readonly vel: Vec) {}
+  init(c: Point) {
+    const rect = Rect.fromCS(c, Size.fromWH(100, 100))
+    const vel = Vec.zero
+    return new Follower(rect, vel)
+  }
+}
