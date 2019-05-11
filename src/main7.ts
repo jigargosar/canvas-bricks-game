@@ -247,8 +247,8 @@ export class Follower2 {
     return rect.center.equalsWithin(1, mouse.at)
       ? Follower2.fromRV(rect.mapCenter(mouse.at), Vec.zero)
       : Follower2.fromRV(
-          v7rect.translateBy(vel),
-          v7Vec.fromPolar(2, rect.center.angleTo(mouse.at)),
+          rect.translateBy(vel),
+          Vec.fromPolar(2, rect.center.angleTo(mouse.at)),
         )
   }
   static render(draw: Draw, { rect }: FollowerModel) {
