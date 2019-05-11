@@ -125,6 +125,13 @@ function initBrick(row, col) {
   return { ...brick, x, y }
 }
 
+function initBricks() {
+  const rowCt = 5
+  const colCt = 5
+
+  return R.times(row => R.times(col => initBrick(row, col), colCt), rowCt)
+}
+
 startGame({
   init({ mouse }) {
     return {
