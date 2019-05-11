@@ -101,6 +101,30 @@ function startGame(cbs) {
   })
 }
 
+function initBall(vp) {
+  return { x: vp.w / 2, y: vp.h / 2, r: 10, vx: 0, vy: 0 }
+}
+
+function initPaddle(vp) {
+  const pad = { x: 0, y: 0, w: 100, h: 15, vx: 0, vy: 0 }
+  const x = (vp.w + pad.w) / 2
+  const y = vp.h - pad.h - 20
+  return { ...pad, x, y }
+}
+
+function initBrick(row, col) {
+  const brick = { x: 0, y: 0, w: 50, h: 10, alive: true }
+
+  const colGap = 20
+  const rowGap = 20
+  const topOffset = 100
+  const leftOffset = 20
+
+  const x = leftOffset + col * (brick.w + colGap)
+  const y = topOffset + row * (brick.h + rowGap)
+  return { ...brick, x, y }
+}
+
 startGame({
   init({ mouse }) {
     return {
