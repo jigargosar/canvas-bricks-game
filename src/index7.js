@@ -124,28 +124,34 @@ function renderPaddle(ctx, { x, y, w, h }) {
   ctx.fillRect(x, y, w, h)
 }
 
-function initBrick(row, col) {
-  const brick = { x: 0, y: 0, w: 50, h: 10, alive: true }
-
+function initBricks() {
+  const rowCt = 5
+  const colCt = 5
+  const brickWidth = 50
+  const brickHeight = 10
   const colGap = 20
   const rowGap = 20
   const topOffset = 30
   const leftOffset = 20
-
-  const x = leftOffset + col * (brick.w + colGap)
-  const y = topOffset + row * (brick.h + rowGap)
-  return { ...brick, x, y }
-}
-
-function initBricks() {
-  const rowCt = 5
-  const colCt = 5
 
   const bricksRows = R.times(
     row => R.times(col => initBrick(row, col), colCt),
     rowCt,
   )
   return R.flatten(bricksRows)
+
+  function initBrick(row, col) {
+    const brick = {
+      x: 0,
+      y: 0,
+      w: brickWidth,
+      h: brickHeight,
+      alive: true,
+    }
+    const x = leftOffset + col * (brick.w + colGap)
+    const y = topOffset + row * (brick.h + rowGap)
+    return { ...brick, x, y }
+  }
 }
 
 function renderBricks(ctx, bricks) {
