@@ -295,21 +295,21 @@ function bounceBallOffPaddle(pad, ball_) {
 
 function updateBallPaddleBricks({ vp }, state) {
   const { ball, pad, bricks } = state
-  const fns = [
-    () =>
-      R.unless(R.isEmpty)(R.objOf('ball'))(
-        bounceCircleWithinRect(vp, ball),
-      ),
-    () =>
-      R.unless(R.isEmpty)(R.objOf('ball'))(bounceBallOffPaddle(pad, ball)),
-    () => ({ ball: translateByVelocity(ball) }),
+  const ballChangesFns = [
+    () => bounceCircleWithinRect(vp, ball),
+    () => bounceBallOffPaddle(pad, ball),
+    () => translateByVelocity(ball),
   ]
 
-  const changes = R.reduce((acc, fn) =>
-    R.isEmpty(acc) ? fn() : R.reduced(acc),
-  )({})(fns)
+  const changes = { ball: findFirstNonEmptyResult(ballChangesFns) }
 
   return R.mergeDeepLeft(changes, state)
+
+  function findFirstNonEmptyResult(fns) {
+    return R.reduce((acc, fn) => (R.isEmpty(acc) ? fn() : R.reduced(acc)))(
+      {},
+    )(ballChangesFns)
+  }
 }
 
 startGame({
