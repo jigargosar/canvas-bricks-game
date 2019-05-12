@@ -134,8 +134,8 @@ function startGame(cbs) {
 }
 
 function initBall(vp) {
-  const [vx, vy] = fromPolar(1, degrees(100))
-  return { x: vp.w / 2, y: vp.h / 2, r: 5, vx, vy }
+  const [vx, vy] = fromPolar(7, degrees(100))
+  return { x: vp.w / 2, y: vp.h / 2, r: 10, vx, vy }
 }
 
 function renderBall(ctx, { x, y, r }) {
@@ -265,12 +265,11 @@ function bounceBallOffPaddle(pad, ball_) {
   const ball = translateByVelocity(ball_)
   if (!isCircleInterSectingWithRect(ball, pad)) return {}
 
-  const rc = rectCenter(pad)
-  const dx = rc.x - ball.x
-  const dy = rc.y - ball.y
+  // const dx = ball_.x - ball.x
+  // const dy = ball_.y - ball.y
 
-  const lenX = abs(dx)
-  const lenY = abs(dy)
+  const lenX = abs(ball.dx)
+  const lenY = abs(ball.dy)
 
   const { minX, minY, maxX, maxY } = rectExtrema(
     growRectByCircle(ball, pad),
