@@ -262,17 +262,18 @@ startGame({
 })
 
 function updatePaddle({ key, vp }, state) {
-  const updatePadVel = pad => {
+  const updateVel = pad => {
     const paddleSpeed = 2
     const vx = key.left ? -paddleSpeed : key.right ? paddleSpeed : 0
-    return R.mergeDeepLeft({ x: pad.x + vx, vx }, pad)
+    return R.assoc('vx')(vx)(pad)
   }
 
   const updater = R.over(
     R.lensProp('pad'),
     R.compose(
       //
-      updatePadVel,
+      translateByVelocity,
+      updateVel,
     ),
   )
 
