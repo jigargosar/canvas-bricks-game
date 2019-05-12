@@ -102,7 +102,8 @@ function startGame(cbs) {
 }
 
 function initBall(vp) {
-  return { x: vp.w / 2, y: vp.h / 2, r: 10, vx: 0, vy: 0 }
+  const [vx, vy] = fromPolar(12, degrees(99))
+  return { x: vp.w / 2, y: vp.h / 2, r: 30, vx, vy }
 }
 
 function renderBall(ctx, { x, y, r }) {
@@ -162,16 +163,80 @@ function renderBricks(ctx, bricks) {
     .forEach(({ x, y, w, h }) => ctx.fillRect(x, y, w, h))
 }
 
-function updateBallPaddleBricks(
-  { mouse, viewport: vp },
-  { ball, pad, bricks },
-) {
-  return { ball, pad, bricks }
+const abs = Math.abs
+const absNeg = R.compose(
+  R.negate,
+  abs,
+)
+const mul = R.multiply
+const add = R.add
+const cos = Math.cos
+const sin = Math.sin
+const sqrt = Math.sqrt
+const atan2 = Math.atan2
+
+function fromPolar(radius, theta) {
+  return [mul(radius, cos(theta)), mul(radius, sin(theta))]
+}
+
+function toPolar(x, y) {
+  return [sqrt(add(mul(x, x), mul(y, y))), atan2(y, x)]
+}
+
+function degrees(angle) {
+  return (angle * Math.PI) / 180
+}
+
+function rectExtrema({ x, y, w, h }) {
+  return { minX: x, minY: y, maxX: x + w, maxY: y + h }
+}
+
+function ballViewportCollision(ball, vp) {
+  const { minX, minY, maxX, maxY } = rectExtrema(vp)
+  const [x, y] = [ball.x + ball.vx, ball.y + ball.vy]
+
+  const xParts =
+    x < minX
+      ? { x: minX, vx: abs(ball.vx) }
+      : x > maxX
+      ? { x: maxX, vx: absNeg(ball.vx) }
+      : {}
+  const yParts =
+    y < minY
+      ? { y: minY, vy: abs(ball.vy) }
+      : y > maxY
+      ? { y: maxY, vy: absNeg(ball.vy) }
+      : {}
+
+  return Object.assign({}, xParts, yParts)
+}
+
+function translateByVelocity(obj) {
+  return R.mergeDeepLeft({ x: obj.x + obj.vx, y: obj.y + obj.vy })(obj)
+}
+
+function updateBallPaddleBricks({ vp }, { ball, pad, bricks }) {
+  const ballVPRes = ballViewportCollision(ball, vp)
+  let res = { ball, pad, bricks }
+
+  if (R.isEmpty(ballVPRes)) {
+    // TODO
+    res = R.mergeDeepLeft({ ball: translateByVelocity(res.ball) })(res)
+  } else {
+    res = R.mergeDeepLeft({ ball: ballVPRes })(res)
+  }
+
+  return res
 }
 
 startGame({
   init({ mouse, viewport }) {
-    const vp = { w: viewport.size.width, h: viewport.size.height }
+    const vp = {
+      x: 0,
+      y: 0,
+      w: viewport.size.width,
+      h: viewport.size.height,
+    }
     return {
       follower: Follower.init(mouse.at),
       follower2: Follower2.init(mouse.at),
@@ -181,12 +246,19 @@ startGame({
     }
   },
   update(deps, state) {
-    const { mouse } = deps
+    const { mouse, viewport } = deps
+    const vp = {
+      x: 0,
+      y: 0,
+      w: viewport.size.width,
+      h: viewport.size.height,
+    }
+    const deps2 = { vp }
     return {
       ...state,
       follower: state.follower.update(mouse),
       follower2: Follower2.update(mouse, state.follower2),
-      ...updateBallPaddleBricks(deps, state),
+      ...updateBallPaddleBricks(deps2, state),
     }
   },
   render(draw, { follower, follower2, ball, pad, bricks }) {
