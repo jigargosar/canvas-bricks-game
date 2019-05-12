@@ -134,8 +134,8 @@ function startGame(cbs) {
 }
 
 function initBall(vp) {
-  const [vx, vy] = fromPolar(4, degrees(99))
-  return { x: vp.w / 2, y: vp.h / 2, r: 30, vx, vy }
+  const [vx, vy] = fromPolar(1, degrees(100))
+  return { x: vp.w / 2, y: vp.h / 2, r: 5, vx, vy }
 }
 
 function renderBall(ctx, { x, y, r }) {
@@ -295,20 +295,43 @@ function bounceBallOffPaddle(pad, ball_) {
 
 function updateBallPaddleBricks({ vp }, state) {
   const { ball, pad, bricks } = state
-  const ballChangesFns = [
-    () => bounceCircleWithinRect(vp, ball),
-    () => bounceBallOffPaddle(pad, ball),
-    () => translateByVelocity(ball),
-  ]
 
-  const changes = { ball: findFirstNonEmptyResult(ballChangesFns) }
+  const ballBrickCollision = () =>
+    bricks.reduce((acc, b, idx) => {
+      if (!b.alive) return {}
+      if (!R.isEmpty(acc)) return R.reduced(acc)
+      const ballChanges = bounceBallOffPaddle(b, ball)
+      if (R.isEmpty(ballChanges)) {
+        return {}
+      } else {
+        return R.reduced({
+          ball: ballChanges,
+          bricks: R.update(idx, { ...b, alive: false }, bricks),
+        })
+      }
+    }, {})
+
+  const ballPaddleVPCollision = () => {
+    const ballChangesFns = [
+      () => bounceCircleWithinRect(vp, ball),
+      () => bounceBallOffPaddle(pad, ball),
+      () => translateByVelocity(ball),
+    ]
+
+    return { ball: findFirstNonEmptyResult(ballChangesFns) }
+  }
+
+  const changes = findFirstNonEmptyResult([
+    ballBrickCollision,
+    ballPaddleVPCollision,
+  ])
 
   return R.mergeDeepLeft(changes, state)
 
   function findFirstNonEmptyResult(fns) {
     return R.reduce((acc, fn) => (R.isEmpty(acc) ? fn() : R.reduced(acc)))(
       {},
-    )(ballChangesFns)
+    )(fns)
   }
 }
 
