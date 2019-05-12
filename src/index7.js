@@ -4,6 +4,38 @@ import './index.css'
 import { Draw, Point, canvasToRect, Follower, Follower2 } from './main7'
 import * as R from 'ramda'
 
+//#region UTILS
+function invariant(pred, msg = 'invariant failed') {
+  if (!pred) {
+    throw new Error(msg)
+  }
+}
+const abs = Math.abs
+const absNeg = R.compose(
+  R.negate,
+  abs,
+)
+const mul = R.multiply
+const add = R.add
+const cos = Math.cos
+const sin = Math.sin
+const sqrt = Math.sqrt
+const atan2 = Math.atan2
+
+function fromPolar(radius, theta) {
+  return [mul(radius, cos(theta)), mul(radius, sin(theta))]
+}
+
+function toPolar(x, y) {
+  return [sqrt(add(mul(x, x), mul(y, y))), atan2(y, x)]
+}
+
+function degrees(angle) {
+  return (angle * Math.PI) / 180
+}
+
+//#endregion UTILS
+
 function initCanvas() {
   const canvas = document.getElementById('gameScreen')
   const ctx = canvas.getContext('2d')
@@ -163,36 +195,25 @@ function renderBricks(ctx, bricks) {
     .forEach(({ x, y, w, h }) => ctx.fillRect(x, y, w, h))
 }
 
-const abs = Math.abs
-const absNeg = R.compose(
-  R.negate,
-  abs,
-)
-const mul = R.multiply
-const add = R.add
-const cos = Math.cos
-const sin = Math.sin
-const sqrt = Math.sqrt
-const atan2 = Math.atan2
-
-function fromPolar(radius, theta) {
-  return [mul(radius, cos(theta)), mul(radius, sin(theta))]
-}
-
-function toPolar(x, y) {
-  return [sqrt(add(mul(x, x), mul(y, y))), atan2(y, x)]
-}
-
-function degrees(angle) {
-  return (angle * Math.PI) / 180
-}
-
 function rectExtrema({ x, y, w, h }) {
   return { minX: x, minY: y, maxX: x + w, maxY: y + h }
 }
 
+function shrinkRectByCircle(circle, rect) {
+  const radius = circle.r
+  const dia = radius * 2
+  const w = rect.w - dia
+  const h = rect.h - dia
+  invariant(w >= 0 && h >= 0)
+  const x = rect.x + radius
+  const y = rect.y + radius
+  return R.mergeDeepLeft({ x, y, w, h }, rect)
+}
+
 function ballViewportCollision(ball, vp) {
-  const { minX, minY, maxX, maxY } = rectExtrema(vp)
+  const { minX, minY, maxX, maxY } = rectExtrema(
+    shrinkRectByCircle(ball, vp),
+  )
   const [x, y] = [ball.x + ball.vx, ball.y + ball.vy]
 
   const xParts =
