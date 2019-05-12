@@ -134,7 +134,7 @@ function startGame(cbs) {
 }
 
 function initBall(vp) {
-  const [vx, vy] = fromPolar(12, degrees(99))
+  const [vx, vy] = fromPolar(4, degrees(99))
   return { x: vp.w / 2, y: vp.h / 2, r: 30, vx, vy }
 }
 
