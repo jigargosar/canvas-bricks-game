@@ -210,7 +210,7 @@ function shrinkRectByCircle(circle, rect) {
   return R.mergeDeepLeft({ x, y, w, h }, rect)
 }
 
-function ballViewportCollision(ball, vp) {
+function bounceCircleInRect(ball, vp) {
   const { minX, minY, maxX, maxY } = rectExtrema(
     shrinkRectByCircle(ball, vp),
   )
@@ -237,7 +237,7 @@ function translateByVelocity(obj) {
 }
 
 function updateBallPaddleBricks({ vp }, { ball, pad, bricks }) {
-  const ballVPRes = ballViewportCollision(ball, vp)
+  const ballVPRes = bounceCircleInRect(ball, vp)
   let res = { ball, pad, bricks }
 
   if (R.isEmpty(ballVPRes)) {
