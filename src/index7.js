@@ -116,7 +116,7 @@ function rectCenter({ x, y, w, h }) {
   return { x: x + w / 2, y: y + h / 2 }
 }
 
-function constrainRectIn(big, small) {
+function clampRectInRect(big, small) {
   invariant(small.w < big.w && small.h < big.h)
 
   return {
@@ -250,24 +250,21 @@ startGame({
 
 function updatePaddle({ key, vp }, state) {
   const updateVel = pad => {
-    const paddleSpeed = 2
-    const vx = key.left ? -paddleSpeed : key.right ? paddleSpeed : 0
-    return R.assoc('vx')(vx)(pad)
+    const dx = 2
+    return { ...pad, vx: key.left ? -dx : key.right ? dx : 0 }
   }
 
-  const updater = R.over(
-    R.lensProp('pad'),
-    R.compose(
-      small => constrainRectIn(vp, small),
-      translateByVelocity,
-      updateVel,
-    ),
+  const update = R.compose(
+    small => clampRectInRect(vp, small),
+    translateByVelocity,
+    updateVel,
   )
-
-  const newState = updater(state)
-  invariant(!R.isEmpty(newState.pad))
-  return newState
+  return overProp('pad')(update)(state)
 }
+
+const overProp = R.curry(function overProp_(prop, fn, obj) {
+  return R.over(R.lensProp(prop))(fn)(obj)
+})
 
 function updateBallPaddleBricks({ vp }, state) {
   const { ball, pad, bricks } = state
