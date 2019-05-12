@@ -274,18 +274,14 @@ function updateBallPaddleBricks({ vp }, state) {
   const { ball, pad, bricks } = state
 
   const ballBrickCollision = () => {
-    return bricks.reduce((acc, b, idx) => {
-      if (!R.isEmpty(acc) || !b.alive) return acc
+    return bricks.reduce((acc, brick, idx) => {
+      if (!R.isEmpty(acc) || !brick.alive) return acc
 
-      const ballChanges = bounceCircleOffRect(b, ball)
-      if (R.isEmpty(ballChanges)) {
-        return {}
-      } else {
-        return {
-          ball: ballChanges,
-          bricks: R.update(idx, { ...b, alive: false }, bricks),
-        }
-      }
+      const ballChanges = bounceCircleOffRect(brick, ball)
+      return R.unless(R.isEmpty)(() => ({
+        ball: ballChanges,
+        bricks: R.update(idx, { ...brick, alive: false }, bricks),
+      }))(ballChanges)
     }, {})
   }
 
