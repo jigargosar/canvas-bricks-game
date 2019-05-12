@@ -74,28 +74,6 @@ const Key = function initKeyboard() {
   }
 }
 
-const Mouse = function initMouse(canvas) {
-  const canvasRect = canvasToRect(canvas)
-  let point = canvasRect.center
-  window.addEventListener('mousemove', e => {
-    point = Point.fromXY(
-      e.pageX - canvas.offsetLeft,
-      e.pageY - canvas.offsetTop,
-    )
-  })
-  return {
-    get at() {
-      return point
-    },
-    get x() {
-      return point.x
-    },
-    get y() {
-      return point.y
-    },
-  }
-}
-
 function useState(initial) {
   let state = initial
   return {
@@ -115,21 +93,17 @@ function startGame(cbs) {
   const { init, update, render } = cbs
 
   const ctx = initCanvas()
-  const draw = Draw.fromCtx(ctx)
+  const vp = { x: 0, y: 0, w: ctx.canvas.width, h: ctx.canvas.height }
+  const key = Key()
 
-  const updateDeps = {
-    mouse: Mouse(ctx.canvas),
-    viewport: draw.rect,
-    key: Key(),
-  }
-
-  const box = useState(init(updateDeps))
+  const box = useState(init({ vp }))
 
   gameLoop(() => {
-    box.mapState(s => update(updateDeps, s))
-    draw.clear()
+    box.mapState(s => update({ key, vp }, s))
 
-    render(draw, box.state)
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+
+    render(ctx, box.state)
   })
 }
 
@@ -247,10 +221,6 @@ function translateByVelocity(obj) {
   return R.mergeDeepLeft({ x: obj.x + obj.vx, y: obj.y + obj.vy })(obj)
 }
 
-function rectCenter({ x, y, w, h }) {
-  return { x: x + w / 2, y: y + h / 2 }
-}
-
 function isCircleInterSectingWithRect(circle, rect) {
   const { minX, minY, maxX, maxY } = rectExtrema(
     growRectByCircle(circle, rect),
@@ -338,41 +308,22 @@ function updateBallPaddleBricks({ vp }, state) {
 }
 
 startGame({
-  init({ mouse, viewport }) {
-    const vp = {
-      x: 0,
-      y: 0,
-      w: viewport.size.width,
-      h: viewport.size.height,
-    }
+  init({ vp }) {
     return {
-      follower: Follower.init(mouse.at),
-      follower2: Follower2.init(mouse.at),
       ball: initBall(vp),
       pad: initPaddle(vp),
       bricks: initBricks(vp),
     }
   },
   update(deps, state) {
-    const { mouse, viewport } = deps
-    const vp = {
-      x: 0,
-      y: 0,
-      w: viewport.size.width,
-      h: viewport.size.height,
-    }
-    const deps2 = { vp }
     return {
       ...state,
-      follower: state.follower.update(mouse),
-      follower2: Follower2.update(mouse, state.follower2),
-      ...updateBallPaddleBricks(deps2, state),
+      ...updateBallPaddleBricks(deps, state),
     }
   },
-  render(draw, { follower, follower2, ball, pad, bricks }) {
+  render(ctx, { ball, pad, bricks }) {
     // follower.render(draw)
     // Follower2.render(draw, follower2)
-    const ctx = draw.ctx
     renderBall(ctx, ball)
     renderPaddle(ctx, pad)
     renderBricks(ctx, bricks)
