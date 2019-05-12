@@ -36,17 +36,6 @@ function degrees(angle) {
 
 //#endregion UTILS
 
-function initCanvas() {
-  const canvas = document.getElementById('gameScreen')
-  const ctx = canvas.getContext('2d')
-  Object.assign(canvas, {
-    width: 400,
-    height: 400,
-    className: 'db center ba',
-  })
-  return ctx
-}
-
 function gameLoop(step) {
   const callback = () => {
     step()
@@ -89,21 +78,24 @@ function useState(initial) {
   }
 }
 
-function startGame(cbs) {
-  const { init, update, render } = cbs
+function startGame({ init, update, render }) {
+  const canvas = document.getElementById('gameScreen')
+  const ctx = canvas.getContext('2d')
+  Object.assign(canvas, {
+    width: 400,
+    height: 400,
+    className: 'db center ba',
+  })
 
-  const ctx = initCanvas()
-  const vp = { x: 0, y: 0, w: ctx.canvas.width, h: ctx.canvas.height }
+  const vp = { x: 0, y: 0, w: canvas.width, h: canvas.height }
   const key = Key()
 
-  const box = useState(init({ vp }))
+  let state = init({ vp })
 
   gameLoop(() => {
-    box.mapState(s => update({ key, vp }, s))
-
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-
-    render(ctx, box.state)
+    state = update({ key, vp }, state)
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    render(ctx, state)
   })
 }
 
