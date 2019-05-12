@@ -210,23 +210,23 @@ function shrinkRectByCircle(circle, rect) {
   return R.mergeDeepLeft({ x, y, w, h }, rect)
 }
 
-function bounceCircleInRect(ball, vp) {
+function bounceCircleWithinRect(circle, rect) {
   const { minX, minY, maxX, maxY } = rectExtrema(
-    shrinkRectByCircle(ball, vp),
+    shrinkRectByCircle(circle, rect),
   )
-  const [x, y] = [ball.x + ball.vx, ball.y + ball.vy]
+  const [x, y] = [circle.x + circle.vx, circle.y + circle.vy]
 
   const xParts =
     x < minX
-      ? { x: minX, vx: abs(ball.vx) }
+      ? { x: minX, vx: abs(circle.vx) }
       : x > maxX
-      ? { x: maxX, vx: absNeg(ball.vx) }
+      ? { x: maxX, vx: absNeg(circle.vx) }
       : {}
   const yParts =
     y < minY
-      ? { y: minY, vy: abs(ball.vy) }
+      ? { y: minY, vy: abs(circle.vy) }
       : y > maxY
-      ? { y: maxY, vy: absNeg(ball.vy) }
+      ? { y: maxY, vy: absNeg(circle.vy) }
       : {}
 
   return Object.assign({}, xParts, yParts)
@@ -237,7 +237,7 @@ function translateByVelocity(obj) {
 }
 
 function updateBallPaddleBricks({ vp }, { ball, pad, bricks }) {
-  const ballVPRes = bounceCircleInRect(ball, vp)
+  const ballVPRes = bounceCircleWithinRect(ball, vp)
   let res = { ball, pad, bricks }
 
   if (R.isEmpty(ballVPRes)) {
