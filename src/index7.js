@@ -251,7 +251,7 @@ function rectCenter({ x, y, w, h }) {
   return { x: x + w / 2, y: y + h / 2 }
 }
 
-function circleRectHitTest(circle, rect) {
+function isCircleInterSectingWithRect(circle, rect) {
   const { minX, minY, maxX, maxY } = rectExtrema(
     growRectByCircle(circle, rect),
   )
@@ -263,7 +263,7 @@ function circleRectHitTest(circle, rect) {
 
 function bounceBallOffPaddle(pad, ball_) {
   const ball = translateByVelocity(ball_)
-  if (!circleRectHitTest(ball, pad)) return {}
+  if (!isCircleInterSectingWithRect(ball, pad)) return {}
 
   const rc = rectCenter(pad)
   const dx = rc.x - ball.x
@@ -287,7 +287,7 @@ function bounceBallOffPaddle(pad, ball_) {
 
   const newB = R.mergeDeepLeft(changes, ball)
   const newTB = translateByVelocity(newB)
-  if (!circleRectHitTest(newTB, pad)) {
+  if (isCircleInterSectingWithRect(newTB, pad)) {
     debugger
   }
   return changes
