@@ -261,11 +261,22 @@ startGame({
   },
 })
 
-function updatePaddle({ key }, state) {
-  const paddleSpeed = 2
-  const vx = key.left ? -paddleSpeed : key.right ? paddleSpeed : 0
-  const changes = { x: state.pad.x + vx, vx }
-  return R.mergeDeepLeft({ pad: changes }, state)
+function updatePaddle({ key, vp }, state) {
+  const updatePadVel = pad => {
+    const paddleSpeed = 2
+    const vx = key.left ? -paddleSpeed : key.right ? paddleSpeed : 0
+    return R.mergeDeepLeft({ x: pad.x + vx, vx }, pad)
+  }
+
+  const updater = R.over(
+    R.lensProp('pad'),
+    R.compose(
+      //
+      updatePadVel,
+    ),
+  )
+
+  return updater(state)
 }
 
 function updateBallPaddleBricks({ vp }, state) {
