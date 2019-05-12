@@ -118,25 +118,12 @@ function rectCenter({ x, y, w, h }) {
 
 function constrainRectIn(big, small) {
   invariant(small.w < big.w && small.h < big.h)
-  const extrema = rectExtrema({
-    ...big,
-    w: big.w - small.w,
-    h: big.h - small.h,
-  })
-  const smallCenter = rectCenter(small)
 
-  if (!isPointInBounds(smallCenter, extrema)) return {}
-
-  const { minX, maxX, minY, maxY } = extrema
-  const { x, y } = smallCenter
-
-  const dx = x < minX ? minX - x : x > maxX ? maxX - x : 0
-  const dy = y < minY ? minY - y : y > maxY ? maxY - y : 0
-
-  const xChanges = dx === 0 ? {} : { x: small.x + dx }
-  const yChanges = dy === 0 ? {} : { y: small.y + dy }
-
-  return R.mergeAll([xChanges, yChanges])
+  return {
+    ...small,
+    x: R.clamp(big.x, big.w - small.w, small.x),
+    y: R.clamp(big.y, big.h - small.h, small.y),
+  }
 }
 
 //#endregion GEOM
@@ -271,13 +258,15 @@ function updatePaddle({ key, vp }, state) {
   const updater = R.over(
     R.lensProp('pad'),
     R.compose(
-      //
+      small => constrainRectIn(vp, small),
       translateByVelocity,
       updateVel,
     ),
   )
 
-  return updater(state)
+  const newState = updater(state)
+  invariant(!R.isEmpty(newState.pad))
+  return newState
 }
 
 function updateBallPaddleBricks({ vp }, state) {
