@@ -210,6 +210,17 @@ function shrinkRectByCircle(circle, rect) {
   return R.mergeDeepLeft({ x, y, w, h }, rect)
 }
 
+function growRectByCircle(circle, rect) {
+  const radius = circle.r
+  const dia = radius * 2
+  const w = rect.w + dia
+  const h = rect.h + dia
+
+  const x = rect.x - radius
+  const y = rect.y - radius
+  return R.mergeDeepLeft({ x, y, w, h }, rect)
+}
+
 function bounceCircleWithinRect(circle, rect) {
   const { minX, minY, maxX, maxY } = rectExtrema(
     shrinkRectByCircle(circle, rect),
@@ -236,7 +247,45 @@ function translateByVelocity(obj) {
   return R.mergeDeepLeft({ x: obj.x + obj.vx, y: obj.y + obj.vy })(obj)
 }
 
-function ballPaddleCollision(ball, pad) {}
+function rectCenter({ x, y, w, h }) {
+  return { x: x + w / 2, y: y + h / 2 }
+}
+
+function circleRectHitTest(circle, rect) {
+  const { minX, minY, maxX, maxY } = rectExtrema(
+    growRectByCircle(circle, rect),
+  )
+
+  const { x, y } = circle
+
+  return x >= minX && x <= maxX && y >= minY && y <= maxY
+}
+
+function ballPaddleCollision(ball_, pad) {
+  const ball = translateByVelocity(ball_)
+  if (!circleRectHitTest(ball, pad)) return {}
+
+  const { x, y } = translateByVelocity(ball)
+  const rc = rectCenter(pad)
+  const dx = rc.x - ball.x
+  const dy = rc.y - ball.y
+
+  const lenX = abs(dx)
+  const lenY = abs(dy)
+
+  const { minX, minY, maxX, maxY } = rectExtrema(
+    growRectByCircle(ball, pad),
+  )
+
+  return lenX > lenY
+    ? ball_.x < ball.x
+      ? { x: minX - 1, vx: absNeg(ball.vx) }
+      : { x: maxX + 1, vx: abs(ball.vx) }
+    : /* lenX < lenY else corners */
+    ball_.y < ball.y
+    ? { y: minY - 1, vy: absNeg(ball.vy) }
+    : { y: maxY + 1, vy: abs(ball.vy) }
+}
 
 function updateBallPaddleBricks({ vp }, { ball, pad, bricks }) {
   const ballVPRes = bounceCircleWithinRect(ball, vp)
@@ -245,7 +294,11 @@ function updateBallPaddleBricks({ vp }, { ball, pad, bricks }) {
   if (R.isEmpty(ballVPRes)) {
     // TODO
     const ballPadRes = ballPaddleCollision(ball, pad)
-    res = R.mergeDeepLeft({ ball: translateByVelocity(res.ball) })(res)
+    if (R.isEmpty(ballPadRes)) {
+      res = R.mergeDeepLeft({ ball: translateByVelocity(res.ball) })(res)
+    } else {
+      res = R.mergeDeepLeft({ ball: ballPadRes })(res)
+    }
   } else {
     res = R.mergeDeepLeft({ ball: ballVPRes })(res)
   }
