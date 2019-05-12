@@ -221,7 +221,7 @@ function growRectByCircle(circle, rect) {
   return R.mergeDeepLeft({ x, y, w, h }, rect)
 }
 
-function bounceCircleWithinRect(circle, rect) {
+function bounceCircleWithinRect(rect, circle) {
   const { minX, minY, maxX, maxY } = rectExtrema(
     shrinkRectByCircle(circle, rect),
   )
@@ -261,7 +261,7 @@ function circleRectHitTest(circle, rect) {
   return x >= minX && x <= maxX && y >= minY && y <= maxY
 }
 
-function ballPaddleCollision(ball_, pad) {
+function bounceBallOffPaddle(pad, ball_) {
   const ball = translateByVelocity(ball_)
   if (!circleRectHitTest(ball, pad)) return {}
 
@@ -288,12 +288,12 @@ function ballPaddleCollision(ball_, pad) {
 }
 
 function updateBallPaddleBricks({ vp }, { ball, pad, bricks }) {
-  const ballVPRes = bounceCircleWithinRect(ball, vp)
+  const ballVPRes = bounceCircleWithinRect(vp, ball)
   let res = { ball, pad, bricks }
 
   if (R.isEmpty(ballVPRes)) {
     // TODO
-    const ballPadRes = ballPaddleCollision(ball, pad)
+    const ballPadRes = bounceBallOffPaddle(pad, ball)
     if (R.isEmpty(ballPadRes)) {
       res = R.mergeDeepLeft({ ball: translateByVelocity(res.ball) })(res)
     } else {
