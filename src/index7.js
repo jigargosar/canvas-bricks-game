@@ -268,8 +268,8 @@ function bounceBallOffPaddle(pad, ball_) {
   // const dx = ball_.x - ball.x
   // const dy = ball_.y - ball.y
 
-  const lenX = abs(ball.dx)
-  const lenY = abs(ball.dy)
+  const lenX = abs(ball.vx)
+  const lenY = abs(ball.vy)
 
   const { minX, minY, maxX, maxY } = rectExtrema(
     growRectByCircle(ball, pad),
@@ -295,20 +295,21 @@ function bounceBallOffPaddle(pad, ball_) {
 function updateBallPaddleBricks({ vp }, state) {
   const { ball, pad, bricks } = state
 
-  const ballBrickCollision = () =>
-    bricks.reduce((acc, b, idx) => {
-      if (!b.alive) return {}
-      if (!R.isEmpty(acc)) return R.reduced(acc)
+  const ballBrickCollision = () => {
+    return bricks.reduce((acc, b, idx) => {
+      if (!R.isEmpty(acc) || !b.alive) return acc
+
       const ballChanges = bounceBallOffPaddle(b, ball)
       if (R.isEmpty(ballChanges)) {
         return {}
       } else {
-        return R.reduced({
+        return {
           ball: ballChanges,
           bricks: R.update(idx, { ...b, alive: false }, bricks),
-        })
+        }
       }
     }, {})
+  }
 
   const ballPaddleVPCollision = () => {
     const ballChangesFns = [
@@ -328,9 +329,11 @@ function updateBallPaddleBricks({ vp }, state) {
   return R.mergeDeepLeft(changes, state)
 
   function findFirstNonEmptyResult(fns) {
-    return R.reduce((acc, fn) => (R.isEmpty(acc) ? fn() : R.reduced(acc)))(
-      {},
-    )(fns)
+    return fns.reduce((acc, fn) => {
+      if (!R.isEmpty(acc)) return acc
+
+      return fn()
+    }, {})
   }
 }
 
