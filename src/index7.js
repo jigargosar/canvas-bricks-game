@@ -265,7 +265,6 @@ function bounceBallOffPaddle(pad, ball_) {
   const ball = translateByVelocity(ball_)
   if (!circleRectHitTest(ball, pad)) return {}
 
-  const { x, y } = translateByVelocity(ball)
   const rc = rectCenter(pad)
   const dx = rc.x - ball.x
   const dy = rc.y - ball.y
@@ -276,34 +275,39 @@ function bounceBallOffPaddle(pad, ball_) {
   const { minX, minY, maxX, maxY } = rectExtrema(
     growRectByCircle(ball, pad),
   )
+  const changes =
+    lenX > lenY
+      ? ball_.x < ball.x
+        ? { x: minX - 1, y: ball.y, vx: absNeg(ball.vx) }
+        : { x: maxX + 1, y: ball.y, vx: abs(ball.vx) }
+      : /* lenX < lenY else corners */
+      ball_.y < ball.y
+      ? { y: minY - 1, x: ball.x, vy: absNeg(ball.vy) }
+      : { y: maxY + 1, x: ball.x, vy: abs(ball.vy) }
 
-  return lenX > lenY
-    ? ball_.x < ball.x
-      ? { x: minX - 1, vx: absNeg(ball.vx) }
-      : { x: maxX + 1, vx: abs(ball.vx) }
-    : /* lenX < lenY else corners */
-    ball_.y < ball.y
-    ? { y: minY - 1, vy: absNeg(ball.vy) }
-    : { y: maxY + 1, vy: abs(ball.vy) }
+  const newB = R.mergeDeepLeft(changes, ball)
+  const newTB = translateByVelocity(newB)
+  if (!circleRectHitTest(newTB, pad)) {
+    debugger
+  }
+  return changes
 }
 
-function updateBallPaddleBricks({ vp }, { ball, pad, bricks }) {
-  const ballVPRes = bounceCircleWithinRect(vp, ball)
-  let res = { ball, pad, bricks }
+function updateBallPaddleBricks({ vp }, state) {
+  const { ball, pad, bricks } = state
+  const fns = [
+    () =>
+      R.unless(R.empty)(R.objOf('ball'))(bounceCircleWithinRect(vp, ball)),
+    () =>
+      R.unless(R.empty)(R.objOf('ball'))(bounceBallOffPaddle(pad, ball)),
+    () => ({ ball: translateByVelocity(ball) }),
+  ]
 
-  if (R.isEmpty(ballVPRes)) {
-    // TODO
-    const ballPadRes = bounceBallOffPaddle(pad, ball)
-    if (R.isEmpty(ballPadRes)) {
-      res = R.mergeDeepLeft({ ball: translateByVelocity(res.ball) })(res)
-    } else {
-      res = R.mergeDeepLeft({ ball: ballPadRes })(res)
-    }
-  } else {
-    res = R.mergeDeepLeft({ ball: ballVPRes })(res)
-  }
+  const changes = R.reduce((acc, fn) =>
+    R.isEmpty(acc) ? fn() : R.reduced(acc),
+  )({})(fns)
 
-  return res
+  return R.mergeDeepLeft(changes, state)
 }
 
 startGame({
