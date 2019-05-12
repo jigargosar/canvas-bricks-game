@@ -1,7 +1,6 @@
 /* eslint-disable no-debugger */
 import 'tachyons'
 import './index.css'
-import { Draw, Point, canvasToRect, Follower, Follower2 } from './main7'
 import * as R from 'ramda'
 
 //#region UTILS
@@ -112,9 +111,6 @@ function bounceCircleOffRect(rect, cir_) {
 
   return changes
 }
-function rectCenter({ x, y, w, h }) {
-  return { x: x + w / 2, y: y + h / 2 }
-}
 
 function clampRectInRect(big, small) {
   invariant(small.w < big.w && small.h < big.h)
@@ -127,6 +123,18 @@ function clampRectInRect(big, small) {
 }
 
 //#endregion GEOM
+
+//#region RENDER
+const fillRect = R.curry(function fillRect_(ctx, { x, y, w, h }) {
+  return ctx.fillRect(x, y, w, h)
+})
+
+const fillCircle = R.curry(function fillRect_(ctx, { x, y, r }) {
+  ctx.beginPath()
+  ctx.arc(x, y, r, 0, degrees(360), false)
+  ctx.fill()
+})
+//#endregion
 
 const Key = function initKeyboard() {
   const km = {}
@@ -175,11 +183,9 @@ function initBall(vp) {
   return { x: vp.w / 2, y: vp.h / 2, r: 10, vx, vy }
 }
 
-function renderBall(ctx, { x, y, r }) {
-  ctx.beginPath()
-  ctx.arc(x, y, r, 0, 2 * Math.PI, false)
+function renderBall(ctx, ball) {
   ctx.fillStyle = 'green'
-  ctx.fill()
+  fillCircle(ctx, ball)
 }
 
 function initPaddle(vp) {
@@ -221,9 +227,6 @@ function initBricks(vp) {
     }
   }
 }
-const fillRect = R.curry(function fillRect_(ctx, { x, y, w, h }) {
-  return ctx.fillRect(x, y, w, h)
-})
 
 function renderBricks(ctx, bricks) {
   ctx.fillStyle = 'dodgerblue'
