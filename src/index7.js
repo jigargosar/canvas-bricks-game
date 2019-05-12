@@ -103,17 +103,11 @@ function bounceCircleOffRect(rect, cir_) {
   const cir = translateByVelocity(cir_)
   if (!isCircleInterSectingWithRect(cir, rect)) return {}
 
-  // const dx = ball_.x - ball.x
-  // const dy = ball_.y - ball.y
-
-  const lenX = abs(cir.vx)
-  const lenY = abs(cir.vy)
-
   const { minX, minY, maxX, maxY } = rectExtrema(
     growRectByCircle(cir, rect),
   )
   const changes =
-    lenX > lenY
+    abs(cir.vx) > abs(cir.vy)
       ? cir_.x < cir.x
         ? { x: minX - 1, y: cir.y, vx: absNeg(cir.vx) }
         : { x: maxX + 1, y: cir.y, vx: abs(cir.vx) }
