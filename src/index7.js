@@ -301,8 +301,7 @@ function updateBallPaddleBricks({ vp }, state) {
         bounceCircleWithinRect(vp, ball),
       ),
     () =>
-      R.unless(R.isEmpty, R.objOf('ball'), bounceBallOffPaddle(pad, ball)),
-
+      R.unless(R.isEmpty)(R.objOf('ball'))(bounceBallOffPaddle(pad, ball)),
     () => ({ ball: translateByVelocity(ball) }),
   ]
 
