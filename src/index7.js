@@ -95,11 +95,11 @@ function isPointInBounds({ x, y }, { minX, minY, maxX, maxY }) {
 
 function bounceCircleOffRect(rect, cir_) {
   const cir = translateByVelocity(cir_)
-  const rectEx = rectExtrema(growRectByCircle(cir, rect))
+  const extrema = rectExtrema(growRectByCircle(cir, rect))
 
-  if (!isPointInBounds(cir, rectEx)) return {}
+  if (!isPointInBounds(cir, extrema)) return {}
 
-  const { minX, minY, maxX, maxY } = rectEx
+  const { minX, minY, maxX, maxY } = extrema
   const changes =
     abs(cir.vx) > abs(cir.vy)
       ? cir_.x < cir.x
