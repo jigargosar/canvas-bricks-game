@@ -273,17 +273,7 @@ const overProp = R.curry(function overProp_(prop, fn, obj) {
 function updateBallPaddleBricks({ vp }, state) {
   const { ball, pad, bricks } = state
 
-  const ballBrickCollision = () => {
-    return bricks.reduce((acc, brick, idx) => {
-      if (!R.isEmpty(acc) || !brick.alive) return acc
-
-      const ballChanges = bounceCircleOffRect(brick, ball)
-      return R.unless(R.isEmpty)(() => ({
-        ball: ballChanges,
-        bricks: R.update(idx, { ...brick, alive: false }, bricks),
-      }))(ballChanges)
-    }, {})
-  }
+  const ballBrickCollision = () => bbc(bricks, ball)
 
   const ballPaddleVPCollision = () => {
     const ballChangesFns = [
@@ -309,4 +299,14 @@ function updateBallPaddleBricks({ vp }, state) {
       return fn()
     }, {})
   }
+}
+
+function bbc(bricks, ball) {
+  return bricks.reduce((acc, brick, idx) => {
+    if (!R.isEmpty(acc) || !brick.alive) return acc
+    return R.unless(R.isEmpty)(ballChanges => ({
+      ball: ballChanges,
+      bricks: R.update(idx, { ...brick, alive: false }, bricks),
+    }))(bounceCircleOffRect(brick, ball))
+  }, {})
 }
