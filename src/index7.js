@@ -229,7 +229,7 @@ function bounceCircleWithinRect(circle, rect) {
       ? { y: maxY, vy: absNeg(circle.vy) }
       : {}
 
-  return Object.assign({}, xParts, yParts)
+  return R.mergeDeepLeft(xParts, yParts)
 }
 
 function translateByVelocity(obj) {
