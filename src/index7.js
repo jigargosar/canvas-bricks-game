@@ -112,6 +112,32 @@ function bounceCircleOffRect(rect, cir_) {
 
   return changes
 }
+function rectCenter({ x, y, w, h }) {
+  return { x: x + w / 2, y: y + h / 2 }
+}
+
+function constrainRectIn(big, small) {
+  invariant(small.w < big.w && small.h < big.h)
+  const extrema = rectExtrema({
+    ...big,
+    w: big.w - small.w,
+    h: big.h - small.h,
+  })
+  const smallCenter = rectCenter(small)
+
+  if (!isPointInBounds(smallCenter, extrema)) return {}
+
+  const { minX, maxX, minY, maxY } = extrema
+  const { x, y } = smallCenter
+
+  const dx = x < minX ? minX - x : x > maxX ? maxX - x : 0
+  const dy = y < minY ? minY - y : y > maxY ? maxY - y : 0
+
+  const xChanges = dx === 0 ? {} : { x: small.x + dx }
+  const yChanges = dy === 0 ? {} : { y: small.y + dy }
+
+  return R.mergeAll([xChanges, yChanges])
+}
 
 //#endregion GEOM
 
