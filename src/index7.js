@@ -99,34 +99,29 @@ function isCircleInterSectingWithRect(circle, rect) {
   return x >= minX && x <= maxX && y >= minY && y <= maxY
 }
 
-function bounceBallOffPaddle(pad, ball_) {
-  const ball = translateByVelocity(ball_)
-  if (!isCircleInterSectingWithRect(ball, pad)) return {}
+function bounceCircleOffRect(rect, cir_) {
+  const cir = translateByVelocity(cir_)
+  if (!isCircleInterSectingWithRect(cir, rect)) return {}
 
   // const dx = ball_.x - ball.x
   // const dy = ball_.y - ball.y
 
-  const lenX = abs(ball.vx)
-  const lenY = abs(ball.vy)
+  const lenX = abs(cir.vx)
+  const lenY = abs(cir.vy)
 
   const { minX, minY, maxX, maxY } = rectExtrema(
-    growRectByCircle(ball, pad),
+    growRectByCircle(cir, rect),
   )
   const changes =
     lenX > lenY
-      ? ball_.x < ball.x
-        ? { x: minX - 1, y: ball.y, vx: absNeg(ball.vx) }
-        : { x: maxX + 1, y: ball.y, vx: abs(ball.vx) }
+      ? cir_.x < cir.x
+        ? { x: minX - 1, y: cir.y, vx: absNeg(cir.vx) }
+        : { x: maxX + 1, y: cir.y, vx: abs(cir.vx) }
       : /* lenX < lenY else corners */
-      ball_.y < ball.y
-      ? { y: minY - 1, x: ball.x, vy: absNeg(ball.vy) }
-      : { y: maxY + 1, x: ball.x, vy: abs(ball.vy) }
+      cir_.y < cir.y
+      ? { y: minY - 1, x: cir.x, vy: absNeg(cir.vy) }
+      : { y: maxY + 1, x: cir.x, vy: abs(cir.vy) }
 
-  const newB = R.mergeDeepLeft(changes, ball)
-  const newTB = translateByVelocity(newB)
-  if (isCircleInterSectingWithRect(newTB, pad)) {
-    debugger
-  }
   return changes
 }
 
@@ -216,16 +211,13 @@ function initBricks(vp) {
   return R.flatten(bricksRows)
 
   function initBrick(row, col) {
-    const brick = {
-      x: 0,
-      y: 0,
+    return {
+      x: leftOffset + col * (brickWidth + colGap),
+      y: topOffset + row * (brickHeight + rowGap),
       w: brickWidth,
       h: brickHeight,
       alive: true,
     }
-    const x = leftOffset + col * (brick.w + colGap)
-    const y = topOffset + row * (brick.h + rowGap)
-    return { ...brick, x, y }
   }
 }
 
@@ -236,6 +228,32 @@ function renderBricks(ctx, bricks) {
     .forEach(({ x, y, w, h }) => ctx.fillRect(x, y, w, h))
 }
 
+startGame({
+  init({ vp }) {
+    return {
+      ball: initBall(vp),
+      pad: initPaddle(vp),
+      bricks: initBricks(vp),
+    }
+  },
+  update(deps, state) {
+    const newState = updatePaddle(deps, state)
+    return updateBallPaddleBricks(deps, newState)
+  },
+  render(ctx, { ball, pad, bricks }) {
+    renderBall(ctx, ball)
+    renderPaddle(ctx, pad)
+    renderBricks(ctx, bricks)
+  },
+})
+
+function updatePaddle({ key }, state) {
+  const paddleSpeed = 2
+  const vx = key.left ? -paddleSpeed : key.right ? paddleSpeed : 0
+  const changes = { x: state.pad.x + vx, vx }
+  return R.mergeDeepLeft({ pad: changes }, state)
+}
+
 function updateBallPaddleBricks({ vp }, state) {
   const { ball, pad, bricks } = state
 
@@ -243,7 +261,7 @@ function updateBallPaddleBricks({ vp }, state) {
     return bricks.reduce((acc, b, idx) => {
       if (!R.isEmpty(acc) || !b.alive) return acc
 
-      const ballChanges = bounceBallOffPaddle(b, ball)
+      const ballChanges = bounceCircleOffRect(b, ball)
       if (R.isEmpty(ballChanges)) {
         return {}
       } else {
@@ -258,7 +276,7 @@ function updateBallPaddleBricks({ vp }, state) {
   const ballPaddleVPCollision = () => {
     const ballChangesFns = [
       () => bounceCircleWithinRect(vp, ball),
-      () => bounceBallOffPaddle(pad, ball),
+      () => bounceCircleOffRect(pad, ball),
       () => translateByVelocity(ball),
     ]
 
@@ -280,21 +298,3 @@ function updateBallPaddleBricks({ vp }, state) {
     }, {})
   }
 }
-
-startGame({
-  init({ vp }) {
-    return {
-      ball: initBall(vp),
-      pad: initPaddle(vp),
-      bricks: initBricks(vp),
-    }
-  },
-  update(deps, state) {
-    return updateBallPaddleBricks(deps, state)
-  },
-  render(ctx, { ball, pad, bricks }) {
-    renderBall(ctx, ball)
-    renderPaddle(ctx, pad)
-    renderBricks(ctx, bricks)
-  },
-})
