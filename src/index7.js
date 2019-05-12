@@ -36,131 +36,7 @@ function degrees(angle) {
 
 //#endregion UTILS
 
-function gameLoop(step) {
-  const callback = () => {
-    step()
-    requestAnimationFrame(callback)
-  }
-  requestAnimationFrame(callback)
-}
-
-const Key = function initKeyboard() {
-  const km = {}
-  window.addEventListener('keydown', e => {
-    km[e.key] = true
-  })
-  window.addEventListener('keyup', e => {
-    km[e.key] = false
-  })
-
-  return {
-    get left() {
-      return km['ArrowLeft']
-    },
-    get right() {
-      return km['ArrowRight']
-    },
-  }
-}
-
-function useState(initial) {
-  let state = initial
-  return {
-    get state() {
-      return state
-    },
-    mapState(fn) {
-      state = fn(state)
-    },
-    mergeState(partialState) {
-      Object.assign(state, partialState)
-    },
-  }
-}
-
-function startGame({ init, update, render }) {
-  const canvas = document.getElementById('gameScreen')
-  const ctx = canvas.getContext('2d')
-  Object.assign(canvas, {
-    width: 400,
-    height: 400,
-    className: 'db center ba',
-  })
-
-  const vp = { x: 0, y: 0, w: canvas.width, h: canvas.height }
-  const key = Key()
-
-  let state = init({ vp })
-
-  gameLoop(() => {
-    state = update({ key, vp }, state)
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    render(ctx, state)
-  })
-}
-
-function initBall(vp) {
-  const [vx, vy] = fromPolar(7, degrees(100))
-  return { x: vp.w / 2, y: vp.h / 2, r: 10, vx, vy }
-}
-
-function renderBall(ctx, { x, y, r }) {
-  ctx.beginPath()
-  ctx.arc(x, y, r, 0, 2 * Math.PI, false)
-  ctx.fillStyle = 'green'
-  ctx.fill()
-}
-
-function initPaddle(vp) {
-  const pad = { x: 0, y: 0, w: 100, h: 15, vx: 0, vy: 0 }
-  const x = (vp.w - pad.w) / 2
-  const y = vp.h - pad.h - 20
-  return { ...pad, x, y }
-}
-
-function renderPaddle(ctx, { x, y, w, h }) {
-  ctx.fillStyle = 'orange'
-  ctx.fillRect(x, y, w, h)
-}
-
-function initBricks(vp) {
-  const rowCt = 5
-  const colCt = 5
-  const brickWidth = 50
-  const brickHeight = 10
-  const colGap = 20
-  const rowGap = 20
-  const topOffset = 30
-  const gridWidth = colCt * (brickWidth + colGap) - colGap
-  const leftOffset = (vp.w - gridWidth) / 2
-
-  const bricksRows = R.times(
-    row => R.times(col => initBrick(row, col), colCt),
-    rowCt,
-  )
-  return R.flatten(bricksRows)
-
-  function initBrick(row, col) {
-    const brick = {
-      x: 0,
-      y: 0,
-      w: brickWidth,
-      h: brickHeight,
-      alive: true,
-    }
-    const x = leftOffset + col * (brick.w + colGap)
-    const y = topOffset + row * (brick.h + rowGap)
-    return { ...brick, x, y }
-  }
-}
-
-function renderBricks(ctx, bricks) {
-  ctx.fillStyle = 'dodgerblue'
-  bricks
-    .filter(b => b.alive)
-    .forEach(({ x, y, w, h }) => ctx.fillRect(x, y, w, h))
-}
-
+//#region GEOM
 function rectExtrema({ x, y, w, h }) {
   return { minX: x, minY: y, maxX: x + w, maxY: y + h }
 }
@@ -254,6 +130,112 @@ function bounceBallOffPaddle(pad, ball_) {
   return changes
 }
 
+//#endregion GEOM
+
+const Key = function initKeyboard() {
+  const km = {}
+  window.addEventListener('keydown', e => {
+    km[e.key] = true
+  })
+  window.addEventListener('keyup', e => {
+    km[e.key] = false
+  })
+
+  return {
+    get left() {
+      return km['ArrowLeft']
+    },
+    get right() {
+      return km['ArrowRight']
+    },
+  }
+}
+
+function startGame({ init, update, render }) {
+  const canvas = document.getElementById('gameScreen')
+  const ctx = canvas.getContext('2d')
+  Object.assign(canvas, {
+    width: 400,
+    height: 400,
+    className: 'db center ba',
+  })
+
+  const vp = { x: 0, y: 0, w: canvas.width, h: canvas.height }
+  const key = Key()
+
+  let state = init({ vp })
+
+  const step = () => {
+    state = update({ key, vp }, state)
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    render(ctx, state)
+    requestAnimationFrame(step)
+  }
+  requestAnimationFrame(step)
+}
+
+function initBall(vp) {
+  const [vx, vy] = fromPolar(7, degrees(100))
+  return { x: vp.w / 2, y: vp.h / 2, r: 10, vx, vy }
+}
+
+function renderBall(ctx, { x, y, r }) {
+  ctx.beginPath()
+  ctx.arc(x, y, r, 0, 2 * Math.PI, false)
+  ctx.fillStyle = 'green'
+  ctx.fill()
+}
+
+function initPaddle(vp) {
+  const pad = { x: 0, y: 0, w: 100, h: 15, vx: 0, vy: 0 }
+  const x = (vp.w - pad.w) / 2
+  const y = vp.h - pad.h - 20
+  return { ...pad, x, y }
+}
+
+function renderPaddle(ctx, { x, y, w, h }) {
+  ctx.fillStyle = 'orange'
+  ctx.fillRect(x, y, w, h)
+}
+
+function initBricks(vp) {
+  const rowCt = 5
+  const colCt = 5
+  const brickWidth = 50
+  const brickHeight = 10
+  const colGap = 20
+  const rowGap = 20
+  const topOffset = 30
+  const gridWidth = colCt * (brickWidth + colGap) - colGap
+  const leftOffset = (vp.w - gridWidth) / 2
+
+  const bricksRows = R.times(
+    row => R.times(col => initBrick(row, col), colCt),
+    rowCt,
+  )
+  return R.flatten(bricksRows)
+
+  function initBrick(row, col) {
+    const brick = {
+      x: 0,
+      y: 0,
+      w: brickWidth,
+      h: brickHeight,
+      alive: true,
+    }
+    const x = leftOffset + col * (brick.w + colGap)
+    const y = topOffset + row * (brick.h + rowGap)
+    return { ...brick, x, y }
+  }
+}
+
+function renderBricks(ctx, bricks) {
+  ctx.fillStyle = 'dodgerblue'
+  bricks
+    .filter(b => b.alive)
+    .forEach(({ x, y, w, h }) => ctx.fillRect(x, y, w, h))
+}
+
 function updateBallPaddleBricks({ vp }, state) {
   const { ball, pad, bricks } = state
 
@@ -308,14 +290,9 @@ startGame({
     }
   },
   update(deps, state) {
-    return {
-      ...state,
-      ...updateBallPaddleBricks(deps, state),
-    }
+    return updateBallPaddleBricks(deps, state)
   },
   render(ctx, { ball, pad, bricks }) {
-    // follower.render(draw)
-    // Follower2.render(draw, follower2)
     renderBall(ctx, ball)
     renderPaddle(ctx, pad)
     renderBricks(ctx, bricks)
