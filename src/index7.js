@@ -89,23 +89,17 @@ function translateByVelocity(obj) {
   return R.mergeDeepLeft({ x: obj.x + obj.vx, y: obj.y + obj.vy })(obj)
 }
 
-function isCircleInterSectingWithRect(circle, rect) {
-  const { minX, minY, maxX, maxY } = rectExtrema(
-    growRectByCircle(circle, rect),
-  )
-
-  const { x, y } = circle
-
+function isPointInBounds({ x, y }, { minX, minY, maxX, maxY }) {
   return x >= minX && x <= maxX && y >= minY && y <= maxY
 }
 
 function bounceCircleOffRect(rect, cir_) {
   const cir = translateByVelocity(cir_)
-  if (!isCircleInterSectingWithRect(cir, rect)) return {}
+  const rectEx = rectExtrema(growRectByCircle(cir, rect))
 
-  const { minX, minY, maxX, maxY } = rectExtrema(
-    growRectByCircle(cir, rect),
-  )
+  if (!isPointInBounds(cir, rectEx)) return {}
+
+  const { minX, minY, maxX, maxY } = rectEx
   const changes =
     abs(cir.vx) > abs(cir.vy)
       ? cir_.x < cir.x
