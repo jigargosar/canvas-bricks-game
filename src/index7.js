@@ -236,12 +236,15 @@ function translateByVelocity(obj) {
   return R.mergeDeepLeft({ x: obj.x + obj.vx, y: obj.y + obj.vy })(obj)
 }
 
+function ballPaddleCollision(ball, pad) {}
+
 function updateBallPaddleBricks({ vp }, { ball, pad, bricks }) {
   const ballVPRes = bounceCircleWithinRect(ball, vp)
   let res = { ball, pad, bricks }
 
   if (R.isEmpty(ballVPRes)) {
     // TODO
+    const ballPadRes = ballPaddleCollision(ball, pad)
     res = R.mergeDeepLeft({ ball: translateByVelocity(res.ball) })(res)
   } else {
     res = R.mergeDeepLeft({ ball: ballVPRes })(res)
