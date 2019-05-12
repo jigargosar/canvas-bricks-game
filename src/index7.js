@@ -221,12 +221,13 @@ function initBricks(vp) {
     }
   }
 }
+const fillRect = R.curry(function fillRect_(ctx, { x, y, w, h }) {
+  return ctx.fillRect(x, y, w, h)
+})
 
 function renderBricks(ctx, bricks) {
   ctx.fillStyle = 'dodgerblue'
-  bricks
-    .filter(b => b.alive)
-    .forEach(({ x, y, w, h }) => ctx.fillRect(x, y, w, h))
+  bricks.filter(R.prop('alive')).forEach(fillRect(ctx))
 }
 
 startGame({
