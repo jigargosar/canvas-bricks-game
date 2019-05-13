@@ -410,15 +410,17 @@ const updateGameObj = curry((deps, state) =>
   )(state),
 )
 
+const gsIs = tagged =>
+  R.pipe(
+    R.prop('gameState'),
+    tagged.is,
+  )
+
 startGame({
   init,
   update(deps, state) {
     const { key, vp } = deps
-    const gsIs = tagged =>
-      R.pipe(
-        R.prop('gameState'),
-        tagged.is,
-      )
+
     const updateState = R.cond([
       [
         gsIs(GameState.Running),
