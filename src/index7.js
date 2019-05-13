@@ -20,6 +20,8 @@ import {
   unless,
   update,
   compose,
+  addIndex,
+  map,
 } from 'ramda'
 
 import daggy from 'daggy'
@@ -37,6 +39,8 @@ const absNeg = compose(
 )
 const mul = multiply
 // const add = add
+const mapIndexed = addIndex(map)
+const reduceIndexed = addIndex(reduce)
 const cos = Math.cos
 const sin = Math.sin
 const sqrt = Math.sqrt
@@ -325,11 +329,13 @@ function updateBallPaddleBricks({ vp }, state) {
 }
 
 function bbc(bricks, ball) {
-  return bricks.reduce((acc, brick, idx) => {
+  const reducerF = (acc, brick, idx) => {
     if (!isEmpty(acc) || !brick.alive) return acc
     return unless(isEmpty)(ballChanges => ({
       ball: ballChanges,
       bricks: update(idx, { ...brick, alive: false }, bricks),
     }))(bounceCircleOffRect(brick, ball))
-  }, {})
+  }
+
+  return reduceIndexed(reducerF, {}, bricks)
 }
