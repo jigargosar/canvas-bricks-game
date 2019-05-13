@@ -403,7 +403,7 @@ function updateGameOver({ vp }, state) {
     : Nothing
 }
 
-const updateGameObj = curry((deps, state) =>
+const updateGameObjects = curry((deps, state) =>
   R.compose(
     updateBallPaddleBricks(deps),
     updatePaddle(deps),
@@ -424,7 +424,7 @@ function update(deps, state) {
       gsIs(GameState.Running),
       state =>
         updateGameOver(deps, state).withDefault(
-          updateGameObj(deps, state),
+          updateGameObjects(deps, state),
         ),
     ],
     [gsIs(GameState.Over), state => (key.space ? init(deps) : state)],
