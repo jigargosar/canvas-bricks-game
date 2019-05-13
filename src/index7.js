@@ -43,6 +43,10 @@ const overPath = curry(function overPath_(path, fn, arr) {
   return over(R.path(path), fn, arr)
 })
 
+const overProp = curry(function overProp_(prop, fn, obj) {
+  return over(lensProp(prop))(fn)(obj)
+})
+
 const whileNothing = curry(function whileNothing_(fn, arr) {
   return reduceIndexed(
     (acc, elem, idx, arr) => acc.orElse(() => fn(elem, idx, arr)),
@@ -322,25 +326,6 @@ function renderBricks(ctx, bricks) {
   bricks.filter(prop('alive')).forEach(fillRect(ctx))
 }
 
-startGame({
-  init({ vp }) {
-    return {
-      ball: initBall(vp),
-      pad: initPaddle(vp),
-      bricks: initBricks(vp),
-    }
-  },
-  update(deps, state) {
-    const newState = updatePaddle(deps, state)
-    return updateBallPaddleBricks(deps, newState)
-  },
-  render(ctx, { ball, pad, bricks }) {
-    renderBall(ctx, ball)
-    renderPaddle(ctx, pad)
-    renderBricks(ctx, bricks)
-  },
-})
-
 function updatePaddle({ key, vp }, state) {
   const updateVel = pad => {
     const dx = 2
@@ -354,10 +339,6 @@ function updatePaddle({ key, vp }, state) {
   )
   return overProp('pad')(update)(state)
 }
-
-const overProp = curry(function overProp_(prop, fn, obj) {
-  return over(lensProp(prop))(fn)(obj)
-})
 
 function updateBallPaddleBricks({ vp }, state) {
   const { ball, pad, bricks } = state
@@ -382,3 +363,22 @@ function ballBrickCollision(bricks, ball) {
     }))
   }, bricks)
 }
+
+startGame({
+  init({ vp }) {
+    return {
+      ball: initBall(vp),
+      pad: initPaddle(vp),
+      bricks: initBricks(vp),
+    }
+  },
+  update(deps, state) {
+    const newState = updatePaddle(deps, state)
+    return updateBallPaddleBricks(deps, newState)
+  },
+  render(ctx, { ball, pad, bricks }) {
+    renderBall(ctx, ball)
+    renderPaddle(ctx, pad)
+    renderBricks(ctx, bricks)
+  },
+})
