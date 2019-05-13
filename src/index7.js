@@ -26,6 +26,8 @@ import {
   map,
 } from 'ramda'
 
+import * as R from 'ramda'
+
 import { taggedSum } from 'daggy'
 
 const Maybe = taggedSum('Maybe', {
@@ -378,16 +380,46 @@ function updateBallPaddleBricks({ vp }, state) {
   }
 }
 
+const overIdx = curry(function overIdx(idx, fn, arr) {
+  return over(R.lensIndex(idx), fn, arr)
+})
+
+const overPath = curry(function overPath(path, fn, arr) {
+  return over(R.path(path), fn, arr)
+})
+
+const whileNothing = curry(function whileNothing_(fn, arr) {
+  return reduceIndexed(
+    (acc, elem, idx) => acc.orElse(() => fn(elem, idx)),
+    Nothing,
+    arr,
+  )
+})
+
 function bbc(bricks, ball) {
   const reducerF = (acc, brick, idx) => {
-    if (!brick.alive) return Nothing
-    return acc.orElse(() =>
-      bounceCircleOffRect(brick, ball).map(ball => ({
+    return acc.orElse(() => {
+      if (!brick.alive) return Nothing
+      return bounceCircleOffRect(brick, ball).map(ball => ({
         ball,
-        bricks: update(idx, { ...brick, alive: false }, bricks),
-      })),
-    )
+        bricks: overIdx(idx, R.mergeDeepLeft({ alive: false }), bricks),
+      }))
+    })
   }
 
-  return reduceIndexed(reducerF, Nothing, bricks).withDefault({})
+  const r1 = reduceIndexed(reducerF, Nothing, bricks).withDefault({})
+
+  const r2 = whileNothing(
+    (brick, idx) =>
+      bounceCircleOffRect(brick, ball).map(ball => ({
+        ball,
+        bricks: overIdx(idx, R.mergeDeepLeft({ alive: false }), bricks),
+      })),
+    bricks,
+  ).withDefault({})
+
+  if (!R.equals(r2, r1)) {
+    debugger
+  }
+  return r1
 }
