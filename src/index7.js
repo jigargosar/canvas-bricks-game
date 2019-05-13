@@ -340,6 +340,16 @@ function updatePaddle({ key, vp }, state) {
   return overProp('pad')(update)(state)
 }
 
+function ballBrickCollision(bricks, ball) {
+  return whileNothing((brick, idx) => {
+    if (!brick.alive) return Nothing
+    return bounceCircleOffRect(brick, ball).map(ball => ({
+      ball,
+      bricks: overIdx(idx, R.mergeDeepLeft({ alive: false }), bricks),
+    }))
+  }, bricks)
+}
+
 function updateBallPaddleBricks({ vp }, state) {
   const { ball, pad, bricks } = state
 
@@ -352,16 +362,6 @@ function updateBallPaddleBricks({ vp }, state) {
     .withDefault({ ball: translateByVelocity(ball) })
 
   return mergeDeepLeft(changes, state)
-}
-
-function ballBrickCollision(bricks, ball) {
-  return whileNothing((brick, idx) => {
-    if (!brick.alive) return Nothing
-    return bounceCircleOffRect(brick, ball).map(ball => ({
-      ball,
-      bricks: overIdx(idx, R.mergeDeepLeft({ alive: false }), bricks),
-    }))
-  }, bricks)
 }
 
 startGame({
