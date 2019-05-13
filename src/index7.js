@@ -381,12 +381,12 @@ function updateBallPaddleBricks({ vp }, state) {
 function bbc(bricks, ball) {
   const reducerF = (acc, brick, idx) => {
     if (!brick.alive) return Nothing
-    return acc.orElse(() => {
+    return acc.orElse(() =>
       bounceCircleOffRect(brick, ball).map(ball => ({
         ball,
         bricks: update(idx, { ...brick, alive: false }, bricks),
-      }))
-    })
+      })),
+    )
   }
 
   return reduceIndexed(reducerF, Nothing, bricks).withDefault({})
