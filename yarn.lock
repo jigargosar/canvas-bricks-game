@@ -3312,6 +3312,14 @@ cyclist@~0.2.2:
   resolved "https://registry.yarnpkg.com/cyclist/-/cyclist-0.2.2.tgz#1b33792e11e914a2fd6d6ed6447464444e5fa640"
   integrity sha1-GzN5LhHpFKL9bW7WRHRkRE5fpkA=
 
+daggy@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/daggy/-/daggy-1.4.0.tgz#178b4722866e1c8fac7b91d4bbf171d3767c1573"
+  integrity sha512-6g8sOIPMzriYtyoCfpM2bUobu2yj0UPdaPy+Yzdqow8RqJy/Dv2PrqiNOzCvbxUuT6B1eSbr2EmFPlLNfKFDzQ==
+  dependencies:
+    sanctuary-type-classes "3.0.0"
+    sanctuary-type-identifiers "1.0.0"
+
 dashdash@^1.12.0:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/dashdash/-/dashdash-1.14.1.tgz#853cfa0f7cbe2fed5de20326b8dd581035f6e2f0"
@@ -9801,6 +9809,18 @@ safer-eval@^1.3.0:
   integrity sha512-mAkc9NX+ULPw4qX+lkFVuIhXQbjFaX97fWFj6atFXMG11lUX4rXfQY6Q0VFf1wfJfqCHYO7cxtC7cA8fIkWsLQ==
   dependencies:
     clones "^1.2.0"
+
+sanctuary-type-classes@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/sanctuary-type-classes/-/sanctuary-type-classes-3.0.0.tgz#e4cf422abceb8c78b6f625d84d61fdb5c6d44116"
+  integrity sha1-5M9CKrzrjHi29iXYTWH9tcbUQRY=
+  dependencies:
+    sanctuary-type-identifiers "1.0.x"
+
+sanctuary-type-identifiers@1.0.0, sanctuary-type-identifiers@1.0.x:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/sanctuary-type-identifiers/-/sanctuary-type-identifiers-1.0.0.tgz#e8f359f006cb5e624cfb8464603fc114608bde9f"
+  integrity sha1-6PNZ8AbLXmJM+4RkYD/BFGCL3p8=
 
 sass-graph@^2.2.4:
   version "2.2.4"

@@ -1,7 +1,28 @@
 /* eslint-disable no-debugger */
 import 'tachyons'
 import './index.css'
-import * as R from 'ramda'
+import {
+  add,
+  propEq,
+  reduce,
+  useWith,
+  negate,
+  multiply,
+  mergeDeepLeft,
+  clamp,
+  curry,
+  times,
+  flatten,
+  prop,
+  over,
+  lensProp,
+  isEmpty,
+  unless,
+  update,
+  compose,
+} from 'ramda'
+
+import daggy from 'daggy'
 
 //#region UTILS
 function invariant(pred, msg = 'invariant failed') {
@@ -10,16 +31,18 @@ function invariant(pred, msg = 'invariant failed') {
   }
 }
 const abs = Math.abs
-const absNeg = R.compose(
-  R.negate,
+const absNeg = compose(
+  negate,
   abs,
 )
-const mul = R.multiply
-const add = R.add
+const mul = multiply
+// const add = add
 const cos = Math.cos
 const sin = Math.sin
 const sqrt = Math.sqrt
 const atan2 = Math.atan2
+
+useWith
 
 function fromPolar(radius, theta) {
   return [mul(radius, cos(theta)), mul(radius, sin(theta))]
@@ -48,7 +71,7 @@ function shrinkRectByCircle(circle, rect) {
   invariant(w >= 0 && h >= 0)
   const x = rect.x + radius
   const y = rect.y + radius
-  return R.mergeDeepLeft({ x, y, w, h }, rect)
+  return mergeDeepLeft({ x, y, w, h }, rect)
 }
 
 function growRectByCircle(circle, rect) {
@@ -59,7 +82,7 @@ function growRectByCircle(circle, rect) {
 
   const x = rect.x - radius
   const y = rect.y - radius
-  return R.mergeDeepLeft({ x, y, w, h }, rect)
+  return mergeDeepLeft({ x, y, w, h }, rect)
 }
 
 function bounceCircleWithinRect(rect, circle) {
@@ -81,11 +104,11 @@ function bounceCircleWithinRect(rect, circle) {
       ? { y: maxY, vy: absNeg(circle.vy) }
       : {}
 
-  return R.mergeDeepLeft(xParts, yParts)
+  return mergeDeepLeft(xParts, yParts)
 }
 
 function translateByVelocity(obj) {
-  return R.mergeDeepLeft({ x: obj.x + obj.vx, y: obj.y + obj.vy })(obj)
+  return mergeDeepLeft({ x: obj.x + obj.vx, y: obj.y + obj.vy })(obj)
 }
 
 function isPointInBounds({ x, y }, { minX, minY, maxX, maxY }) {
@@ -117,19 +140,19 @@ function clampRectInRect(big, small) {
 
   return {
     ...small,
-    x: R.clamp(big.x, big.w - small.w, small.x),
-    y: R.clamp(big.y, big.h - small.h, small.y),
+    x: clamp(big.x, big.w - small.w, small.x),
+    y: clamp(big.y, big.h - small.h, small.y),
   }
 }
 
 //#endregion GEOM
 
 //#region RENDER
-const fillRect = R.curry(function fillRect_(ctx, { x, y, w, h }) {
+const fillRect = curry(function fillRect_(ctx, { x, y, w, h }) {
   return ctx.fillRect(x, y, w, h)
 })
 
-const fillCircle = R.curry(function fillRect_(ctx, { x, y, r }) {
+const fillCircle = curry(function fillRect_(ctx, { x, y, r }) {
   ctx.beginPath()
   ctx.arc(x, y, r, 0, degrees(360), false)
   ctx.fill()
@@ -211,11 +234,11 @@ function initBricks(vp) {
   const gridWidth = colCt * (brickWidth + colGap) - colGap
   const leftOffset = (vp.w - gridWidth) / 2
 
-  const bricksRows = R.times(
-    row => R.times(col => initBrick(row, col), colCt),
+  const bricksRows = times(
+    row => times(col => initBrick(row, col), colCt),
     rowCt,
   )
-  return R.flatten(bricksRows)
+  return flatten(bricksRows)
 
   function initBrick(row, col) {
     return {
@@ -230,7 +253,7 @@ function initBricks(vp) {
 
 function renderBricks(ctx, bricks) {
   ctx.fillStyle = 'dodgerblue'
-  bricks.filter(R.prop('alive')).forEach(fillRect(ctx))
+  bricks.filter(prop('alive')).forEach(fillRect(ctx))
 }
 
 startGame({
@@ -258,7 +281,7 @@ function updatePaddle({ key, vp }, state) {
     return { ...pad, vx: key.left ? -dx : key.right ? dx : 0 }
   }
 
-  const update = R.compose(
+  const update = compose(
     small => clampRectInRect(vp, small),
     translateByVelocity,
     updateVel,
@@ -266,8 +289,8 @@ function updatePaddle({ key, vp }, state) {
   return overProp('pad')(update)(state)
 }
 
-const overProp = R.curry(function overProp_(prop, fn, obj) {
-  return R.over(R.lensProp(prop))(fn)(obj)
+const overProp = curry(function overProp_(prop, fn, obj) {
+  return over(lensProp(prop))(fn)(obj)
 })
 
 function updateBallPaddleBricks({ vp }, state) {
@@ -290,11 +313,11 @@ function updateBallPaddleBricks({ vp }, state) {
     ballPaddleVPCollision,
   ])
 
-  return R.mergeDeepLeft(changes, state)
+  return mergeDeepLeft(changes, state)
 
   function findFirstNonEmptyResult(fns) {
     return fns.reduce((acc, fn) => {
-      if (!R.isEmpty(acc)) return acc
+      if (!isEmpty(acc)) return acc
 
       return fn()
     }, {})
@@ -303,10 +326,10 @@ function updateBallPaddleBricks({ vp }, state) {
 
 function bbc(bricks, ball) {
   return bricks.reduce((acc, brick, idx) => {
-    if (!R.isEmpty(acc) || !brick.alive) return acc
-    return R.unless(R.isEmpty)(ballChanges => ({
+    if (!isEmpty(acc) || !brick.alive) return acc
+    return unless(isEmpty)(ballChanges => ({
       ball: ballChanges,
-      bricks: R.update(idx, { ...brick, alive: false }, bricks),
+      bricks: update(idx, { ...brick, alive: false }, bricks),
     }))(bounceCircleOffRect(brick, ball))
   }, {})
 }

@@ -32,6 +32,7 @@
     "webpack-dev-server": "^3.3.1"
   },
   "dependencies": {
+    "daggy": "^1.4.0",
     "faker": "^4.1.0",
     "nanoid": "^2.0.1",
     "ramda": "^0.26.1",
