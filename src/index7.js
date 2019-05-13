@@ -403,18 +403,19 @@ function updateGameOver({ vp }, state) {
     : Nothing
 }
 
-const updateGameObjects = curry((deps, state) =>
-  R.compose(
+const updateGameObjects = curry(function(deps, state) {
+  return R.compose(
     updateBallPaddleBricks(deps),
     updatePaddle(deps),
-  )(state),
-)
+  )(state)
+})
 
-const gsIs = tagged =>
-  R.pipe(
+const gsIs = function(tagged) {
+  return R.pipe(
     R.prop('gameState'),
     tagged.is,
   )
+}
 
 function update(deps, state) {
   const { key } = deps
