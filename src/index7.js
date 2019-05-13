@@ -416,24 +416,26 @@ const gsIs = tagged =>
     tagged.is,
   )
 
+function update(deps, state) {
+  const { key } = deps
+
+  const updateState = R.cond([
+    [
+      gsIs(GameState.Running),
+      state =>
+        updateGameOver(deps, state).withDefault(
+          updateGameObj(deps, state),
+        ),
+    ],
+    [gsIs(GameState.Over), state => (key.space ? init(deps) : state)],
+  ])
+
+  return updateState(state)
+}
+
 startGame({
   init,
-  update(deps, state) {
-    const { key, vp } = deps
-
-    const updateState = R.cond([
-      [
-        gsIs(GameState.Running),
-        state =>
-          updateGameOver(deps, state).withDefault(
-            updateGameObj(deps, state),
-          ),
-      ],
-      [gsIs(GameState.Over), state => (key.space ? init(deps) : state)],
-    ])
-
-    return updateState(state)
-  },
+  update,
   render({ vp, ctx }, { ball, pad, bricks, gameState }) {
     renderBall(ctx, ball)
     renderPaddle(ctx, pad)
