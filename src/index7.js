@@ -403,27 +403,6 @@ startGame({
         state => {
           const newBall = translateByVelocity(state.ball)
           const isGameOver = checkBallOutOfBottomEdge(deps.vp, newBall)
-
-          R.cond([
-            [
-              () => isGameOver,
-              () => ({
-                ...state,
-                gameState: GameState.Over,
-                ball: newBall,
-              }),
-            ],
-            //
-            [
-              R.T,
-              () =>
-                R.compose(
-                  updateBallPaddleBricks(deps),
-                  updatePaddle(deps),
-                ),
-            ],
-          ])
-
           if (isGameOver) {
             return { ...state, gameState: GameState.Over, ball: newBall }
           }
