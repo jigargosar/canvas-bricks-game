@@ -355,47 +355,28 @@ const overProp = curry(function overProp_(prop, fn, obj) {
   return over(lensProp(prop))(fn)(obj)
 })
 
+function maybeFromEmpty(val) {
+  return isEmpty(val) ? Nothing : Just(val)
+}
+
 function updateBallPaddleBricks({ vp }, state) {
   const { ball, pad, bricks } = state
 
   const ballPaddleVPCollision = () => {
     const ballChangesFns = [
-      () => bounceCircleWithinRect(vp, ball),
-      () => {
-        const mb = bounceCircleOffRect(pad, ball)
-        invariant(Maybe.is(mb))
-        const r = mb.withDefault({})
-        // if(!isEmpty(r)){
-        //   debugger
-        // }
-        return r
-      },
-      () => translateByVelocity(ball),
+      () => maybeFromEmpty(bounceCircleWithinRect(vp, ball)),
+      () => bounceCircleOffRect(pad, ball),
+      () => maybeFromEmpty(translateByVelocity(ball)),
     ]
 
-    return { ball: findFirstNonEmptyResult(ballChangesFns) }
+    return whileNothing(f => f(), ballChangesFns).map(ball => ({ ball }))
   }
 
-  function maybeFromEmpty(val) {
-    return isEmpty(val) ? Nothing : Just(val)
-  }
+  const changes = ballBrickCollision(bricks, ball)
+    .orElse(ballPaddleVPCollision)
+    .withDefault({})
 
-  const collisionFns = [
-    () => ballBrickCollision(bricks, ball),
-    () => maybeFromEmpty(ballPaddleVPCollision()),
-  ]
-
-  const changes2 = whileNothing(fn => fn(), collisionFns).withDefault({})
-
-  return mergeDeepLeft(changes2, state)
-
-  function findFirstNonEmptyResult(fns) {
-    return fns.reduce((acc, fn) => {
-      if (!isEmpty(acc)) return acc
-
-      return fn()
-    }, {})
-  }
+  return mergeDeepLeft(changes, state)
 }
 
 function ballBrickCollision(bricks, ball) {
