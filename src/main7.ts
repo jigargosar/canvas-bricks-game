@@ -1,4 +1,6 @@
 import * as R from 'ramda'
+import { Some, some } from '../node_modules/fp-ts/lib/Option'
+
 // BASICS
 
 // https://github.com/elm/core/blob/1.0.2/src/Basics.elm
@@ -255,3 +257,4 @@ export class Follower2 {
     draw.fillEllipse(rect, 'white')
   }
 }
+some(1).isNone()

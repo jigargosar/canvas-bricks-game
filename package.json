@@ -34,10 +34,12 @@
   "dependencies": {
     "daggy": "^1.4.0",
     "faker": "^4.1.0",
+    "fp-ts": "^1.17.4",
     "nanoid": "^2.0.1",
     "ramda": "^0.26.1",
     "react": "^16.0.0",
     "react-dom": "^16.8.6",
+    "sanctuary-maybe": "^1.2.0",
     "tachyons": "^4.11.1"
   },
   "prettier": {

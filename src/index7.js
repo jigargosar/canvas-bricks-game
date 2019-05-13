@@ -1,3 +1,5 @@
+// @ts-ignore
+/* eslint-disable no-console */
 /* eslint-disable no-debugger */
 import 'tachyons'
 import './index.css'
@@ -24,7 +26,26 @@ import {
   map,
 } from 'ramda'
 
-import daggy from 'daggy'
+import { taggedSum } from 'daggy'
+
+const Maybe = taggedSum('Maybe', {
+  Nothing: [],
+  Just: ['value'],
+})
+
+Maybe.prototype.orElse = function orElse(f) {
+  return this.cata({
+    Just: () => this,
+    Nothing: () => f(),
+  })
+}
+
+Maybe.prototype.withDefault = function withDefault(defaultValue) {
+  return this.cata({
+    Just: () => this.value,
+    Nothing: () => defaultValue,
+  })
+}
 
 //#region UTILS
 function invariant(pred, msg = 'invariant failed') {
@@ -45,8 +66,6 @@ const cos = Math.cos
 const sin = Math.sin
 const sqrt = Math.sqrt
 const atan2 = Math.atan2
-
-useWith
 
 function fromPolar(radius, theta) {
   return [mul(radius, cos(theta)), mul(radius, sin(theta))]
@@ -330,12 +349,22 @@ function updateBallPaddleBricks({ vp }, state) {
 
 function bbc(bricks, ball) {
   const reducerF = (acc, brick, idx) => {
-    if (!isEmpty(acc) || !brick.alive) return acc
-    return unless(isEmpty)(ballChanges => ({
-      ball: ballChanges,
-      bricks: update(idx, { ...brick, alive: false }, bricks),
-    }))(bounceCircleOffRect(brick, ball))
+    return acc.orElse(() => {
+      if (!brick.alive) return Maybe.Nothing
+      const ballChanges = bounceCircleOffRect(brick, ball)
+      return isEmpty(ballChanges)
+        ? Maybe.Nothing
+        : Maybe.Just({
+            ball: ballChanges,
+            bricks: update(idx, { ...brick, alive: false }, bricks),
+          })
+    })
+    // if (!isEmpty(acc) || !brick.alive) return acc
+    // return unless(isEmpty)(ballChanges => ({
+    //   ball: ballChanges,
+    //   bricks: update(idx, { ...brick, alive: false }, bricks),
+    // }))(bounceCircleOffRect(brick, ball))
   }
 
-  return reduceIndexed(reducerF, {}, bricks)
+  return reduceIndexed(reducerF, Maybe.Nothing, bricks).withDefault({})
 }
