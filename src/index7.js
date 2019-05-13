@@ -85,6 +85,10 @@ const Maybe = taggedSum('Maybe', {
   Just: ['value'],
 })
 
+Maybe.fromEmpty = function maybeFromEmpty(val) {
+  return isEmpty(val) ? Nothing : Just(val)
+}
+
 Maybe.withDefault = curry(function withDefault(defaultValue, mb) {
   return mb.withDefault(defaultValue)
 })
@@ -166,7 +170,7 @@ function bounceCircleWithinRect(rect, circle) {
       ? { y: maxY, vy: absNeg(circle.vy) }
       : {}
 
-  return mergeDeepLeft(xParts, yParts)
+  return Maybe.fromEmpty(mergeDeepLeft(xParts, yParts))
 }
 
 function translateByVelocity(obj) {
@@ -355,16 +359,12 @@ const overProp = curry(function overProp_(prop, fn, obj) {
   return over(lensProp(prop))(fn)(obj)
 })
 
-function maybeFromEmpty(val) {
-  return isEmpty(val) ? Nothing : Just(val)
-}
-
 function updateBallPaddleBricks({ vp }, state) {
   const { ball, pad, bricks } = state
 
   const changes = ballBrickCollision(bricks, ball)
     .orElse(() =>
-      maybeFromEmpty(bounceCircleWithinRect(vp, ball))
+      bounceCircleWithinRect(vp, ball)
         .orElse(() => bounceCircleOffRect(pad, ball))
         .map(ball => ({ ball })),
     )
