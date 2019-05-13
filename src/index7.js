@@ -402,8 +402,7 @@ startGame({
         gsIs(GameState.Running),
         state => {
           const newBall = translateByVelocity(state.ball)
-          const isGameOver = checkBallOutOfBottomEdge(deps.vp, newBall)
-          if (isGameOver) {
+          if (checkBallOutOfBottomEdge(deps.vp, newBall)) {
             return { ...state, gameState: GameState.Over, ball: newBall }
           }
           return R.compose(
@@ -415,7 +414,11 @@ startGame({
       [
         gsIs(GameState.Over),
         state => {
-          return deps.key.km[' '] ? init(deps) : state
+          if (deps.key.km[' ']) {
+            return init(deps)
+          }
+
+          return state
         },
       ],
     ])
