@@ -239,6 +239,9 @@ const Key = function initKeyboard() {
   })
 
   return {
+    get km() {
+      return km
+    },
     get left() {
       return km['ArrowLeft']
     },
@@ -366,20 +369,45 @@ const updateBallPaddleBricks = curry(function updateBallPaddleBricks_(
 
   return mergeDeepLeft(changes, state)
 })
+function circExtrema({ x, y, r }) {
+  return { minX: x - r, maxX: x + r, minY: y - r, maxY: y + r }
+}
+const checkBallOutOfBottomEdge = curry(function(vp, ball) {
+  const vpEx = rectExtrema(vp)
+  const ballEx = circExtrema(ball)
+
+  return ballEx.maxY >= vpEx.maxY
+})
+
+const GameState = taggedSum('GameState', { Running: [], Over: [] })
+function init({ vp }) {
+  return {
+    ball: initBall(vp),
+    pad: initPaddle(vp),
+    bricks: initBricks(vp),
+    gameState: GameState.Running,
+  }
+}
 
 startGame({
-  init({ vp }) {
-    return {
-      ball: initBall(vp),
-      pad: initPaddle(vp),
-      bricks: initBricks(vp),
-    }
-  },
+  init,
   update(deps, state) {
-    return R.compose(
-      updateBallPaddleBricks(deps),
-      updatePaddle(deps),
-    )(state)
+    if (GameState.Running.is(state.gameState)) {
+      const newBall = translateByVelocity(state.ball)
+      if (checkBallOutOfBottomEdge(deps.vp, newBall)) {
+        return { ...state, gameState: GameState.Over, ball: newBall }
+      }
+      return R.compose(
+        updateBallPaddleBricks(deps),
+        updatePaddle(deps),
+      )(state)
+    } else if (GameState.Over.is(state.gameState)) {
+      if (deps.key.km[' ']) {
+        return init(deps)
+      }
+
+      return state
+    }
   },
   render(ctx, { ball, pad, bricks }) {
     renderBall(ctx, ball)
