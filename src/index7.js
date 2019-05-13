@@ -406,13 +406,18 @@ startGame({
         gsIs(GameState.Running),
         state => {
           const newBall = translateByVelocity(state.ball)
-          if (checkBallOutOfBottomEdge(vp, newBall)) {
-            return { ...state, gameState: GameState.Over, ball: newBall }
-          }
-          return R.compose(
+          const updateGameObj = R.compose(
             updateBallPaddleBricks(deps),
             updatePaddle(deps),
-          )(state)
+          )
+          return checkBallOutOfBottomEdge(vp, newBall)
+            ? { ...state, gameState: GameState.Over, ball: newBall }
+            : updateGameObj(state)
+          // if (checkBallOutOfBottomEdge(vp, newBall)) {
+          //   return { ...state, gameState: GameState.Over, ball: newBall }
+          // }
+
+          // return updateGameObj(state)
         },
       ],
       [gsIs(GameState.Over), state => (key.space ? init(deps) : state)],
