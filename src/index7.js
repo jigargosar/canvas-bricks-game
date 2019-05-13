@@ -433,17 +433,6 @@ function update(deps, state) {
   return updateState(state)
 }
 
-startGame({
-  init,
-  update,
-  render({ vp, ctx }, { ball, pad, bricks, gameState }) {
-    renderBall(ctx, ball)
-    renderPaddle(ctx, pad)
-    renderBricks(ctx, bricks)
-    renderGameState({ ctx, vp }, gameState)
-  },
-})
-
 function renderGameState({ ctx, vp }, gs) {
   if (!GameState.Over.is(gs)) return
   ctx.fillStyle = 'rgba(0,0,0,0.5)'
@@ -456,3 +445,16 @@ function renderGameState({ ctx, vp }, gs) {
 
   ctx.fillText(textString, vp.w / 2 - tm.width / 2, (vp.h + fz) / 2)
 }
+
+function render({ vp, ctx }, { ball, pad, bricks, gameState }) {
+  renderBall(ctx, ball)
+  renderPaddle(ctx, pad)
+  renderBricks(ctx, bricks)
+  renderGameState({ ctx, vp }, gameState)
+}
+
+startGame({
+  init,
+  update,
+  render,
+})
