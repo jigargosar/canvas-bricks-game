@@ -248,6 +248,9 @@ const Key = function initKeyboard() {
     get right() {
       return km['ArrowRight']
     },
+    get space() {
+      return km[' ']
+    },
   }
 }
 
@@ -412,7 +415,7 @@ startGame({
           )(state)
         },
       ],
-      [gsIs(GameState.Over), state => (key.km[' '] ? init(deps) : state)],
+      [gsIs(GameState.Over), state => (key.space ? init(deps) : state)],
     ])
 
     return handleState(state)
