@@ -30,7 +30,7 @@
       }
     ],
     "linebreak-style": ["warn", "unix"],
-    "quotes": ["warn", "single"],
+    "quotes": ["off", "single"],
     "semi": ["warn", "never"]
   }
 }

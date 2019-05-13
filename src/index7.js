@@ -33,10 +33,28 @@ const Maybe = taggedSum('Maybe', {
   Just: ['value'],
 })
 
+Maybe.withDefault = curry(function withDefault(defaultValue, mb) {
+  return mb.withDefault(defaultValue)
+})
+
+const Just = Maybe.Just
+const Nothing = Maybe.Nothing
+
+Maybe.prototype.map = function map(f) {
+  return this.cata({
+    Just: () => Just(f(this.value)),
+    Nothing: () => this,
+  })
+}
+
 Maybe.prototype.orElse = function orElse(f) {
   return this.cata({
     Just: () => this,
-    Nothing: () => f(),
+    Nothing: () => {
+      const r = f()
+      invariant(Maybe.is(r))
+      return r
+    },
   })
 }
 
@@ -66,6 +84,11 @@ const cos = Math.cos
 const sin = Math.sin
 const sqrt = Math.sqrt
 const atan2 = Math.atan2
+
+const tapLog = curry(function tapLog(msg, val) {
+  console.log(msg, val)
+  return val
+})
 
 function fromPolar(radius, theta) {
   return [mul(radius, cos(theta)), mul(radius, sin(theta))]
@@ -142,7 +165,7 @@ function bounceCircleOffRect(rect, cir_) {
   const cir = translateByVelocity(cir_)
   const extrema = rectExtrema(growRectByCircle(cir, rect))
 
-  if (!isPointInBounds(cir, extrema)) return {}
+  if (!isPointInBounds(cir, extrema)) return Nothing
 
   const { minX, minY, maxX, maxY } = extrema
   const changes =
@@ -155,7 +178,7 @@ function bounceCircleOffRect(rect, cir_) {
       ? { y: minY - 1, x: cir.x, vy: absNeg(cir.vy) }
       : { y: maxY + 1, x: cir.x, vy: abs(cir.vy) }
 
-  return changes
+  return isEmpty(changes) ? Nothing : Just(changes)
 }
 
 function clampRectInRect(big, small) {
@@ -324,7 +347,15 @@ function updateBallPaddleBricks({ vp }, state) {
   const ballPaddleVPCollision = () => {
     const ballChangesFns = [
       () => bounceCircleWithinRect(vp, ball),
-      () => bounceCircleOffRect(pad, ball),
+      () => {
+        const mb = bounceCircleOffRect(pad, ball)
+        invariant(Maybe.is(mb))
+        const r = mb.withDefault({})
+        // if(!isEmpty(r)){
+        //   debugger
+        // }
+        return r
+      },
       () => translateByVelocity(ball),
     ]
 
@@ -349,22 +380,14 @@ function updateBallPaddleBricks({ vp }, state) {
 
 function bbc(bricks, ball) {
   const reducerF = (acc, brick, idx) => {
+    if (!brick.alive) return Nothing
     return acc.orElse(() => {
-      if (!brick.alive) return Maybe.Nothing
-      const ballChanges = bounceCircleOffRect(brick, ball)
-      return isEmpty(ballChanges)
-        ? Maybe.Nothing
-        : Maybe.Just({
-            ball: ballChanges,
-            bricks: update(idx, { ...brick, alive: false }, bricks),
-          })
+      bounceCircleOffRect(brick, ball).map(ball => ({
+        ball,
+        bricks: update(idx, { ...brick, alive: false }, bricks),
+      }))
     })
-    // if (!isEmpty(acc) || !brick.alive) return acc
-    // return unless(isEmpty)(ballChanges => ({
-    //   ball: ballChanges,
-    //   bricks: update(idx, { ...brick, alive: false }, bricks),
-    // }))(bounceCircleOffRect(brick, ball))
   }
 
-  return reduceIndexed(reducerF, Maybe.Nothing, bricks).withDefault({})
+  return reduceIndexed(reducerF, Nothing, bricks).withDefault({})
 }
