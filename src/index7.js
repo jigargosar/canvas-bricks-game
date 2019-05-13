@@ -1,35 +1,85 @@
 // @ts-ignore
 /* eslint-disable no-console */
 /* eslint-disable no-debugger */
-import 'tachyons'
-import './index.css'
+import { taggedSum } from 'daggy'
+import * as R from 'ramda'
 import {
   add,
-  propEq,
-  reduce,
-  useWith,
-  negate,
-  multiply,
-  mergeDeepLeft,
-  clamp,
-  curry,
-  times,
-  flatten,
-  prop,
-  over,
-  lensProp,
-  isEmpty,
-  unless,
-  update,
-  compose,
   addIndex,
+  clamp,
+  compose,
+  curry,
+  flatten,
+  isEmpty,
+  lensProp,
   map,
+  mergeDeepLeft,
+  multiply,
+  negate,
+  over,
+  prop,
+  reduce,
+  times,
 } from 'ramda'
+import 'tachyons'
+import './index.css'
 
-import * as R from 'ramda'
+//#region UTILS
+function invariant(pred, msg = 'invariant failed') {
+  if (!pred) {
+    throw new Error(msg)
+  }
+}
+const abs = Math.abs
+const absNeg = compose(
+  negate,
+  abs,
+)
+const overIdx = curry(function overIdx_(idx, fn, arr) {
+  return over(R.lensIndex(idx), fn, arr)
+})
 
-import { taggedSum } from 'daggy'
+const overPath = curry(function overPath_(path, fn, arr) {
+  return over(R.path(path), fn, arr)
+})
 
+const whileNothing = curry(function whileNothing_(fn, arr) {
+  return reduceIndexed(
+    (acc, elem, idx, arr) => acc.orElse(() => fn(elem, idx, arr)),
+    Nothing,
+    arr,
+  )
+})
+
+const mul = multiply
+// const add = add
+const mapIndexed = addIndex(map)
+const reduceIndexed = addIndex(reduce)
+const cos = Math.cos
+const sin = Math.sin
+const sqrt = Math.sqrt
+const atan2 = Math.atan2
+
+const tapLog = curry(function tapLog(msg, val) {
+  console.log(msg, val)
+  return val
+})
+
+function fromPolar(radius, theta) {
+  return [mul(radius, cos(theta)), mul(radius, sin(theta))]
+}
+
+function toPolar(x, y) {
+  return [sqrt(add(mul(x, x), mul(y, y))), atan2(y, x)]
+}
+
+function degrees(angle) {
+  return (angle * Math.PI) / 180
+}
+
+//#endregion UTILS
+
+//#region Maybe
 const Maybe = taggedSum('Maybe', {
   Nothing: [],
   Just: ['value'],
@@ -67,46 +117,10 @@ Maybe.prototype.withDefault = function withDefault(defaultValue) {
   })
 }
 
-//#region UTILS
-function invariant(pred, msg = 'invariant failed') {
-  if (!pred) {
-    throw new Error(msg)
-  }
-}
-const abs = Math.abs
-const absNeg = compose(
-  negate,
-  abs,
-)
-const mul = multiply
-// const add = add
-const mapIndexed = addIndex(map)
-const reduceIndexed = addIndex(reduce)
-const cos = Math.cos
-const sin = Math.sin
-const sqrt = Math.sqrt
-const atan2 = Math.atan2
-
-const tapLog = curry(function tapLog(msg, val) {
-  console.log(msg, val)
-  return val
-})
-
-function fromPolar(radius, theta) {
-  return [mul(radius, cos(theta)), mul(radius, sin(theta))]
-}
-
-function toPolar(x, y) {
-  return [sqrt(add(mul(x, x), mul(y, y))), atan2(y, x)]
-}
-
-function degrees(angle) {
-  return (angle * Math.PI) / 180
-}
-
-//#endregion UTILS
+//#endregion
 
 //#region GEOM
+
 function rectExtrema({ x, y, w, h }) {
   return { minX: x, minY: y, maxX: x + w, maxY: y + h }
 }
@@ -379,22 +393,6 @@ function updateBallPaddleBricks({ vp }, state) {
     }, {})
   }
 }
-
-const overIdx = curry(function overIdx(idx, fn, arr) {
-  return over(R.lensIndex(idx), fn, arr)
-})
-
-const overPath = curry(function overPath(path, fn, arr) {
-  return over(R.path(path), fn, arr)
-})
-
-const whileNothing = curry(function whileNothing_(fn, arr) {
-  return reduceIndexed(
-    (acc, elem, idx) => acc.orElse(() => fn(elem, idx)),
-    Nothing,
-    arr,
-  )
-})
 
 function bbc(bricks, ball) {
   return whileNothing((brick, idx) => {
