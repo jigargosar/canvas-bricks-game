@@ -268,7 +268,7 @@ function startGame({ init, update, render }) {
   const step = () => {
     state = update({ key, vp }, state)
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    render(ctx, state)
+    render({ ctx, vp }, state)
     requestAnimationFrame(step)
   }
   requestAnimationFrame(step)
@@ -409,9 +409,23 @@ startGame({
       return state
     }
   },
-  render(ctx, { ball, pad, bricks }) {
+  render({ vp, ctx }, { ball, pad, bricks, gameState }) {
     renderBall(ctx, ball)
     renderPaddle(ctx, pad)
     renderBricks(ctx, bricks)
+    renderGameState({ ctx, vp }, gameState)
   },
 })
+
+function renderGameState({ ctx, vp }, gs) {
+  if (!GameState.Over.is(gs)) return
+  ctx.fillStyle = 'rgba(0,0,0,0.5)'
+  fillRect(ctx, vp)
+  ctx.fillStyle = 'white'
+  const fz = 50
+  ctx.font = `${fz}px san-serif`
+  const textString = 'GAME OVER'
+  const tm = ctx.measureText(textString)
+
+  ctx.fillText(textString, vp.w / 2 - tm.width / 2, (vp.h + fz) / 2)
+}
