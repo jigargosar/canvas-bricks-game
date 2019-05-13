@@ -356,10 +356,7 @@ function ballBrickCollision(bricks, ball) {
   }, bricks)
 }
 
-const updateBallPaddleBricks = curry(function updateBallPaddleBricks_(
-  { vp },
-  state,
-) {
+const updateBallPaddleBricks = curry(function({ vp }, state) {
   const { ball, pad, bricks } = state
 
   const changes = ballBrickCollision(bricks, ball)
@@ -372,9 +369,11 @@ const updateBallPaddleBricks = curry(function updateBallPaddleBricks_(
 
   return mergeDeepLeft(changes, state)
 })
+
 function circExtrema({ x, y, r }) {
   return { minX: x - r, maxX: x + r, minY: y - r, maxY: y + r }
 }
+
 const checkBallOutOfBottomEdge = curry(function(vp, ball) {
   const vpEx = rectExtrema(vp)
   const ballEx = circExtrema(ball)
@@ -383,6 +382,7 @@ const checkBallOutOfBottomEdge = curry(function(vp, ball) {
 })
 
 const GameState = taggedSum('GameState', { Running: [], Over: [] })
+
 function init({ vp }) {
   return {
     ball: initBall(vp),
