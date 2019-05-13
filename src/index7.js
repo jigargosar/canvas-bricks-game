@@ -326,7 +326,7 @@ function renderBricks(ctx, bricks) {
   bricks.filter(prop('alive')).forEach(fillRect(ctx))
 }
 
-function updatePaddle({ key, vp }, state) {
+const updatePaddle = curry(function updatePaddle_({ key, vp }, state) {
   const updateVel = pad => {
     const dx = 2
     return { ...pad, vx: key.left ? -dx : key.right ? dx : 0 }
@@ -338,7 +338,7 @@ function updatePaddle({ key, vp }, state) {
     updateVel,
   )
   return overProp('pad')(update)(state)
-}
+})
 
 function ballBrickCollision(bricks, ball) {
   return whileNothing((brick, idx) => {
@@ -350,7 +350,10 @@ function ballBrickCollision(bricks, ball) {
   }, bricks)
 }
 
-function updateBallPaddleBricks({ vp }, state) {
+const updateBallPaddleBricks = curry(function updateBallPaddleBricks_(
+  { vp },
+  state,
+) {
   const { ball, pad, bricks } = state
 
   const changes = ballBrickCollision(bricks, ball)
@@ -362,7 +365,7 @@ function updateBallPaddleBricks({ vp }, state) {
     .withDefault({ ball: translateByVelocity(ball) })
 
   return mergeDeepLeft(changes, state)
-}
+})
 
 startGame({
   init({ vp }) {
@@ -373,8 +376,10 @@ startGame({
     }
   },
   update(deps, state) {
-    const newState = updatePaddle(deps, state)
-    return updateBallPaddleBricks(deps, newState)
+    return R.compose(
+      updateBallPaddleBricks(deps),
+      updatePaddle(deps),
+    )(state)
   },
   render(ctx, { ball, pad, bricks }) {
     renderBall(ctx, ball)
