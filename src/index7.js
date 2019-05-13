@@ -392,6 +392,24 @@ function init({ vp }) {
   }
 }
 
+function updateGameOver({ vp }, state) {
+  const newBall = translateByVelocity(state.ball)
+  return checkBallOutOfBottomEdge(vp, newBall)
+    ? Just({
+        ...state,
+        gameState: GameState.Over,
+        ball: newBall,
+      })
+    : Nothing
+}
+
+const updateGameObj = curry((deps, state) =>
+  R.compose(
+    updateBallPaddleBricks(deps),
+    updatePaddle(deps),
+  )(state),
+)
+
 startGame({
   init,
   update(deps, state) {
@@ -401,35 +419,18 @@ startGame({
         R.prop('gameState'),
         tagged.is,
       )
-    const handleState = R.cond([
+    const updateState = R.cond([
       [
         gsIs(GameState.Running),
-        state => {
-          const updateGameObj = R.compose(
-            updateBallPaddleBricks(deps),
-            updatePaddle(deps),
-          )
-          const newBall = translateByVelocity(state.ball)
-
-          function handleGameOver() {
-            return checkBallOutOfBottomEdge(vp, newBall)
-              ? Just({
-                  ...state,
-                  gameState: GameState.Over,
-                  ball: newBall,
-                })
-              : Nothing
-          }
-
-          return checkBallOutOfBottomEdge(vp, newBall)
-            ? { ...state, gameState: GameState.Over, ball: newBall }
-            : updateGameObj(state)
-        },
+        state =>
+          updateGameOver(deps, state).withDefault(
+            updateGameObj(deps, state),
+          ),
       ],
       [gsIs(GameState.Over), state => (key.space ? init(deps) : state)],
     ])
 
-    return handleState(state)
+    return updateState(state)
   },
   render({ vp, ctx }, { ball, pad, bricks, gameState }) {
     renderBall(ctx, ball)
