@@ -392,6 +392,7 @@ function init({ vp }) {
 startGame({
   init,
   update(deps, state) {
+    const { key, vp } = deps
     const gsIs = tagged =>
       R.pipe(
         R.prop('gameState'),
@@ -402,7 +403,7 @@ startGame({
         gsIs(GameState.Running),
         state => {
           const newBall = translateByVelocity(state.ball)
-          if (checkBallOutOfBottomEdge(deps.vp, newBall)) {
+          if (checkBallOutOfBottomEdge(vp, newBall)) {
             return { ...state, gameState: GameState.Over, ball: newBall }
           }
           return R.compose(
@@ -411,16 +412,7 @@ startGame({
           )(state)
         },
       ],
-      [
-        gsIs(GameState.Over),
-        state => {
-          if (deps.key.km[' ']) {
-            return init(deps)
-          }
-
-          return state
-        },
-      ],
+      [gsIs(GameState.Over), state => (key.km[' '] ? init(deps) : state)],
     ])
 
     return handleState(state)
