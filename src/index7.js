@@ -397,29 +397,11 @@ const whileNothing = curry(function whileNothing_(fn, arr) {
 })
 
 function bbc(bricks, ball) {
-  const reducerF = (acc, brick, idx) => {
-    return acc.orElse(() => {
-      if (!brick.alive) return Nothing
-      return bounceCircleOffRect(brick, ball).map(ball => ({
-        ball,
-        bricks: overIdx(idx, R.mergeDeepLeft({ alive: false }), bricks),
-      }))
-    })
-  }
-
-  const r1 = reduceIndexed(reducerF, Nothing, bricks).withDefault({})
-
-  const r2 = whileNothing(
-    (brick, idx) =>
-      bounceCircleOffRect(brick, ball).map(ball => ({
-        ball,
-        bricks: overIdx(idx, R.mergeDeepLeft({ alive: false }), bricks),
-      })),
-    bricks,
-  ).withDefault({})
-
-  if (!R.equals(r2, r1)) {
-    debugger
-  }
-  return r1
+  return whileNothing((brick, idx) => {
+    if (!brick.alive) return Nothing
+    return bounceCircleOffRect(brick, ball).map(ball => ({
+      ball,
+      bricks: overIdx(idx, R.mergeDeepLeft({ alive: false }), bricks),
+    }))
+  }, bricks).withDefault({})
 }
