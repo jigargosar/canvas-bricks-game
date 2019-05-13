@@ -362,17 +362,12 @@ function maybeFromEmpty(val) {
 function updateBallPaddleBricks({ vp }, state) {
   const { ball, pad, bricks } = state
 
-  const ballPaddleVPCollision = () => {
-    const ballChangesFns = [
-      () => maybeFromEmpty(bounceCircleWithinRect(vp, ball)),
-      () => bounceCircleOffRect(pad, ball),
-    ]
-
-    return whileNothing(f => f(), ballChangesFns).map(ball => ({ ball }))
-  }
-
   const changes = ballBrickCollision(bricks, ball)
-    .orElse(ballPaddleVPCollision)
+    .orElse(() =>
+      maybeFromEmpty(bounceCircleWithinRect(vp, ball))
+        .orElse(() => bounceCircleOffRect(pad, ball))
+        .map(ball => ({ ball })),
+    )
     .withDefault({ ball: translateByVelocity(ball) })
 
   return mergeDeepLeft(changes, state)
