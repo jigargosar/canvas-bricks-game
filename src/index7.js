@@ -366,7 +366,6 @@ function updateBallPaddleBricks({ vp }, state) {
     const ballChangesFns = [
       () => maybeFromEmpty(bounceCircleWithinRect(vp, ball)),
       () => bounceCircleOffRect(pad, ball),
-      () => maybeFromEmpty(translateByVelocity(ball)),
     ]
 
     return whileNothing(f => f(), ballChangesFns).map(ball => ({ ball }))
@@ -374,7 +373,7 @@ function updateBallPaddleBricks({ vp }, state) {
 
   const changes = ballBrickCollision(bricks, ball)
     .orElse(ballPaddleVPCollision)
-    .withDefault({})
+    .withDefault({ ball: translateByVelocity(ball) })
 
   return mergeDeepLeft(changes, state)
 }
