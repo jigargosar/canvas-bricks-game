@@ -358,8 +358,6 @@ const overProp = curry(function overProp_(prop, fn, obj) {
 function updateBallPaddleBricks({ vp }, state) {
   const { ball, pad, bricks } = state
 
-  const ballBrickCollision = () => bbc(bricks, ball)
-
   const ballPaddleVPCollision = () => {
     const ballChangesFns = [
       () => bounceCircleWithinRect(vp, ball),
@@ -378,12 +376,18 @@ function updateBallPaddleBricks({ vp }, state) {
     return { ball: findFirstNonEmptyResult(ballChangesFns) }
   }
 
-  const changes = findFirstNonEmptyResult([
-    ballBrickCollision,
-    ballPaddleVPCollision,
-  ])
+  function maybeFromEmpty(val) {
+    return isEmpty(val) ? Nothing : Just(val)
+  }
 
-  return mergeDeepLeft(changes, state)
+  const collisionFns = [
+    () => ballBrickCollision(bricks, ball),
+    () => maybeFromEmpty(ballPaddleVPCollision()),
+  ]
+
+  const changes2 = whileNothing(fn => fn(), collisionFns).withDefault({})
+
+  return mergeDeepLeft(changes2, state)
 
   function findFirstNonEmptyResult(fns) {
     return fns.reduce((acc, fn) => {
@@ -394,12 +398,12 @@ function updateBallPaddleBricks({ vp }, state) {
   }
 }
 
-function bbc(bricks, ball) {
+function ballBrickCollision(bricks, ball) {
   return whileNothing((brick, idx) => {
     if (!brick.alive) return Nothing
     return bounceCircleOffRect(brick, ball).map(ball => ({
       ball,
       bricks: overIdx(idx, R.mergeDeepLeft({ alive: false }), bricks),
     }))
-  }, bricks).withDefault({})
+  }, bricks)
 }
