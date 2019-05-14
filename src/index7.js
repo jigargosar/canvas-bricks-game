@@ -24,7 +24,7 @@ import {
 import 'tachyons'
 import './index.css'
 
-//#region UTILS
+//#region BASICS
 function invariant(pred, msg = 'invariant failed') {
   if (!pred) {
     throw new Error(msg)
