@@ -380,13 +380,14 @@ const updatePaddle = curry(function({ key, vp }, state) {
 })
 
 function ballBrickCollision(bricks, ball) {
-  return whileNothing((brick, idx) => {
+  const reducer = (brick, idx) => {
     if (!brick.alive) return Nothing
     return bounceCircleOffRect(brick, ball).map(ball => ({
       ball,
       bricks: overIdx(idx)(R.mergeDeepLeft({ alive: false }))(bricks),
     }))
-  })(bricks)
+  }
+  return whileNothing(reducer)(bricks)
 }
 
 const updateBallPaddleBricks = curry(function({ vp }, state) {
