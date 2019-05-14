@@ -351,7 +351,12 @@ function update(deps, state) {
 
 function updateGameOver({ vp }, state) {
   const newBall = translateByVelocity(state.ball)
-  return checkBallOutOfBottomEdge(vp, newBall)
+  const vpEx = rectExtrema(vp)
+  const ballEx = circExtrema(newBall)
+
+  const isOver = ballEx.maxY >= vpEx.maxY
+
+  return isOver
     ? Just({
         ...state,
         gameState: GameState.Over,
@@ -379,17 +384,6 @@ const updatePaddle = curry(function({ key, vp }, state) {
   return overProp('pad')(paddleF)(state)
 })
 
-function ballBrickCollision(bricks, ball) {
-  const reducer = (brick, idx) => {
-    if (!brick.alive) return Nothing
-    return bounceCircleOffRect(brick, ball).map(ball => ({
-      ball,
-      bricks: overIdx(idx)(R.mergeDeepLeft({ alive: false }))(bricks),
-    }))
-  }
-  return whileNothing(reducer)(bricks)
-}
-
 const updateBallPaddleBricks = curry(function({ vp }, state) {
   const { ball, pad, bricks } = state
 
@@ -404,12 +398,16 @@ const updateBallPaddleBricks = curry(function({ vp }, state) {
   return mergeDeepLeft(changes, state)
 })
 
-const checkBallOutOfBottomEdge = curry(function(vp, ball) {
-  const vpEx = rectExtrema(vp)
-  const ballEx = circExtrema(ball)
-
-  return ballEx.maxY >= vpEx.maxY
-})
+function ballBrickCollision(bricks, ball) {
+  const reducer = (brick, idx) => {
+    if (!brick.alive) return Nothing
+    return bounceCircleOffRect(brick, ball).map(ball => ({
+      ball,
+      bricks: overIdx(idx)(R.mergeDeepLeft({ alive: false }))(bricks),
+    }))
+  }
+  return whileNothing(reducer)(bricks)
+}
 
 //#endregion
 
