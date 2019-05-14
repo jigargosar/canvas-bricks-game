@@ -419,16 +419,22 @@ function update(deps, state) {
 }
 
 function renderGameState({ ctx, vp }, gs) {
-  if (!GameState.Over.is(gs)) return
-  ctx.fillStyle = 'rgba(0,0,0,0.5)'
-  fillRect(ctx, vp)
-  ctx.fillStyle = 'white'
-  const fz = 50
-  ctx.font = `${fz}px san-serif`
-  const textString = 'GAME OVER'
-  const tm = ctx.measureText(textString)
+  gs.cata({
+    Running: R.identity,
+    Over: () => {
+      // dim bg
+      ctx.fillStyle = 'rgba(0,0,0,0.5)'
+      fillRect(ctx, vp)
 
-  ctx.fillText(textString, vp.w / 2 - tm.width / 2, (vp.h + fz) / 2)
+      // render game over
+      ctx.fillStyle = 'white'
+      const fz = 50
+      ctx.font = `${fz}px san-serif`
+      const textString = 'GAME OVER'
+      const tm = ctx.measureText(textString)
+      ctx.fillText(textString, vp.w / 2 - tm.width / 2, (vp.h + fz) / 2)
+    },
+  })
 }
 
 function render({ vp, ctx }, { ball, pad, bricks, gameState }) {
