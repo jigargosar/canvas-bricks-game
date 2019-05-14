@@ -100,30 +100,30 @@ Maybe.withDefault = curry(function withDefault(defaultValue, mb) {
 const Just = Maybe.Just
 const Nothing = Maybe.Nothing
 
-Maybe.prototype.map = function map(f) {
-  return this.cata({
-    Just: () => Just(f(this.value)),
-    Nothing: () => this,
-  })
-}
-
-Maybe.prototype.orElse = function orElse(f) {
-  return this.cata({
-    Just: () => this,
-    Nothing: () => {
-      const r = f()
-      invariant(Maybe.is(r))
-      return r
-    },
-  })
-}
-
-Maybe.prototype.withDefault = function withDefault(defaultValue) {
-  return this.cata({
-    Just: () => this.value,
-    Nothing: () => defaultValue,
-  })
-}
+Object.assign(Maybe.prototype, {
+  map(f) {
+    return this.cata({
+      Just: () => Just(f(this.value)),
+      Nothing: () => this,
+    })
+  },
+  orElse(f) {
+    return this.cata({
+      Just: () => this,
+      Nothing: () => {
+        const r = f()
+        invariant(Maybe.is(r))
+        return r
+      },
+    })
+  },
+  withDefault(defaultValue) {
+    return this.cata({
+      Just: () => this.value,
+      Nothing: () => defaultValue,
+    })
+  },
+})
 
 //#endregion
 
@@ -410,26 +410,8 @@ const updateGameObjects = curry(function(deps, state) {
   )(state)
 })
 
-const gsIs = function(tagged) {
-  return R.pipe(
-    R.prop('gameState'),
-    tagged.is,
-  )
-}
-
 function update(deps, state) {
   const { key } = deps
-
-  const updateState = R.cond([
-    [
-      gsIs(GameState.Running),
-      state =>
-        updateGameOver(deps, state).withDefault(
-          updateGameObjects(deps, state),
-        ),
-    ],
-    [gsIs(GameState.Over), state => (key.space ? init(deps) : state)],
-  ])
 
   const fn = state.gameState.cata({
     Running: () => state =>
