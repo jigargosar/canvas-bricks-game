@@ -384,9 +384,9 @@ function ballBrickCollision(bricks, ball) {
     if (!brick.alive) return Nothing
     return bounceCircleOffRect(brick, ball).map(ball => ({
       ball,
-      bricks: overIdx(idx, R.mergeDeepLeft({ alive: false }), bricks),
+      bricks: overIdx(idx)(R.mergeDeepLeft({ alive: false }))(bricks),
     }))
-  }, bricks)
+  })(bricks)
 }
 
 const updateBallPaddleBricks = curry(function({ vp }, state) {
