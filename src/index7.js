@@ -277,14 +277,20 @@ function startGame({ init, update, render }) {
   requestAnimationFrame(step)
 }
 
+const GameState = taggedSum('GameState', { Running: [], Over: [] })
+
+function init({ vp }) {
+  return {
+    ball: initBall(vp),
+    pad: initPaddle(vp),
+    bricks: initBricks(vp),
+    gameState: GameState.Running,
+  }
+}
+
 function initBall(vp) {
   const [vx, vy] = fromPolar(7, degrees(100))
   return { x: vp.w / 2, y: vp.h / 2, r: 10, vx, vy }
-}
-
-function renderBall(ctx, ball) {
-  ctx.fillStyle = 'green'
-  fillCircle(ctx, ball)
 }
 
 function initPaddle(vp) {
@@ -292,11 +298,6 @@ function initPaddle(vp) {
   const x = (vp.w - pad.w) / 2
   const y = vp.h - pad.h - 20
   return { ...pad, x, y }
-}
-
-function renderPaddle(ctx, { x, y, w, h }) {
-  ctx.fillStyle = 'orange'
-  ctx.fillRect(x, y, w, h)
 }
 
 function initBricks(vp) {
@@ -327,10 +328,37 @@ function initBricks(vp) {
   }
 }
 
-function renderBricks(ctx, bricks) {
-  ctx.fillStyle = 'dodgerblue'
-  bricks.filter(prop('alive')).forEach(fillRect(ctx))
+//#region UPDATE
+
+function update(deps, state) {
+  const { key } = deps
+
+  return state.gameState.cata({
+    Running: () =>
+      updateGameOver(deps, state).withDefault(
+        updateGameObjects(deps, state),
+      ),
+    Over: () => (key.space ? init(deps) : state),
+  })
 }
+
+function updateGameOver({ vp }, state) {
+  const newBall = translateByVelocity(state.ball)
+  return checkBallOutOfBottomEdge(vp, newBall)
+    ? Just({
+        ...state,
+        gameState: GameState.Over,
+        ball: newBall,
+      })
+    : Nothing
+}
+
+const updateGameObjects = curry(function(deps, state) {
+  return R.compose(
+    updateBallPaddleBricks(deps),
+    updatePaddle(deps),
+  )(state)
+})
 
 const updatePaddle = curry(function updatePaddle_({ key, vp }, state) {
   const updateVel = pad => {
@@ -377,46 +405,9 @@ const checkBallOutOfBottomEdge = curry(function(vp, ball) {
   return ballEx.maxY >= vpEx.maxY
 })
 
-const GameState = taggedSum('GameState', { Running: [], Over: [] })
+//#endregion
 
-function init({ vp }) {
-  return {
-    ball: initBall(vp),
-    pad: initPaddle(vp),
-    bricks: initBricks(vp),
-    gameState: GameState.Running,
-  }
-}
-
-function updateGameOver({ vp }, state) {
-  const newBall = translateByVelocity(state.ball)
-  return checkBallOutOfBottomEdge(vp, newBall)
-    ? Just({
-        ...state,
-        gameState: GameState.Over,
-        ball: newBall,
-      })
-    : Nothing
-}
-
-const updateGameObjects = curry(function(deps, state) {
-  return R.compose(
-    updateBallPaddleBricks(deps),
-    updatePaddle(deps),
-  )(state)
-})
-
-function update(deps, state) {
-  const { key } = deps
-
-  return state.gameState.cata({
-    Running: () =>
-      updateGameOver(deps, state).withDefault(
-        updateGameObjects(deps, state),
-      ),
-    Over: () => (key.space ? init(deps) : state),
-  })
-}
+//#region RENDER
 
 function render({ vp, ctx }, { ball, pad, bricks, gameState }) {
   renderBall(ctx, ball)
@@ -443,5 +434,21 @@ function renderGameState({ ctx, vp }, gs) {
     },
   })
 }
+function renderBall(ctx, ball) {
+  ctx.fillStyle = 'green'
+  fillCircle(ctx, ball)
+}
+
+function renderPaddle(ctx, { x, y, w, h }) {
+  ctx.fillStyle = 'orange'
+  ctx.fillRect(x, y, w, h)
+}
+
+function renderBricks(ctx, bricks) {
+  ctx.fillStyle = 'dodgerblue'
+  bricks.filter(prop('alive')).forEach(fillRect(ctx))
+}
+
+//#endregion
 
 startGame({ init, update, render })
