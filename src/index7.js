@@ -217,7 +217,7 @@ function clampRectInRect(big, small) {
 
 //#endregion GEOM
 
-//#region RENDER
+//#region RENDER_COMMON
 const fillRect = curry(function fillRect_(ctx, { x, y, w, h }) {
   return ctx.fillRect(x, y, w, h)
 })
