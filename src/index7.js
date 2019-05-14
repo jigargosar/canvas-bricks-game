@@ -93,10 +93,6 @@ Maybe.fromEmpty = function maybeFromEmpty(val) {
   return isEmpty(val) ? Nothing : Just(val)
 }
 
-Maybe.withDefault = curry(function withDefault(defaultValue, mb) {
-  return mb.withDefault(defaultValue)
-})
-
 const Just = Maybe.Just
 const Nothing = Maybe.Nothing
 
