@@ -368,17 +368,15 @@ const updateGameObjects = curry(function(deps, state) {
 })
 
 const updatePaddle = curry(function updatePaddle_({ key, vp }, state) {
-  const updateVel = pad => {
-    const dx = 2
-    return { ...pad, vx: key.left ? -dx : key.right ? dx : 0 }
-  }
+  const dx = 2
+  const newVX = key.left ? -dx : key.right ? dx : 0
 
-  const update = compose(
+  const paddleF = compose(
     small => clampRectInRect(vp, small),
     translateByVelocity,
-    updateVel,
+    R.assoc('vx')(newVX),
   )
-  return overProp('pad')(update)(state)
+  return overProp('pad')(paddleF)(state)
 })
 
 function ballBrickCollision(bricks, ball) {
