@@ -409,15 +409,13 @@ const updateGameObjects = curry(function(deps, state) {
 function update(deps, state) {
   const { key } = deps
 
-  const fn = state.gameState.cata({
-    Running: () => state =>
+  return state.gameState.cata({
+    Running: () =>
       updateGameOver(deps, state).withDefault(
         updateGameObjects(deps, state),
       ),
-    Over: () => state => (key.space ? init(deps) : state),
+    Over: () => (key.space ? init(deps) : state),
   })
-
-  return fn(state)
 }
 
 function renderGameState({ ctx, vp }, gs) {
