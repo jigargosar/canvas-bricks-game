@@ -431,7 +431,15 @@ function update(deps, state) {
     [gsIs(GameState.Over), state => (key.space ? init(deps) : state)],
   ])
 
-  return updateState(state)
+  const fn = state.gameState.cata({
+    Running: () => state =>
+      updateGameOver(deps, state).withDefault(
+        updateGameObjects(deps, state),
+      ),
+    Over: () => state => (key.space ? init(deps) : state),
+  })
+
+  return fn(state)
 }
 
 function renderGameState({ ctx, vp }, gs) {
