@@ -229,6 +229,8 @@ const fillCircle = curry(function fillRect_(ctx, { x, y, r }) {
 })
 //#endregion
 
+//#region GAME_COMMON
+
 const Key = function initKeyboard() {
   const km = {}
   window.addEventListener('keydown', e => {
@@ -276,6 +278,9 @@ function startGame({ init, update, render }) {
   }
   requestAnimationFrame(step)
 }
+//#endregion
+
+//#region INIT
 
 const GameState = taggedSum('GameState', { Running: [], Over: [] })
 
@@ -327,6 +332,8 @@ function initBricks(vp) {
     }
   }
 }
+
+//#endregion
 
 //#region UPDATE
 
