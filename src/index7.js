@@ -205,7 +205,7 @@ function bounceCircleOffRect(rect, cir_) {
   return isEmpty(changes) ? Nothing : Just(changes)
 }
 
-function clampRectInRect(big, small) {
+const clampRectInRect = curry(function(big, small) {
   invariant(small.w < big.w && small.h < big.h)
 
   return {
@@ -213,7 +213,7 @@ function clampRectInRect(big, small) {
     x: clamp(big.x, big.w - small.w, small.x),
     y: clamp(big.y, big.h - small.h, small.y),
   }
-}
+})
 
 //#endregion GEOM
 
@@ -367,12 +367,12 @@ const updateGameObjects = curry(function(deps, state) {
   )(state)
 })
 
-const updatePaddle = curry(function updatePaddle_({ key, vp }, state) {
+const updatePaddle = curry(function({ key, vp }, state) {
   const dx = 2
   const newVX = key.left ? -dx : key.right ? dx : 0
 
   const paddleF = compose(
-    small => clampRectInRect(vp, small),
+    clampRectInRect(vp),
     translateByVelocity,
     R.assoc('vx')(newVX),
   )
