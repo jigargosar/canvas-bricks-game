@@ -129,6 +129,10 @@ function rectExtrema({ x, y, w, h }) {
   return { minX: x, minY: y, maxX: x + w, maxY: y + h }
 }
 
+function circExtrema({ x, y, r }) {
+  return { minX: x - r, maxX: x + r, minY: y - r, maxY: y + r }
+}
+
 function shrinkRectByCircle(circle, rect) {
   const radius = circle.r
   const dia = radius * 2
@@ -365,10 +369,6 @@ const updateBallPaddleBricks = curry(function({ vp }, state) {
 
   return mergeDeepLeft(changes, state)
 })
-
-function circExtrema({ x, y, r }) {
-  return { minX: x - r, maxX: x + r, minY: y - r, maxY: y + r }
-}
 
 const checkBallOutOfBottomEdge = curry(function(vp, ball) {
   const vpEx = rectExtrema(vp)
