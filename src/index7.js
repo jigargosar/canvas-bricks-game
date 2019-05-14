@@ -418,6 +418,13 @@ function update(deps, state) {
   })
 }
 
+function render({ vp, ctx }, { ball, pad, bricks, gameState }) {
+  renderBall(ctx, ball)
+  renderPaddle(ctx, pad)
+  renderBricks(ctx, bricks)
+  renderGameState({ ctx, vp }, gameState)
+}
+
 function renderGameState({ ctx, vp }, gs) {
   gs.cata({
     Running: R.identity,
@@ -437,15 +444,4 @@ function renderGameState({ ctx, vp }, gs) {
   })
 }
 
-function render({ vp, ctx }, { ball, pad, bricks, gameState }) {
-  renderBall(ctx, ball)
-  renderPaddle(ctx, pad)
-  renderBricks(ctx, bricks)
-  renderGameState({ ctx, vp }, gameState)
-}
-
-startGame({
-  init,
-  update,
-  render,
-})
+startGame({ init, update, render })
