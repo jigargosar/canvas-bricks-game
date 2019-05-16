@@ -8,3 +8,5 @@
 - git commit message prefilling & history.
   https://github.com/JanBN/vscode-git-last-commit-message
   @learn @vsc:ext:dev @awesome
+
+* testing commit message
