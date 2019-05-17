@@ -79,6 +79,8 @@ const initBall = vp => ({
   x: vp.w / 2,
   y: (vp.h * 2) / 3,
   r: 10,
+  vx: 1,
+  vy: 1,
 })
 
 const initPad = vp => {
@@ -106,24 +108,49 @@ const viewBall = ball => {
 }
 
 const update = ({ vp, key }) => state => {
-  return R.compose(
+  return R.pipe(
     //
     updatePad({ vp, key }),
+    updateBall(vp),
   )(state)
 }
 
 const arrowKeyToDx = key => (key.left ? -1 : key.right ? 1 : 0)
 const overPad = R.over(R.lensProp('pad'))
 const overX = R.over(R.lensProp('x'))
+const overY = R.over(R.lensProp('y'))
 
 const updatePad = ({ vp, key }) =>
   overPad(pad =>
     overX(
       R.pipe(
         R.add(arrowKeyToDx(key) * 10),
-        R.clamp(vp.x)(vp.w - pad.w),
+        R.clamp(0)(vp.w - pad.w),
       ),
     )(pad),
   )
+
+const overProp = R.pipe(
+  R.lensProp,
+  R.over,
+)
+
+const updateBall = vp =>
+  overProp('ball')(ball => {
+    const xfn = R.pipe(
+      R.add(ball.vx),
+      R.clamp(ball.r, vp.w - ball.r),
+    )
+
+    const yfn = R.pipe(
+      R.add(ball.vy),
+      R.clamp(ball.r, vp.w - ball.r),
+    )
+
+    return R.pipe(
+      overX(xfn),
+      overY(yfn),
+    )(ball)
+  })
 
 run(init)(view)(update)
