@@ -12,9 +12,15 @@ const Canvas2D = {
     const { x, y, w, h } = vp
     ctx.clearRect(x, y, w, h)
   },
-  fillRect: ({ x, y, w, h, style }) => ({ ctx }) => {
-    ctx.fillStyle = style
+  fillRect: ({ x, y, w, h, fill }) => ({ ctx }) => {
+    ctx.fillStyle = fill
     ctx.fillRect(x, y, w, h)
+  },
+  fillCircle: ({ x, y, r, fill }) => ({ ctx }) => {
+    ctx.beginPath()
+    ctx.fillStyle = fill
+    ctx.arc(x, y, r, 0, 2 * Math.PI, false)
+    ctx.fill()
   },
   run: ({ vp, ctx }) => viewCmds =>
     R.compose(
@@ -66,6 +72,13 @@ const run = initFn => viewFn => updateFn => {
 
 const init = vp => ({
   pad: initPad(vp),
+  ball: initBall(vp),
+})
+
+const initBall = vp => ({
+  x: vp.w / 2,
+  y: (vp.h * 2) / 3,
+  r: 10,
 })
 
 const initPad = vp => {
@@ -79,11 +92,17 @@ const view = state => [
   //
   Canvas2D.clearScreen(),
   viewPad(state.pad),
+  viewBall(state.ball),
 ]
 
 const viewPad = pad => {
   const { x, y, w, h } = pad
-  return Canvas2D.fillRect({ x, y, w, h, style: 'orange' })
+  return Canvas2D.fillRect({ x, y, w, h, fill: 'orange' })
+}
+
+const viewBall = ball => {
+  const { x, y, r } = ball
+  return Canvas2D.fillCircle({ x, y, r, fill: 'blue' })
 }
 
 const update = ({ vp, key }) => state => {
