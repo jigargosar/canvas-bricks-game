@@ -9,14 +9,9 @@ const elById = id => document.getElementById(id)
 const run = () => {
   const vpWidth = 400
   const vpHeight = 400
-  const canvas = elById('gameScreen')
-  canvas.width = vpWidth
-  canvas.height = vpHeight
-  canvas.className = 'db center ba bw1 b--green'
-
-  const ctx = canvas.getContext('2d')
-
   const vp = { x: 0, y: 0, w: vpWidth, h: vpHeight }
+
+  const ctx = initCanvas(vpWidth, vpHeight)
 
   const state = {
     pad: initPad(vp),
@@ -32,6 +27,15 @@ const render = ctx => state => {
 }
 
 run()
+function initCanvas(vpWidth, vpHeight) {
+  const canvas = elById('gameScreen')
+  canvas.width = vpWidth
+  canvas.height = vpHeight
+  canvas.className = 'db center ba bw1 b--green'
+  const ctx = canvas.getContext('2d')
+  return ctx
+}
+
 function initPad(vp) {
   const padWidth = 100
   const padHeight = 15
