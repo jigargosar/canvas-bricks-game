@@ -6,16 +6,21 @@ import './index.css'
 
 const elById = id => document.getElementById(id)
 
-const render = ctx => state => {
-  const { x, y, w, h } = state.pad
-  ctx.fillStyle = 'orange'
-  ctx.fillRect(x, y, w, h)
+const Canvas2D = {
+  clearScreen: () => ({ ctx, vp }) => {
+    const { x, y, w, h } = vp
+    ctx.clearRect(x, y, w, h)
+  },
+  fillRect: ({ x, y, w, h, style }) => ({ ctx }) => {
+    ctx.fillStyle = style
+    ctx.fillRect(x, y, w, h)
+  },
 }
 
-function initCanvas(vpWidth, vpHeight) {
+function initCanvas(width, height) {
   const canvas = elById('gameScreen')
-  canvas.width = vpWidth
-  canvas.height = vpHeight
+  canvas.width = width
+  canvas.height = height
   canvas.className = 'db center ba bw1 b--green'
   const ctx = canvas.getContext('2d')
   return ctx
@@ -33,18 +38,34 @@ function initPad(vp) {
   return initialPad
 }
 
-const run = () => {
-  const vpWidth = 400
-  const vpHeight = 400
-  const vp = { x: 0, y: 0, w: vpWidth, h: vpHeight }
-
-  const ctx = initCanvas(vpWidth, vpHeight)
-
-  const state = {
-    pad: initPad(vp),
-  }
-
-  render(ctx)(state)
+const runDrawCanvas = ({ ctx, vp }) => viewCmds => {
+  const callWith = arg => fn => fn(arg)
+  R.flatten(viewCmds).forEach(callWith({ ctx, vp }))
 }
 
-run()
+const run = initFn => viewFn => {
+  const vp = { x: 0, y: 0, w: 400, h: 400 }
+
+  const ctx = initCanvas(vp.w, vp.h)
+
+  const state = initFn(vp)
+
+  const viewCmds = viewFn(state)
+  runDrawCanvas({ ctx, vp })(viewCmds)
+}
+
+const init = vp => {
+  return {
+    pad: initPad(vp),
+  }
+}
+const view = state => {
+  return [Canvas2D.clearScreen(), renderPad(state.pad)]
+}
+
+const renderPad = pad => {
+  const { x, y, w, h } = pad
+  return Canvas2D.fillRect({ x, y, w, h, style: 'orange' })
+}
+
+run(init)(view)
