@@ -94,15 +94,17 @@ const update = ({ vp, key }) => state => {
 }
 
 const arrowKeyToDx = key => (key.left ? -1 : key.right ? 1 : 0)
-
 const overPad = R.over(R.lensProp('pad'))
+const overX = R.over(R.lensProp('x'))
 
 const updatePad = ({ vp, key }) =>
-  overPad(
-    R.pipe(
-      pad => ({ ...pad, x: pad.x + arrowKeyToDx(key) * 10 }),
-      pad => ({ ...pad, x: R.clamp(vp.x)(vp.w - pad.w)(pad.x) }),
-    ),
+  overPad(pad =>
+    overX(
+      R.pipe(
+        R.add(arrowKeyToDx(key) * 10),
+        R.clamp(vp.x)(vp.w - pad.w),
+      ),
+    )(pad),
   )
 
 run(init)(view)(update)
