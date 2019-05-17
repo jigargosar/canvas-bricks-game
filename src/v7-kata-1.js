@@ -127,8 +127,8 @@ const updatePad = ({ vp, key }) =>
   overPad(pad =>
     overX(
       R.pipe(
-        R.add(arrowKeyToDx(key) * 10),
-        R.clamp(0)(vp.w - pad.w),
+        add(arrowKeyToDx(key) * 10),
+        clamp(0)(vp.w - pad.w),
       ),
     )(pad),
   )
@@ -147,22 +147,22 @@ const absNeg = R.pipe(
 const overVx = overProp('vx')
 const overVy = overProp('vy')
 
-const clampBallInViewport = vp => ball =>
+const clampBallInViewport = vp =>
   R.pipe(
-    overX(R.clamp(ball.r, vp.w - ball.r)),
-    overY(R.clamp(ball.r, vp.h - ball.r)),
-  )(ball)
+    b => overX(clamp(b.r)(vp.w - b.r))(b),
+    b => overY(clamp(b.r)(vp.h - b.r))(b),
+  )
 
 const updateBall = vp =>
   overProp('ball')(ball => {
     const updateXY = R.pipe(
-      overX(R.add(ball.vx)),
-      overY(R.add(ball.vy)),
+      overX(add(ball.vx)),
+      overY(add(ball.vy)),
     )
 
     return R.pipe(
-      b => overX(R.add(b.vx))(b),
-      b => overY(R.add(b.vy))(b),
+      b => overX(add(b.vx))(b),
+      b => overY(add(b.vy))(b),
       b => overVx(b.x < b.r ? abs : b.x > vp.w - b.r ? absNeg : I)(b),
       b => overVy(b.y < b.r ? abs : b.y > vp.w - b.r ? absNeg : I)(b),
       clampBallInViewport(vp),
