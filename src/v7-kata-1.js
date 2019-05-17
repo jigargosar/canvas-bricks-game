@@ -131,6 +131,63 @@ const updatePad = ({ vp, key }) =>
     )(pad),
   )
 
-const updateBall = () => I
+const updateBall = vp => state => {
+  const ball = state.ball
+  const newBall = { ...ball, x: ball.x + ball.vx, y: ball.y + ball.vy }
+
+  if (ballViewportHitTest(vp)(newBall)) {
+    const solvedBall = resolveBallViewportCollision(vp)(newBall)
+    return { ...state, ball: solvedBall }
+  } else if (ballPaddleHitTest(state.pad)(newBall)) {
+    return { ...state }
+  } else {
+    return { ...state, ball: newBall }
+  }
+}
+
+const resolveBallViewportCollision = vp => ball => {
+  const vpExtrema = {
+    minX: vp.x + ball.r,
+    maxX: vp.x + vp.w - ball.r,
+    minY: vp.y + ball.r,
+    maxY: vp.y + vp.h - ball.r,
+  }
+  const abs = Math.abs
+  const absNeg = x => Math.abs(x) * -1
+
+  const newXParts = (() => {
+    if (ball.x < vpExtrema.minX) {
+      return { x: vpExtrema.minX, vx: abs(ball.vx) }
+    } else if (ball.x > vpExtrema.maxX) {
+      return { x: vpExtrema.maxX, vx: absNeg(ball.vx) }
+    } else {
+      return {}
+    }
+  })()
+
+  const newYParts = (() => {
+    if (ball.y < vpExtrema.minY) {
+      return { y: vpExtrema.minY, vy: abs(ball.vy) }
+    } else if (ball.y > vpExtrema.maxY) {
+      return { y: vpExtrema.maxY, vy: absNeg(ball.vy) }
+    } else {
+      return {}
+    }
+  })()
+
+  return { ...ball, ...newXParts, ...newYParts }
+}
+
+const ballViewportHitTest = vp => ball => {
+  const minX = vp.x + ball.r
+  const maxX = vp.x + vp.w - ball.r
+  const minY = vp.y + ball.r
+  const maxY = vp.y + vp.h - ball.r
+  return ball.x < minX || ball.x > maxX || ball.y < minY || ball.y > maxY
+}
+
+const ballPaddleHitTest = paddle => ball => {
+  return false
+}
 
 run(init)(view)(update)
