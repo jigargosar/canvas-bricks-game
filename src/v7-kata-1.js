@@ -38,10 +38,13 @@ function initPad(vp) {
   return initialPad
 }
 
-const runDrawCanvas = ({ ctx, vp }) => viewCmds => {
-  const callWith = arg => fn => fn(arg)
-  R.flatten(viewCmds).forEach(callWith({ ctx, vp }))
-}
+const callWith = arg => fn => fn(arg)
+
+const runDrawCanvas = ({ vp, ctx }) => viewCmds =>
+  R.compose(
+    R.forEach(callWith({ vp, ctx })),
+    R.flatten,
+  )(viewCmds)
 
 const run = initFn => viewFn => {
   const vp = { x: 0, y: 0, w: 400, h: 400 }
