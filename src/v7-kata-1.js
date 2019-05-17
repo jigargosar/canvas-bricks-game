@@ -8,6 +8,8 @@ const callWith = arg => fn => fn(arg)
 const I = R.identity
 const add = R.add
 const clamp = R.clamp
+const abs = Math.abs
+const absNeg = x => Math.abs(x) * -1
 
 const Canvas2D = {
   clearScreen: () => ({ ctx, vp }) => {
@@ -146,30 +148,27 @@ const updateBall = vp => state => {
 }
 
 const resolveBallViewportCollision = vp => ball => {
-  const vpExtrema = {
-    minX: vp.x + ball.r,
-    maxX: vp.x + vp.w - ball.r,
-    minY: vp.y + ball.r,
-    maxY: vp.y + vp.h - ball.r,
-  }
-  const abs = Math.abs
-  const absNeg = x => Math.abs(x) * -1
+  const minX = vp.x + ball.r
+  const maxX = vp.x + vp.w - ball.r
 
   const newXParts = (() => {
-    if (ball.x < vpExtrema.minX) {
-      return { x: vpExtrema.minX, vx: abs(ball.vx) }
-    } else if (ball.x > vpExtrema.maxX) {
-      return { x: vpExtrema.maxX, vx: absNeg(ball.vx) }
+    if (ball.x < minX) {
+      return { x: minX, vx: abs(ball.vx) }
+    } else if (ball.x > maxX) {
+      return { x: maxX, vx: absNeg(ball.vx) }
     } else {
       return {}
     }
   })()
 
+  const minY = vp.y + ball.r
+  const maxY = vp.y + vp.h - ball.r
+
   const newYParts = (() => {
-    if (ball.y < vpExtrema.minY) {
-      return { y: vpExtrema.minY, vy: abs(ball.vy) }
-    } else if (ball.y > vpExtrema.maxY) {
-      return { y: vpExtrema.maxY, vy: absNeg(ball.vy) }
+    if (ball.y < minY) {
+      return { y: minY, vy: abs(ball.vy) }
+    } else if (ball.y > maxY) {
+      return { y: maxY, vy: absNeg(ball.vy) }
     } else {
       return {}
     }
