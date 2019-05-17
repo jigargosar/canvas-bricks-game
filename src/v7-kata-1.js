@@ -14,3 +14,5 @@ const run = () => {
   canvas.height = 400
   canvas.className = 'db center ba b--green'
 }
+
+run()
