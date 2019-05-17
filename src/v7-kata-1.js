@@ -139,6 +139,15 @@ const clampY = min => max => overY(clamp(min)(max))
 const translateX = v => overX(add(v))
 const translateY = v => overY(add(v))
 
+const overVx = overProp('vx')
+const overVy = overProp('vy')
+
+const translateBy = dx => dy =>
+  R.pipe(
+    translateX(dx),
+    translateY(dy),
+  )
+
 const updatePad = ({ vp, key }) =>
   overPad(pad =>
     overX(
@@ -149,14 +158,10 @@ const updatePad = ({ vp, key }) =>
     )(pad),
   )
 
-const overVx = overProp('vx')
-const overVy = overProp('vy')
-
 const updateBall = vp =>
   overBall(ball => {
     return R.pipe(
-      b => translateX(b.vx)(b),
-      b => translateY(b.vy)(b),
+      b => translateBy(b.vx)(b.vy)(b),
       b => overVx(b.x < b.r ? abs : b.x > vp.w - b.r ? absNeg : I)(b),
       b => overVy(b.y < b.r ? abs : b.y > vp.w - b.r ? absNeg : I)(b),
       clampBallInViewport(vp),
