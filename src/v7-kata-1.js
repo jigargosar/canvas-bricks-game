@@ -32,15 +32,21 @@ function initCanvas(width, height) {
   return ctx
 }
 
-const run = initFn => viewFn => {
+const run = initFn => viewFn => updateFn => {
   const vp = { x: 0, y: 0, w: 400, h: 400 }
 
   const ctx = initCanvas(vp.w, vp.h)
 
-  const state = initFn(vp)
+  const initialState = initFn(vp)
 
-  const viewCmds = viewFn(state)
-  Canvas2D.run({ ctx, vp })(viewCmds)
+  const onFrame = state => () => {
+    const viewCmds = viewFn(state)
+    Canvas2D.run({ ctx, vp })(viewCmds)
+    const nextState = updateFn(vp)(state)
+    requestAnimationFrame(onFrame(nextState))
+  }
+
+  requestAnimationFrame(onFrame(initialState))
 }
 
 const init = vp => ({
@@ -65,4 +71,8 @@ const viewPad = pad => {
   return Canvas2D.fillRect({ x, y, w, h, style: 'orange' })
 }
 
-run(init)(view)
+const update = vp => state => {
+  return state
+}
+
+run(init)(view)(update)
