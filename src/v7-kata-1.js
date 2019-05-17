@@ -6,6 +6,9 @@ import './index.css'
 
 const elById = id => document.getElementById(id)
 const callWith = arg => fn => fn(arg)
+const I = R.identity
+const add = R.add
+const clamp = R.clamp
 
 const Canvas2D = {
   clearScreen: () => ({ ctx, vp }) => {
@@ -135,21 +138,34 @@ const overProp = R.pipe(
   R.over,
 )
 
+const abs = Math.abs
+const absNeg = R.pipe(
+  abs,
+  R.negate,
+)
+
+const overVx = overProp('vx')
+const overVy = overProp('vy')
+
+const clampBallInViewport = vp => ball =>
+  R.pipe(
+    overX(R.clamp(ball.r, vp.w - ball.r)),
+    overY(R.clamp(ball.r, vp.h - ball.r)),
+  )(ball)
+
 const updateBall = vp =>
   overProp('ball')(ball => {
-    const xfn = R.pipe(
-      R.add(ball.vx),
-      R.clamp(ball.r, vp.w - ball.r),
-    )
-
-    const yfn = R.pipe(
-      R.add(ball.vy),
-      R.clamp(ball.r, vp.w - ball.r),
+    const updateXY = R.pipe(
+      overX(R.add(ball.vx)),
+      overY(R.add(ball.vy)),
     )
 
     return R.pipe(
-      overX(xfn),
-      overY(yfn),
+      b => overX(R.add(b.vx))(b),
+      b => overY(R.add(b.vy))(b),
+      b => overVx(b.x < b.r ? abs : b.x > vp.w - b.r ? absNeg : I)(b),
+      b => overVy(b.y < b.r ? abs : b.y > vp.w - b.r ? absNeg : I)(b),
+      clampBallInViewport(vp),
     )(ball)
   })
 
