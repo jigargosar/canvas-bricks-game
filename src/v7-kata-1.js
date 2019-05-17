@@ -72,7 +72,7 @@ const initPad = vp => {
   const w = 100
   const h = 15
 
-  return { x: (vp.w - w) / 2, y: vp.h - h * 2, w, h, vx: 0 }
+  return { x: (vp.w - w) / 2, y: vp.h - h * 2, w, h }
 }
 
 const view = state => [
@@ -99,10 +99,9 @@ const overPad = R.over(R.lensProp('pad'))
 
 const updatePad = ({ vp, key }) =>
   overPad(
-    R.compose(
-      //
-      pad => ({ ...pad, x: pad.x + pad.vx }),
-      pad => ({ ...pad, vx: arrowKeyToDx(key) * 10 }),
+    R.pipe(
+      pad => ({ ...pad, x: pad.x + arrowKeyToDx(key) * 10 }),
+      pad => ({ ...pad, x: R.clamp(vp.x)(vp.w - pad.w)(pad.x) }),
     ),
   )
 
