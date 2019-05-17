@@ -5,6 +5,7 @@ import 'tachyons'
 import './index.css'
 
 const elById = id => document.getElementById(id)
+const callWith = arg => fn => fn(arg)
 
 const Canvas2D = {
   clearScreen: () => ({ ctx, vp }) => {
@@ -17,6 +18,12 @@ const Canvas2D = {
   },
 }
 
+const runDrawCanvas = ({ vp, ctx }) => viewCmds =>
+  R.compose(
+    R.forEach(callWith({ vp, ctx })),
+    R.flatten,
+  )(viewCmds)
+
 function initCanvas(width, height) {
   const canvas = elById('gameScreen')
   canvas.width = width
@@ -25,6 +32,21 @@ function initCanvas(width, height) {
   const ctx = canvas.getContext('2d')
   return ctx
 }
+
+const run = initFn => viewFn => {
+  const vp = { x: 0, y: 0, w: 400, h: 400 }
+
+  const ctx = initCanvas(vp.w, vp.h)
+
+  const state = initFn(vp)
+
+  const viewCmds = viewFn(state)
+  runDrawCanvas({ ctx, vp })(viewCmds)
+}
+
+const init = vp => ({
+  pad: initPad(vp),
+})
 
 function initPad(vp) {
   const padWidth = 100
@@ -38,33 +60,11 @@ function initPad(vp) {
   return initialPad
 }
 
-const callWith = arg => fn => fn(arg)
-
-const runDrawCanvas = ({ vp, ctx }) => viewCmds =>
-  R.compose(
-    R.forEach(callWith({ vp, ctx })),
-    R.flatten,
-  )(viewCmds)
-
-const run = initFn => viewFn => {
-  const vp = { x: 0, y: 0, w: 400, h: 400 }
-
-  const ctx = initCanvas(vp.w, vp.h)
-
-  const state = initFn(vp)
-
-  const viewCmds = viewFn(state)
-  runDrawCanvas({ ctx, vp })(viewCmds)
-}
-
-const init = vp => {
-  return {
-    pad: initPad(vp),
-  }
-}
-const view = state => {
-  return [Canvas2D.clearScreen(), renderPad(state.pad)]
-}
+const view = state => [
+  //
+  Canvas2D.clearScreen(),
+  renderPad(state.pad),
+]
 
 const renderPad = pad => {
   const { x, y, w, h } = pad
