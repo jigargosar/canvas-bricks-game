@@ -1,7 +1,7 @@
 # Notes
 
 - shift+space key shortcut causes unecessary pauses @vsc
-- have to type commit messages over and over again @vsc
+- @done have to type commit messages over and over again @vsc
 - gclm ext has sample code to show quick pick. check api and see if we can use custom filter to narrow list.
 
 # Resources
