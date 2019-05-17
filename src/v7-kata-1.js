@@ -6,27 +6,12 @@ import './index.css'
 
 const elById = id => document.getElementById(id)
 
-const run = () => {
-  const vpWidth = 400
-  const vpHeight = 400
-  const vp = { x: 0, y: 0, w: vpWidth, h: vpHeight }
-
-  const ctx = initCanvas(vpWidth, vpHeight)
-
-  const state = {
-    pad: initPad(vp),
-  }
-
-  render(ctx)(state)
-}
-
 const render = ctx => state => {
   const { x, y, w, h } = state.pad
   ctx.fillStyle = 'orange'
   ctx.fillRect(x, y, w, h)
 }
 
-run()
 function initCanvas(vpWidth, vpHeight) {
   const canvas = elById('gameScreen')
   canvas.width = vpWidth
@@ -47,3 +32,19 @@ function initPad(vp) {
   }
   return initialPad
 }
+
+const run = () => {
+  const vpWidth = 400
+  const vpHeight = 400
+  const vp = { x: 0, y: 0, w: vpWidth, h: vpHeight }
+
+  const ctx = initCanvas(vpWidth, vpHeight)
+
+  const state = {
+    pad: initPad(vp),
+  }
+
+  render(ctx)(state)
+}
+
+run()
