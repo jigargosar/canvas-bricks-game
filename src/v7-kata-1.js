@@ -72,7 +72,7 @@ const initPad = vp => {
   const w = 100
   const h = 15
 
-  return { x: (vp.w - w) / 2, y: vp.h - h * 2, w, h, dx: 0, dy: 0 }
+  return { x: (vp.w - w) / 2, y: vp.h - h * 2, w, h, vx: 0 }
 }
 
 const view = state => [
@@ -87,12 +87,23 @@ const viewPad = pad => {
 }
 
 const update = ({ vp, key }) => state => {
-  return R.compose(updatePadVel(key))(state)
+  return R.compose(
+    //
+    updatePad({ vp, key }),
+  )(state)
 }
 
-const arrowKeyToUnitDx = key => (key.left ? -1 : key.right ? 1 : 0)
+const arrowKeyToDx = key => (key.left ? -1 : key.right ? 1 : 0)
 
-const updatePadVel = key => state =>
-  R.assocPath(['pad', 'dx'], arrowKeyToUnitDx(key) * 10)(state)
+const overPad = R.over(R.lensProp('pad'))
+
+const updatePad = ({ vp, key }) =>
+  overPad(
+    R.compose(
+      //
+      pad => ({ ...pad, x: pad.x + pad.vx }),
+      pad => ({ ...pad, vx: arrowKeyToDx(key) * 10 }),
+    ),
+  )
 
 run(init)(view)(update)
