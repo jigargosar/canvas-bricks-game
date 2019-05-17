@@ -6,13 +6,11 @@ import './index.css'
 
 const elById = id => document.getElementById(id)
 
-const getGameCanvas = elById('gameScreen')
-
 const run = () => {
-  const canvas = getGameCanvas()
+  const canvas = elById('gameScreen')
   canvas.width = 400
   canvas.height = 400
-  canvas.className = 'db center ba b--green'
+  canvas.className = 'db center ba bw1 b--green'
 }
 
 run()
