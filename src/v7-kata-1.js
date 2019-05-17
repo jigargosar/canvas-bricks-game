@@ -9,6 +9,15 @@ const callWith = arg => fn => fn(arg)
 const I = R.identity
 const add = R.add
 const clamp = R.clamp
+const overProp = R.pipe(
+  R.lensProp,
+  R.over,
+)
+const abs = Math.abs
+const absNeg = R.pipe(
+  abs,
+  R.negate,
+)
 
 const Canvas2D = {
   clearScreen: () => ({ ctx, vp }) => {
@@ -120,8 +129,15 @@ const update = ({ vp, key }) => state => {
 
 const arrowKeyToDx = key => (key.left ? -1 : key.right ? 1 : 0)
 const overPad = R.over(R.lensProp('pad'))
+const overBall = R.over(R.lensProp('ball'))
 const overX = R.over(R.lensProp('x'))
 const overY = R.over(R.lensProp('y'))
+
+const clampX = min => max => overX(clamp(min)(max))
+const clampY = min => max => overY(clamp(min)(max))
+
+const translateX = v => overX(add(v))
+const translateY = v => overY(add(v))
 
 const updatePad = ({ vp, key }) =>
   overPad(pad =>
@@ -133,40 +149,24 @@ const updatePad = ({ vp, key }) =>
     )(pad),
   )
 
-const overProp = R.pipe(
-  R.lensProp,
-  R.over,
-)
-
-const abs = Math.abs
-const absNeg = R.pipe(
-  abs,
-  R.negate,
-)
-
 const overVx = overProp('vx')
 const overVy = overProp('vy')
 
-const clampBallInViewport = vp =>
-  R.pipe(
-    b => overX(clamp(b.r)(vp.w - b.r))(b),
-    b => overY(clamp(b.r)(vp.h - b.r))(b),
-  )
-
 const updateBall = vp =>
-  overProp('ball')(ball => {
-    const updateXY = R.pipe(
-      overX(add(ball.vx)),
-      overY(add(ball.vy)),
-    )
-
+  overBall(ball => {
     return R.pipe(
-      b => overX(add(b.vx))(b),
-      b => overY(add(b.vy))(b),
+      b => translateX(b.vx)(b),
+      b => translateY(b.vy)(b),
       b => overVx(b.x < b.r ? abs : b.x > vp.w - b.r ? absNeg : I)(b),
       b => overVy(b.y < b.r ? abs : b.y > vp.w - b.r ? absNeg : I)(b),
       clampBallInViewport(vp),
     )(ball)
   })
+
+const clampBallInViewport = vp =>
+  R.pipe(
+    b => clampX(b.r)(vp.w - b.r)(b),
+    b => clampY(b.r)(vp.h - b.r)(b),
+  )
 
 run(init)(view)(update)
