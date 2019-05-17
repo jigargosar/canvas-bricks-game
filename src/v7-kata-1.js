@@ -16,13 +16,12 @@ const Canvas2D = {
     ctx.fillStyle = style
     ctx.fillRect(x, y, w, h)
   },
+  run: ({ vp, ctx }) => viewCmds =>
+    R.compose(
+      R.forEach(callWith({ vp, ctx })),
+      R.flatten,
+    )(viewCmds),
 }
-
-const runDrawCanvas = ({ vp, ctx }) => viewCmds =>
-  R.compose(
-    R.forEach(callWith({ vp, ctx })),
-    R.flatten,
-  )(viewCmds)
 
 function initCanvas(width, height) {
   const canvas = elById('gameScreen')
@@ -41,7 +40,7 @@ const run = initFn => viewFn => {
   const state = initFn(vp)
 
   const viewCmds = viewFn(state)
-  runDrawCanvas({ ctx, vp })(viewCmds)
+  Canvas2D.run({ ctx, vp })(viewCmds)
 }
 
 const init = vp => ({

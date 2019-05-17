@@ -43,7 +43,7 @@
     "tachyons": "^4.11.1"
   },
   "eslintIgnore": [
-    ".src/flow/**/*"
+    "./src/flow/**/*"
   ],
   "prettier": {
     "tabWidth": 2,
