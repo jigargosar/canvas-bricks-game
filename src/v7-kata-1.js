@@ -47,25 +47,20 @@ const init = vp => ({
   pad: initPad(vp),
 })
 
-function initPad(vp) {
-  const padWidth = 100
-  const padHeight = 15
-  const initialPad = {
-    x: (vp.w - padWidth) / 2,
-    y: vp.h - padHeight * 2,
-    w: padWidth,
-    h: padHeight,
-  }
-  return initialPad
+const initPad = vp => {
+  const w = 100
+  const h = 15
+
+  return { x: (vp.w - w) / 2, y: vp.h - h * 2, w, h }
 }
 
 const view = state => [
   //
   Canvas2D.clearScreen(),
-  renderPad(state.pad),
+  viewPad(state.pad),
 ]
 
-const renderPad = pad => {
+const viewPad = pad => {
   const { x, y, w, h } = pad
   return Canvas2D.fillRect({ x, y, w, h, style: 'orange' })
 }
