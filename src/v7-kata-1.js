@@ -143,6 +143,10 @@ const updateBall = vp => state => {
   } else if (circleRectHitTest(state.pad)(newBall)) {
     const solvedBall = resolveBallPaddleCollision(state.pad)(newBall)
     return { ...state, ball: solvedBall }
+  } else if (ballBricksHitTest(state.bricks)(newBall)) {
+    const result = resolveBallBricksCollision(state.bricks)(newBall)
+    const { ball, bricks } = result
+    return { ...state, ball, bricks }
   } else {
     return { ...state, ball: newBall }
   }
@@ -219,6 +223,14 @@ const resolveBallPaddleCollision = pad => ball => {
       : { y: maxY + 1, vy: abs(vy) }
 
   return { ...ball, ...changes }
+}
+
+const ballBricksHitTest = bricks => ball => {
+  return false
+}
+
+const resolveBallBricksCollision = bricks => ball => {
+  return { ball, bricks }
 }
 
 run(init)(view)(update)
