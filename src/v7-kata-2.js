@@ -134,15 +134,21 @@ const vecMapLength = lengthFn =>
 const view = state => [
   //
   Canvas2D.clearScreen(),
-  Canvas2D.fillCircle({ ...state.ball, fill: 'dodgerblue' }),
-  Canvas2D.strokeVec({
-    center: circleCenter(state.ball),
-    vec: R.pipe(
-      vecFromVelocity,
-      vecMapLength(() => state.ball.r),
-    )(state.ball),
-  }),
+  viewBall(state.ball),
 ]
+
+const viewBall = ball => {
+  return [
+    Canvas2D.fillCircle({ ...ball, fill: 'dodgerblue' }),
+    Canvas2D.strokeVec({
+      center: circleCenter(ball),
+      vec: R.pipe(
+        vecFromVelocity,
+        vecMapLength(() => ball.r),
+      )(ball),
+    }),
+  ]
+}
 
 const update = ({ vp, key }) => state => {
   return R.pipe(
