@@ -1,5 +1,9 @@
 # Notes
 
+-
+
+# @done
+
 - commit requires many steps
   - alt+2 -> ctrl + [ I , I , Enter] -> alt+`
 
@@ -11,5 +15,3 @@
 - single cmd to:
   commit
   hide sidebar
-
-test 2nd cmd
