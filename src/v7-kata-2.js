@@ -85,18 +85,90 @@ const run = initFn => viewFn => updateFn => {
   requestAnimationFrame(onFrame(initialState))
 }
 
-const init = vp => ({})
+const rectCenter = rect => ({
+  x: rect.x + rect.w / 2,
+  y: rect.y + rect.h / 2,
+})
 
+const init = vp => ({
+  ball: initBall(vp),
+})
+
+const initBall = vp => {
+  const { x, y } = rectCenter(vp)
+  const [vx, vy] = fromPolar(3, degrees(99))
+  return { x, y, r: 10, vx, vy }
+}
 const view = state => [
   //
   Canvas2D.clearScreen(),
+  Canvas2D.fillCircle({ ...state.ball, fill: 'blue' }),
 ]
 
 const update = ({ vp, key }) => state => {
   return R.pipe(
     //
     I,
+    updateBall(vp),
   )(state)
+}
+const move = ro => {
+  const { x, y, vx, vy } = ro
+  return { ...ro, x: x + vx, y: y + vy }
+}
+
+const expandRectByCirExtrema = rect => cir => {
+  return {
+    minX: rect.x - cir.r,
+    maxX: rect.x + rect.w + cir.r,
+    minY: rect.y - cir.r,
+    maxY: rect.y + rect.h + cir.r,
+  }
+}
+
+const shrinkRectByCirExtrema = rect => cir => {
+  return {
+    minX: rect.x + cir.r,
+    maxX: rect.x + rect.w - cir.r,
+    minY: rect.y + cir.r,
+    maxY: rect.y + rect.h - cir.r,
+  }
+}
+
+const rectContainsCircle = rect => cir => {
+  const { minX, maxX, minY, maxY } = shrinkRectByCirExtrema(rect)(cir)
+  const { x, y } = cir
+
+  return x === R.clamp(minX)(maxX)(x) && y === R.clamp(minY)(maxY)(x)
+}
+
+const bounceCircleInRect = cir => rect => {
+  const { minX, maxX, minY, maxY } = shrinkRectByCirExtrema(rect)(cir)
+  const { x, y, vx, vy } = cir
+
+  const xparts =
+    x < minX
+      ? { x: minX, vx: abs(vx) }
+      : x > maxX
+      ? { x: maxX, vx: absNeg(vx) }
+      : {}
+
+  const yparts =
+    y < minY
+      ? { y: minY, vy: abs(vy) }
+      : y > maxY
+      ? { y: maxY, vy: absNeg(vy) }
+      : {}
+
+  return { ...cir, ...xparts, ...yparts }
+}
+
+const updateBall = vp => state => {
+  const newBall = move(state.ball)
+  if (!rectContainsCircle(vp)(newBall)) {
+    return { ...state, ball: bounceCircleInRect(newBall)(vp) }
+  }
+  return { ...state, ball: newBall }
 }
 
 const arrowKeyToDx = key => (key.left ? -1 : key.right ? 1 : 0)
