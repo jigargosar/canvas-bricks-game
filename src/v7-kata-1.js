@@ -175,7 +175,7 @@ const updateBall = vp => state => {
     const solvedBall = resolveBallViewportCollision(vp)(newBall)
     return { ...state, ball: solvedBall }
   } else if (circleRectHitTest(state.pad)(newBall)) {
-    const solvedBall = resolveBallPaddleCollision(state.pad)(newBall)
+    const solvedBall = resolveCircleRectCollision(state.pad)(newBall)
     return { ...state, ball: solvedBall }
   } else if (ballBricksHitTest(state.bricks)(newBall)) {
     const result = resolveBallBricksCollision(state.bricks)(newBall)
@@ -241,7 +241,7 @@ const circleRectHitTest = rect => circle => {
   return x >= minX && x <= maxX && y >= minY && y <= maxY
 }
 
-const resolveBallPaddleCollision = pad => ball => {
+const resolveCircleRectCollision = pad => ball => {
   const extrema = expandRectByCirExtrema(ball)(pad)
   const { minX, maxX, minY, maxY } = extrema
 
@@ -275,7 +275,9 @@ const resolveBallBricksCollision = bricks => ball => {
 
   const newBrick = { ...brick, alive: false }
 
-  return { ball, bricks: R.update(idx)(newBrick)(bricks) }
+  const newBall = resolveCircleRectCollision(brick)(ball)
+
+  return { ball: newBall, bricks: R.update(idx)(newBrick)(bricks) }
 }
 
 run(init)(view)(update)
