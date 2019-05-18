@@ -77,6 +77,7 @@ const run = initFn => viewFn => updateFn => {
 const init = vp => ({
   pad: initPad(vp),
   ball: initBall(vp),
+  bricks: initBricks(vp),
 })
 
 const initBall = vp => ({
@@ -94,11 +95,17 @@ const initPad = vp => {
   return { x: (vp.w - w) / 2, y: vp.h - h * 5, w, h }
 }
 
+const initBricks = vp => {
+  const createBrick = () => ({ x: 0, y: 0, w: 50, h: 10 })
+  return [createBrick()]
+}
+
 const view = state => [
   //
   Canvas2D.clearScreen(),
   viewPad(state.pad),
   viewBall(state.ball),
+  viewBricks(state.bricks),
 ]
 
 const viewPad = pad => {
@@ -109,6 +116,15 @@ const viewPad = pad => {
 const viewBall = ball => {
   const { x, y, r } = ball
   return Canvas2D.fillCircle({ x, y, r, fill: 'blue' })
+}
+
+const viewBricks = bricks => {
+  const viewBrick = brick => {
+    const { x, y, w, h } = brick
+    return Canvas2D.fillRect({ x, y, w, h, fill: 'green' })
+  }
+
+  return bricks.map(viewBrick)
 }
 
 const update = ({ vp, key }) => state => {
