@@ -197,7 +197,23 @@ const ballPaddleHitTest = pad => ball => {
 }
 
 const resolveBallPaddleCollision = pad => ball => {
-  return { ...ball }
+  const minX = pad.x - ball.r
+  const maxX = pad.x + pad.w + ball.r
+  const minY = pad.y - ball.r
+  const maxY = pad.y + pad.h + ball.r
+
+  const { vx, vy } = ball
+
+  const changes =
+    abs(vx) > abs(vy)
+      ? vx >= 0
+        ? { x: minX - 1, vx: absNeg(vx) }
+        : { x: maxX + 1, vx: abs(vx) }
+      : vy >= 0
+      ? { y: minY - 1, vy: absNeg(vy) }
+      : { y: maxY + 1, vy: abs(vy) }
+
+  return { ...ball, ...changes }
 }
 
 run(init)(view)(update)
