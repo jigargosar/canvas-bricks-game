@@ -11,3 +11,5 @@
 - single cmd to:
   commit
   hide sidebar
+
+test 2nd cmd
