@@ -196,7 +196,7 @@ const expandRectByCirExtrema = cir => rect => {
 }
 
 const circleRectHitTest = rect => circle => {
-  const extrema = expandRectByCirExtrema(circle, rect)
+  const extrema = expandRectByCirExtrema(circle)(rect)
   const { minX, maxX, minY, maxY } = extrema
 
   const { x, y } = circle
@@ -204,7 +204,7 @@ const circleRectHitTest = rect => circle => {
 }
 
 const resolveBallPaddleCollision = pad => ball => {
-  const extrema = expandRectByCirExtrema(ball, pad)
+  const extrema = expandRectByCirExtrema(ball)(pad)
   const { minX, maxX, minY, maxY } = extrema
 
   const { vx, vy } = ball
