@@ -96,8 +96,26 @@ const initPad = vp => {
 }
 
 const initBricks = vp => {
-  const createBrick = () => ({ x: 0, y: 0, w: 50, h: 10 })
-  return [createBrick()]
+  const rows = 5
+  const cols = 5
+  const w = 50
+  const h = 15
+  const xGap = 30
+  const yGap = 20
+
+  const xOffset = (vp.w - cols * (w + xGap) + xGap) / 2
+  const yOffset = 20
+
+  const createBrickAt = (x, y) => ({
+    x: x * (w + xGap) + xOffset,
+    y: y * (h + yGap) + yOffset,
+    w,
+    h,
+    alive: true,
+  })
+
+  const grid = R.times(y => R.times(x => createBrickAt(x, y))(rows))(cols)
+  return R.flatten(grid)
 }
 
 const view = state => [
