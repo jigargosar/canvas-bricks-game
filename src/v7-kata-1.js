@@ -141,7 +141,8 @@ const updateBall = vp => state => {
     const solvedBall = resolveBallViewportCollision(vp)(newBall)
     return { ...state, ball: solvedBall }
   } else if (ballPaddleHitTest(state.pad)(newBall)) {
-    return { ...state }
+    const solvedBall = resolveBallPaddleCollision(state.pad)(state.ball)
+    return { ...state, ball: solvedBall }
   } else {
     return { ...state, ball: newBall }
   }
@@ -185,8 +186,18 @@ const ballViewportHitTest = vp => ball => {
   return ball.x < minX || ball.x > maxX || ball.y < minY || ball.y > maxY
 }
 
-const ballPaddleHitTest = paddle => ball => {
-  return false
+const ballPaddleHitTest = pad => ball => {
+  const minX = pad.x - ball.r
+  const maxX = pad.x + pad.w + ball.r * 2
+  const minY = pad.y - ball.r
+  const maxY = pad.y + pad.h + ball.r * 2
+  return (
+    ball.x >= minX && ball.x <= maxX && ball.y >= minY && ball.y <= maxY
+  )
+}
+
+const resolveBallPaddleCollision = pad => ball => {
+  return ball
 }
 
 run(init)(view)(update)
