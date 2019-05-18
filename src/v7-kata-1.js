@@ -10,6 +10,17 @@ const add = R.add
 const clamp = R.clamp
 const abs = Math.abs
 const absNeg = x => Math.abs(x) * -1
+const mul = R.multiply
+const cos = Math.cos
+const sin = Math.sin
+
+function fromPolar(radius, theta) {
+  return [mul(radius, cos(theta)), mul(radius, sin(theta))]
+}
+
+function degrees(angle) {
+  return (angle * Math.PI) / 180
+}
 
 const Canvas2D = {
   clearScreen: () => ({ ctx, vp }) => {
@@ -80,13 +91,16 @@ const init = vp => ({
   bricks: initBricks(vp),
 })
 
-const initBall = vp => ({
-  x: vp.w / 2,
-  y: (vp.h * 2) / 3,
-  r: 10,
-  vx: 1,
-  vy: 1,
-})
+const initBall = vp => {
+  const [vx, vy] = fromPolar(7, degrees(120))
+  return {
+    x: vp.w / 2,
+    y: (vp.h * 2) / 3,
+    r: 10,
+    vx,
+    vy,
+  }
+}
 
 const initPad = vp => {
   const w = 100
