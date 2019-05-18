@@ -91,7 +91,7 @@ const initPad = vp => {
   const w = 100
   const h = 15
 
-  return { x: (vp.w - w) / 2, y: vp.h - h * 2, w, h }
+  return { x: (vp.w - w) / 2, y: vp.h - h * 5, w, h }
 }
 
 const view = state => [
@@ -140,7 +140,7 @@ const updateBall = vp => state => {
   if (ballViewportHitTest(vp)(newBall)) {
     const solvedBall = resolveBallViewportCollision(vp)(newBall)
     return { ...state, ball: solvedBall }
-  } else if (ballPaddleHitTest(state.pad)(newBall)) {
+  } else if (circleRectHitTest(state.pad)(newBall)) {
     const solvedBall = resolveBallPaddleCollision(state.pad)(newBall)
     return { ...state, ball: solvedBall }
   } else {
@@ -186,21 +186,26 @@ const resolveBallViewportCollision = vp => ball => {
   return { ...ball, ...newXParts, ...newYParts }
 }
 
-const ballPaddleHitTest = pad => ball => {
-  const minX = pad.x - ball.r
-  const maxX = pad.x + pad.w + ball.r * 2
-  const minY = pad.y - ball.r
-  const maxY = pad.y + pad.h + ball.r * 2
-  return (
-    ball.x >= minX && ball.x <= maxX && ball.y >= minY && ball.y <= maxY
-  )
+const expandRectByCirExtrema = cir => rect => {
+  return {
+    minX: rect.x - cir.r,
+    maxX: rect.x + rect.w + cir.r,
+    minY: rect.y - cir.r,
+    maxY: rect.y + rect.h + cir.r,
+  }
+}
+
+const circleRectHitTest = rect => circle => {
+  const extrema = expandRectByCirExtrema(circle, rect)
+  const { minX, maxX, minY, maxY } = extrema
+
+  const { x, y } = circle
+  return x >= minX && x <= maxX && y >= minY && y <= maxY
 }
 
 const resolveBallPaddleCollision = pad => ball => {
-  const minX = pad.x - ball.r
-  const maxX = pad.x + pad.w + ball.r
-  const minY = pad.y - ball.r
-  const maxY = pad.y + pad.h + ball.r
+  const extrema = expandRectByCirExtrema(ball, pad)
+  const { minX, maxX, minY, maxY } = extrema
 
   const { vx, vy } = ball
 
