@@ -142,7 +142,7 @@ const viewBricks = bricks => {
     return Canvas2D.fillRect({ x, y, w, h, fill: 'green' })
   }
 
-  return bricks.map(viewBrick)
+  return bricks.filter(R.prop('alive')).map(viewBrick)
 }
 
 const update = ({ vp, key }) => state => {
@@ -259,12 +259,23 @@ const resolveBallPaddleCollision = pad => ball => {
   return { ...ball, ...changes }
 }
 
+const isBallCollidingWithAliveBrick = brick => ball =>
+  brick.alive && circleRectHitTest(brick)(ball)
+
 const ballBricksHitTest = bricks => ball => {
-  return false
+  return R.any(brick => isBallCollidingWithAliveBrick(brick)(ball))(bricks)
 }
 
 const resolveBallBricksCollision = bricks => ball => {
-  return { ball, bricks }
+  const idx = R.findIndex(brick =>
+    isBallCollidingWithAliveBrick(brick)(ball),
+  )(bricks)
+
+  const brick = bricks[idx]
+
+  const newBrick = { ...brick, alive: false }
+
+  return { ball, bricks: R.update(idx)(newBrick)(bricks) }
 }
 
 run(init)(view)(update)
