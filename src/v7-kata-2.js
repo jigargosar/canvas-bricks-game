@@ -13,9 +13,23 @@ const absNeg = x => Math.abs(x) * -1
 const mul = R.multiply
 const cos = Math.cos
 const sin = Math.sin
+const sqrt = Math.sqrt
+const atan2 = Math.atan2
+const overIdx = idx => R.over(R.lensIndex(idx))
 
-function fromPolar(radius, theta) {
-  return [mul(radius, cos(theta)), mul(radius, sin(theta))]
+const Tuple = {
+  pair: a => b => [a, b],
+  mapEach: afn => bfn => ([a, b]) => [afn[a], bfn[b]],
+  mapFst: overIdx(0),
+  mapSnd: overIdx(1),
+}
+
+function fromPolar([length, angle]) {
+  return [mul(length, cos(angle)), mul(length, sin(angle))]
+}
+
+function toPolar([x, y]) {
+  return [sqrt(add(mul(x, x), mul(y, y))), atan2(y, x)]
 }
 
 function degrees(angle) {
@@ -36,6 +50,12 @@ const Canvas2D = {
     ctx.fillStyle = fill
     ctx.arc(x, y, r, 0, 2 * Math.PI, false)
     ctx.fill()
+  },
+  strokeVec: ({ center: { x, y }, vec: [dx, dy] }) => ({ ctx }) => {
+    ctx.beginPath()
+    ctx.moveTo(x, y)
+    ctx.lineTo(x + dx, y + dy)
+    ctx.stroke()
   },
   run: ({ vp, ctx }) => viewCmds =>
     R.compose(
@@ -90,19 +110,38 @@ const rectCenter = rect => ({
   y: rect.y + rect.h / 2,
 })
 
+const circleCenter = R.pick(['x', 'y'])
+
 const init = vp => ({
   ball: initBall(vp),
 })
 
 const initBall = vp => {
   const { x, y } = rectCenter(vp)
-  const [vx, vy] = fromPolar(3, degrees(99))
+  const [vx, vy] = fromPolar([3, degrees(99)])
   return { x, y, r: 10, vx, vy }
 }
+
+const vecFromVelocity = ({ vx, vy }) => [vx, vy]
+
+const vecMapLength = lengthFn =>
+  R.pipe(
+    toPolar,
+    Tuple.mapFst(lengthFn),
+    fromPolar,
+  )
+
 const view = state => [
   //
   Canvas2D.clearScreen(),
-  Canvas2D.fillCircle({ ...state.ball, fill: 'blue' }),
+  Canvas2D.fillCircle({ ...state.ball, fill: 'dodgerblue' }),
+  Canvas2D.strokeVec({
+    center: circleCenter(state.ball),
+    vec: R.pipe(
+      vecFromVelocity,
+      vecMapLength(() => state.ball.r),
+    )(state.ball),
+  }),
 ]
 
 const update = ({ vp, key }) => state => {
@@ -112,6 +151,7 @@ const update = ({ vp, key }) => state => {
     updateBall(vp),
   )(state)
 }
+
 const move = ro => {
   const { x, y, vx, vy } = ro
   return { ...ro, x: x + vx, y: y + vy }
